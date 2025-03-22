@@ -159,3 +159,27 @@ $$
 При $n = 10^{20}$ при p=1 результат скалярного произведения будет $\sim10^{16}$, всё из-за экспоненциального метода хранения числа.
 
 Также ответ может меняться от запуска к запуску из-за точек синхронизации. В `reduce_sum` должен быть детерменированный порядок, нужно выделить массив, а потом просуммировать в одном порядке.
+
+``` cpp
+static double *results = nullptr;
+int init_reduce_sum(int p)
+{
+	results = new double[p];
+	if (results == nullptr) return -1;
+	return 0;
+}
+
+double reduce_sum_det(
+	int p,
+	int k,
+	double s
+) {
+	results[k] = s;
+	reduce_sum(p); // точка синхронизации
+	double sum = 0;
+	for (int l = 0; l < p; l++) {
+		sum += result[l];
+	}
+	return sum;
+}
+```
