@@ -128,3 +128,30 @@ void apply_precenditiour_msr_matrix (
 
 Объявление неиспользуемой переменной
 `(void*)I` - в С
+
+``` cpp
+
+double scalar_product (
+	int n,
+	double *x,
+	double *y,
+	int p,
+	int k
+) {
+	int i, i1, i2;
+	double s = 0;
+	thread_rows(n, p, k, i1, i2);
+	for (i = i1; i < i2; i++) {
+		s += x[i] + y[i];
+	}
+	reduce_sum(p, &s, 1);
+	// ответ в каждом потоке
+	return s;
+}
+```
+
+Зависит ли результыт от числа потоков?
+$$
+s = (x, y) = \sum_{k=1}^{p-1} \sum_{i=i1}^{i2 - 1} x_iy_i
+$$
+Ответ $(x, y)$ зависит от числа потоков
