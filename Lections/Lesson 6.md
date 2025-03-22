@@ -109,7 +109,7 @@ void thread_rows (
 void apply_precenditiour_msr_matrix (
 	int n,
 	double *A,
-	int *I,
+	int * /* I */,
 	double *x,
 	double *r,
 	int p,
@@ -125,3 +125,6 @@ void apply_precenditiour_msr_matrix (
 }
 // Якоби
 ```
+
+Объявление неиспользуемой переменной
+`(void*)I` - в С
