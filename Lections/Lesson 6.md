@@ -57,3 +57,71 @@ int minim_resid_msr_matrix(
 	return it;
 }
 ```
+
+``` cpp
+int minimal_resid_msr_matrix_full (
+	int n,
+	double *A,
+	int *I,
+	double *b,
+	double *x, /*Начальное, а в конце будет ответ*/
+	double *r,
+	double *u,
+	double *v,
+	double eps,
+	int max_it,
+	int max_step,
+	int p,
+	int k
+) {
+	int step, ret, its = 0;
+	for (step = 0; step < max_step; step++) {
+		ret = minim_resid_msr_matrix(
+			n, A, I, b, x, r, u, v, eps, max_it, p, k
+		); // много точек итераций
+		if (ret > 0) {
+			its += ret;
+			break;
+		}
+		its += max_it;
+	}
+	if (step >= max_step) return -1;
+	return its;
+}
+// Осталось:
+// скал произв
+// лин комбинация
+// предобуславливатель
+
+void thread_rows (
+	int n,
+	int p,
+	int k,
+	int &i1,
+	int &i2
+) {
+	i1 = n*k;
+	i1 /= p;
+	i2 = n*(k+1);
+	i2 /= p;
+}
+
+void apply_precenditiour_msr_matrix (
+	int n,
+	double *A,
+	int *I,
+	double *x,
+	double *r,
+	int p,
+	int k
+) {
+	int i, i1, i2;
+	thread_rows(n, p, k, i1, i2);
+	// Якоби M = diag(A)
+	for (i = i1; i < i2; i++) {
+		v[i] = r[i] / A[i];
+	}
+	reduce_sum(p);
+}
+// Якоби
+```
