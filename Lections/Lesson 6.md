@@ -184,3 +184,40 @@ double reduce_sum_det(
 }
 ```
 
+![[IMG_9742.jpg]]
+``` cpp
+int ij2l (
+	int nx,
+	int /*ny*/,
+	int i,
+	int j,
+	int &l
+) {
+	l = i + j *(nx + 1);
+}
+
+int l2ij (
+	int nx,
+	int /*ny*/,
+	int &i,
+	int &j,
+	int l	
+) {
+	j = l / (nx + 1);
+	i = l - j*(nx + 1);
+}
+
+// Число внедиагональных элементов
+int get_len_msr (
+	int nx,
+	int ny
+) {
+	return 6 * (nx - 1) * (ny - 1) + 4 * (2 * (nx - 1) 
+		 + 2 * (ny - 1)) 
+		 + 3 * 2 + 2 * 2;
+}
+
+// Общая длина msr матрицы = диаг + 1 + число внедиагональных
+// (nx + 1) * (ny - 1) + 1 + get_len_msr(nx, ny)
+
+```
