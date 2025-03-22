@@ -219,6 +219,23 @@ int get_len_msr (
 
 // Общая длина msr матрицы = диаг + 1 + число внедиагональных
 // (nx + 1) * (ny - 1) + 1 + get_len_msr(nx, ny)
+```
 
 
+```cpp
+void IA_ij (
+	int nx,
+	int ny,
+	double hx,
+	double hy,
+	int i,
+	int j, // (i,j)
+	int is,
+	int js,
+	int s,
+	int *I = nullptr,
+	int *A = nullptr
+) {
+	
+}
 ```
