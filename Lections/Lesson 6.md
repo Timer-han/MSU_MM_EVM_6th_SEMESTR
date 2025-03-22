@@ -185,6 +185,7 @@ double reduce_sum_det(
 ```
 
 ![[IMG_9742.jpg]]
+![[IMG_9743.jpg]]
 ``` cpp
 int ij2l (
 	int nx,
@@ -221,8 +222,11 @@ int get_len_msr (
 // (nx + 1) * (ny - 1) + 1 + get_len_msr(nx, ny)
 ```
 
-
+![[IMG_9745.jpg]]
 ```cpp
+#define F(IS, JS, S) \
+	IA_ij(nx, ny, hx, hy, i, j, (IS), (JS), (S), I, A)
+
 void IA_ij (
 	int nx,
 	int ny,
@@ -236,6 +240,29 @@ void IA_ij (
 	int *I = nullptr,
 	int *A = nullptr
 ) {
-	
+
+}
+
+//возвращает количество внедиагональных точки (i, j)
+int get_all_diag(
+	int nx,
+	int ny,
+	double hx,
+	double hy,
+	int i,
+	int j,
+	int *I,
+	double *A
+) {
+	if (i > 0 && i < nx && j > 0 && j < ny) {
+		if (I && A) {
+			F(i + 1, j, );
+			F(i, j, );
+			F(i, j, );
+			F(i, j, );
+			F(i, j, );
+			F(i, j, );
+		}
+	}
 }
 ```
