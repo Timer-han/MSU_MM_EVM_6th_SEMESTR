@@ -254,15 +254,31 @@ int get_all_diag(
 	int *I,
 	double *A
 ) {
-	if (i > 0 && i < nx && j > 0 && j < ny) {
-		if (I && A) {
-			F(i + 1, j, );
-			F(i, j, );
-			F(i, j, );
-			F(i, j, );
-			F(i, j, );
-			F(i, j, );
-		}
+	int s = 0;
+	if (i < nx) {
+		F(i + 1, j, s);
+		s++;
 	}
+	if (j > 0) {
+		F(i, j - 1, s);
+		s++;
+	}
+	if (i > 0 && j > 0) {
+		F(i - 1, j - 1, s);
+		s++;
+	}
+	if (i > 0) {
+		F(i - 1, j, s);
+		s++;
+	}
+	if (j < ny) {
+		F(i, j + 1, s);
+		s++;
+	}
+	if (i < nx && j < ny) {
+		F(i + 1, j + 1, s);
+		s++;
+	}
+	return s; // количество диагональных элементов
 }
 ```
