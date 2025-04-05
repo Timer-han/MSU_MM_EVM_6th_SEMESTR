@@ -60,7 +60,7 @@ double F_ij (
 		);
 	}
 
-	if (i > 0 && i < nx && j == ny) {
+	if (i > 0 && i < nx && j == ny) { // верхняя сторона
 		return w * (
 			18 * F(i, j) +
 			10 * (F(i - 0.5, j) + F(i + 0.5, j)) +
