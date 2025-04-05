@@ -21,7 +21,8 @@ double F_ij (
 	double (*f) (double x, double y)	
 ) {
 	double w = hx * hy / 192; // ввели вес
-	if (i > 0 && i < nx && i > 0 && i < ny) {
+
+	if (i > 0 && i < nx && i > 0 && i < ny) { // внутренние
 		return w * (36 * F(i, j) 
 				+ 20 * 
 				(
