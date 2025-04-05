@@ -149,3 +149,21 @@ double F_ij (
 	return 1e308; // типа ошибка. Сюда не должно быть попаданий
 }
 ```
+
+1)
+$$
+a_{ij} = (\varphi_i, \varphi_j) = (\varphi_j, \varphi_i) = a_{ji}
+$$
+Проблемы:
+	a) не нашли в j-й строке индекс равный 0 => шаблон несимметричен
+	б) $a_{ij} \neq a_{ji}$
+2)
+$$
+S_i = \sum_{j \in S(A)}
+$$
+$$
+\sum a_{ij} = \sum_j (\varphi_i, \varphi_j) = (\varphi_i,\sum_j  \varphi_j) = (\varphi_i, 1) = \sum \int \varphi
+$$
+$$
+\sum_{j, (i, j) \in S(A) } a_{ij} = \frac{h_x h_y}{6}
+$$
