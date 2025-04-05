@@ -149,7 +149,12 @@ double F_ij (
 	return 1e308; // типа ошибка. Сюда не должно быть попаданий
 }
 ```
-
+![[IMG_9823.jpg]]
+![[IMG_9824.jpg]]
+![[IMG_9825.jpg]]
+![[IMG_9826.jpg]]
+![[IMG_9828.jpg]]
+![[IMG_9829.jpg]]
 1)
 $$
 a_{ij} = (\varphi_i, \varphi_j) = (\varphi_j, \varphi_i) = a_{ji}
@@ -167,3 +172,5 @@ $$
 $$
 \sum_{j, (i, j) \in S(A) } a_{ij} = \frac{h_x h_y}{6}
 $$
+![[IMG_9830.jpg]]
+![[IMG_9831.jpg]]
