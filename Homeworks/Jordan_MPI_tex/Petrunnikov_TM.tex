@@ -1,0 +1,205 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage[T2A]{fontenc}
+
+\usepackage[
+  a4paper, mag=1000, includefoot,
+  left=1.1cm, right=1.1cm, top=1.2cm, bottom=1.2cm, headsep=0.8cm, footskip=0.8cm
+]{geometry} 
+
+
+\usepackage{listings}
+\usepackage{xcolor}
+ 
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+\definecolor{TRE} {rgb}{0.988,0.64,0.07}
+
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{times}
+\usepackage{mathptmx}
+
+\IfFileExists{pscyr.sty}
+{
+  \usepackage{pscyr}
+  \def\rmdefault{ftm}
+  \def\sfdefault{ftx}
+  \def\ttdefault{fer}
+  \DeclareMathAlphabet{\mathbf}{OT1}{ftm}{bx}{it} % bx/it or bx/m
+}
+
+\mathsurround=0.1em
+\clubpenalty=1000%
+\widowpenalty=1000%
+\brokenpenalty=2000%
+\frenchspacing%
+\tolerance=2500%
+\hbadness=1500%
+\vbadness=1500%
+\doublehyphendemerits=50000%
+\finalhyphendemerits=25000%
+\adjdemerits=50000%
+
+
+\begin{document}
+
+\author{Петрунников Тимур}
+\title{18 Метод Жордана нахождения обратной матрицы с выбором главного элемента по столбцу. \\ Поточная реализация.}
+\date{\today}
+\maketitle
+\begin{center}
+{\bfseries Постановка задачи}
+\end{center}
+\section{Постановка задачи}
+Находим обратную матрицу $D^{n \times n}$ к матрице
+\begin{equation}
+    A^{n \times n} =
+    \begin{pmatrix}
+        A_{1,1}^{m\times m} & A_{1,2}^{m\times m} & \cdots & A_{1,k}^{m\times m} & A_{1,k+1}^{m\times l} \\
+        A_{2,1}^{m\times m} & A_{2,2}^{m\times m} & \cdots & A_{2,k}^{m\times m} & A_{2,k+1}^{m\times l} \\
+        \vdots & \vdots & \ddots & \vdots & \vdots \\
+        A_{k,1}^{m\times m} & A_{k,2}^{m\times m} & \cdots & A_{k,k}^{m\times m} & A_{k,k+1}^{m\times l} \\
+        A_{k+1,1}^{l\times m} & A_{k+1,2}^{l\times m} & \cdots & A_{k+1,k}^{l\times m} & A_{k+1,k+1}^{l\times l} \\
+    \end{pmatrix}
+\end{equation} \\
+методом Жордана с выбором главного элемента по столбцу. \\ \\
+n - размер матрицы \\
+m - размер блока \\
+p - число блоков \\
+k - число целых блоков в строке \\
+l - остаток от деления n / m \\
+
+
+\section{Разделение данных и формулы для преобразования локальной и глобальной нумераций} 
+$\quad \quad$ Хранение матрицы происходин по блочным строкам. Но процесс с номером $i$  хранит только те блочные столбцы, у которых индекс имеет остаток $i$ при делении на $p$. Например, $2$й процесс будет хранить блочные столбцы с номерами $2, 2 + p, 2 + 2p \dots$
+\newpage
+То есть если $k \% p == pi$, то локальная матрица в процессе $pi$ примет следующий вид: \\
+\begin{equation}
+    A_{pi} =
+    \begin{pmatrix}
+        A_{1,pi}^{m\times m} & A_{1,pi+p}^{m\times m} & \cdots & A_{1,pi+[\frac{k}{p}]}^{m\times m} & A_{1,k + 1}^{m\times l} \\
+        A_{2,pi}^{m\times m} & A_{2,pi+p}^{m\times m} & \cdots & A_{2,pi+[\frac{k}{p}]}^{m\times m} & A_{2,k + 1}^{m\times l} \\
+        \vdots & \vdots & \ddots & \vdots & \vdots \\
+        A_{k,pi}^{m\times m} & A_{k,pi+p}^{m\times m} & \cdots & A_{k,pi+[\frac{k}{p}]}^{m\times m} & A_{k,k + 1}^{m\times l} \\
+        A_{k+1,pi}^{l\times m} & A_{k+1,pi+p}^{l\times m} & \cdots & A_{k+1,pi+[\frac{k}{p}]}^{l\times m} & A_{k+1,k + 1}^{l\times l} \\
+    \end{pmatrix}
+\end{equation} \\
+
+И если если $k \% p != pi$, то следующий вид: \\
+
+\begin{equation}
+    A_{pi} =
+    \begin{pmatrix}
+        A_{1,pi}^{m\times m} & A_{1,pi+p}^{m\times m} & \cdots & A_{1,pi+[\frac{k}{p}] - p}^{m\times m} & A_{1,pi+[\frac{k}{p}]}^{m\times m} \\
+        A_{2,pi}^{m\times m} & A_{2,pi+p}^{m\times m} & \cdots & A_{2,pi+[\frac{k}{p}] - p}^{m\times m} & A_{2,pi+[\frac{k}{p}]}^{m\times m} \\
+        \vdots & \vdots & \ddots & \vdots & \vdots \\
+        A_{k,pi}^{m\times m} & A_{k,pi+p}^{m\times m} & \cdots & A_{k,pi+[\frac{k}{p}] - p}^{m\times m} & A_{k,pi+[\frac{k}{p}]}^{m\times m} \\
+        A_{k+1,pi}^{l\times m} & A_{k+1,pi+p}^{l\times m} & \cdots & A_{k+1,pi+[\frac{k}{p}] - p}^{l\times m} & A_{k+1,pi+[\frac{k}{p}]}^{l\times m} \\
+    \end{pmatrix}
+\end{equation} \\
+
+\quad Рассмотрим локальную и глобальную номерацию для процесса с номером $pi$ и их преобразование друг в друга.
+
+\begin{lstlisting}[language=C++,
+tabsize=2,
+stepnumber=1,
+numbers=left,
+ commentstyle=\itshape \color{TRE},
+backgroundcolor=\color{backcolour},
+basicstyle=\ttfamily\small,
+frame=single,
+breaklines=true,   
+breakatwhitespace=true,
+emphstyle=\itshape,
+keywordstyle=\color{blue} ]
+// local to global
+int l2g (
+	int n,
+	int m,
+	int p,
+	int k,
+	int i_loc
+) { 
+	int i_loc_m = i_loc / m;
+	int i_glob_m = i_loc_m * p + k;
+	return i_glob_m * m + i_loc % m;
+}
+
+// global to local
+int g2l (
+	int n,
+	int m,
+	int p,
+	int k,
+	int i_glob
+) {
+	int i_glob_m = i_glob / m;
+	int i_loc_m = i_glob_m / p;
+	return i_loc_m * m + i_glob % m;
+}
+\end{lstlisting}
+\newpage
+
+\section{Точки коммуникации в программе}
+Для каждого шага i рассматриваем $i$-й столбец матрицы $A$.
+Первая точка коммуникации в ходе нахождения обратной матрицы: \\
+Отправляем $i$-й столбец матрицы $A$ всем остальным процессам. Каждый процесс с номером $pi$ ищет обратные матрицы для $A_{i, i + pi + j * p}$, где $j >= 0$ и $i + pi + j * p < n$. Потом коллективным обменом отправляет данные о блоке с минимальной нормой обратной матрицы. \\
+
+Далее перестановка блочных строк исходной матрицы. Она происходит параллельно в каждом процессе за счёт того, что в процессах хранятся блочные столбцы. Точка синхронизации - коллективный обмен.\\
+
+Далее идёт домножение на обратную матрицу к $A_{ii}$ в каждом процессе. Для каждого процесса $pi=1,\dots,p$ и $\forall j: j \geq i, i + pi + j * p < n$ умножаем матрицы $A_{ii}^{-1} \cdot A_{ij}$.
+Так как столбец $i$ уже хранится в каждом процессе, то отправлять этот блок не нужно. Точка синхронизации - коллективный обмен.\\
+
+
+Затем обнуляем $i$-й столбец, кроме $i$-й строки. Для этого из каждой строки $j \neq i$ в процессе $p$ вычтем строку $i$, каждый блочный элемент который заранее домножен на блок $A_{ji}$. Для каждого процесса $pi=1,\dots,p$, номера строки и столбца $\forall r \neq i, \quad \forall j: j \geq i, i + pi + j * p < n$ умножаем матрицы $$A_{rj}^{new} = A_{rj} - A_{ri} \cdot A_{ij}$$
+Здесь также обмен данными не нужен, так как столбец с глобальным индексом $i$ уже хранится во всех процессах. Точка синхронизации - коллективный обмен. \\
+
+В сумме отправляется $\sim n^2$ элементов, точек коммуникации будет $\sim 4n$ \\
+
+
+\section{Оценка сложности}
+\subsection{Оценка сложности на поток}
+Внутри одного потока лежит матрица размера $n \times \frac{2n}{p}$.
+Знаем, что: \\
+- Сложность нахождения обратной матрицы размера $m \times m$ неблочным методом Жордана - $2m^3 + O(m^2)$ \\
+- Сложность умножения матриц - $2m^3 - m^2$ \\
+- Сложность сложения, вычитания, умножения матриц на число - $m^2$ \\
+Теперь рассчитаем сложность одного шага метода Жордана для MPI реализации.
+
+\subsection{Сложность на шаге $i$ для процесса $pi=1\dots k$}
+1) Потребуется $\frac{k-i}{p}$ обращений матрицы внутри одного столбца. Сложность $\frac{k-i}{p} \cdot (2m^3 + O(m^2))$ \\
+2) Перестановок строк: $m^2 \cdot \frac{2k - i - 1}{p}$ \\
+3) Умножений на обратную: $(2m^3 - m^2) \cdot \frac{2k - i - 1}{p}$ \\
+4) Обнулить $i$-й столбец: $(k-1) \cdot \frac{2k - i - 1}{p} \cdot (2m^3 - m^2 + m^2) = \frac{2m^3}{p} \cdot (k-1)\cdot(2k-i-1)$ \\
+5) Повторить шаги 1-4 \\
+\newpage
+\subsection{Итоговая сложность}
+$$
+\sum_{i=1}^{k} \frac{k-i}{p} \cdot (2m^3 + O(m^2)) + m^2 \cdot \frac{2k - i - 1}{p} + (2m^3 - m^2) \cdot \frac{2k - i - 1}{p} + \frac{2m^3}{p} \cdot (k-1)\cdot(2k-i-1)
+$$
+$$
+= \frac{2}{p} \sum_{i=1}^{k} (k-i) \cdot (m^3 + O(m^2)) + (m^2 + 2m^3 - m^2  + m^3 \cdot (k-1))\cdot(2k-i-1)
+$$
+$$
+= \frac{2}{p} \sum_{i=1}^{k} (k-i) \cdot (m^3 + O(m^2)) + (m^3 + m^3k) \cdot(2k-i-1)
+$$
+$$
+= \frac{1}{p}(2k^2m^3 + k^2O(m^2) + 4k^2m^3 + 4k^3m^3 - 2km^3 - 2k^2m^3 - k^3m^3 - 2km^3 - k^2m^3 + k^2O(m^2))
+$$
+$$
+= \frac{1}{p}(3n^3 + n^2m - 2nm^2 + O(n^2))
+$$
+То есть  \\
+$S(n, m, p) = \frac{1}{p}(3n^3 + n^2m - 2nm^2 + O(n^2))$\\
+$S(n, n, p) = \frac{1}{p}(2n^3 + O(n^2))$\\
+$S(n, 1, p) = \frac{1}{p}(3n^3 + O(n^2))$ \\
+$S(n, m, 1) = 3n^3 + n^2m - 2nm^2 + O(n^2)$ \\
+
+
+
+
+\end{document}
+
