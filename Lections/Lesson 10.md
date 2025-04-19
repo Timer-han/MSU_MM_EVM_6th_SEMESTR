@@ -77,6 +77,6 @@ u|_{\partial \Omega} = 0
 \end {cases} \\
 \begin {cases}
 -div(A \nabla u) = f \\
-u|_{\partial \Omega} = 0
+(A \nabla u, n)|_{\partial \Omega} = 0
 \end {cases} \\
 $$
