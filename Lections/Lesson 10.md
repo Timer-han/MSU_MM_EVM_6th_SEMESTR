@@ -62,3 +62,6 @@ $$
 	$\exists c_1 = c_1(\Omega): \forall u \in W_2^1(\Omega), u|_{\partial \Omega} = 0$
 	$||u||_{L_2(\Omega)} \leq c_1 ||\nabla u||_{L_2(\Omega)}$
 	$||u||^2_{W_2^1(\Omega)}$
+
+10. Неравенства Пуанкаре
+	$\exists c_2 = c_2(\Omega): \forall u \in W_2^1(\Omega) (\navlau, n)$
