@@ -80,3 +80,5 @@ u|_{\partial \Omega} = 0
 (A \nabla u, n)|_{\partial \Omega} = 0
 \end {cases} \\
 $$
+
+![[IMG_9905.jpg]]
