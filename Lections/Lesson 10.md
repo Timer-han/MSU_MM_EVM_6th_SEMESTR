@@ -46,6 +46,7 @@ $$
 2. Свойства
 	$W_2^1(\Omega) = {u \in L_2(\omega) \exist \frac{\partial u}{\partial x_i} \in L_2(\Omega)}$
 	$(u, v)_{W_2^1(\Omega)} = (u, v)_{L_2(\Omega)} + (\nabla u, \nabla v)_{L_2(\Omega)}$
-3. $||u||_{W_2^1(\Omega)} = (u, u)_{W_2^1(\Omega)}$
+3. $||u||_{W_2^1(\Omega)} = (u, u)_{W_2^1(\Omega)}^{frac{1}{2}}$
+4. Полное пространство
 
 
