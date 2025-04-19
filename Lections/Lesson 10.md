@@ -53,4 +53,6 @@ $$
 6. Теорема о сладах
 	$\frac{\partial u}{\partial n} = (\nabla u, \overrightarrow n)$
 7. Соболев. Теорема о вложении
-	$W_2^1(\Omega) \in$
+	$W_2^1(\Omega) \subset L_2(\Omega)$
+	$W_2^1(\Omega) \subset L_p(\Omega) \forall p \geq 2 ?$
+	$W_2^1(\Omega) \subset L_p(\Omega)$
