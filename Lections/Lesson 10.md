@@ -60,4 +60,5 @@ $$
 8. $W_p^l (\Omega) = \{u \in L_p(\Omega): \exists \frac{\partial u}{\partial x_i}\}$
 9. Неравенства Фридрихса
 	$\exists c_1 = c_1(\Omega): \forall u \in W_2^1(\Omega), u|_{\partial \Omega} = 0$
-	$||u||_{L_2(\Omega)} \leq c_1 ||\nabla u||_{}$
+	$||u||_{L_2(\Omega)} \leq c_1 ||\nabla u||_{L_2(\Omega)}$
+	$||u||^2_{W_2^1(\Omega)}$
