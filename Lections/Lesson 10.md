@@ -67,7 +67,7 @@ $$
 	$\exists c_2 = c_2(\Omega): \forall u \in W_2^1(\Omega) \quad (\nabla u, n)|_{\partial \Omega} = 0$
 	$\int_{\Omega}udx = 1 \quad (u, n) = 1$
 	$||u||_{L_2(\Omega)} \leq C_2 ||\nabla u||_{L_2(\Omega)}$
-	$W_2^1(\Omega) / \Real = \{u \in W_0^1(\Omega):(\)$
+	$W_2^1(\Omega) / \mathbb{R} = \{u \in W_0^1(\Omega):\dots$
 	![[IMG_9904.jpg]]
 
 $$
