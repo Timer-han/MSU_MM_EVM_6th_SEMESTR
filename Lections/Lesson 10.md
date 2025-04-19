@@ -92,9 +92,12 @@ $$
 Определили решение, когда $f \in L_2(\Omega), A = (a_ij) \in L_{\infty}, \Omega$ - измерима
 1. Корректность
 	1. Совпадение настоящ. и обобщ. п. в., если настоящ. уществует
-	2. $\f \in L_2, A \in L^{\infty}, \partial\Omega - C^1$ - тогда совп почти всюду
+	2. $f \in L_2, A \in L^{\infty}, \partial\Omega - C^1$ - тогда совп почти всюду
 $(A \nabla u, \nabla v)_{L_2(\Omega)} = (f, v)_{L_2(\Omega)}$
 $\lambda_{min}(x,x) \leq (Ax,x) \leq \lambda_{max}(x,x)$
 $\lambda_{min}(\nabla x,\nabla x) \leq (A\nabla x,\nabla x) \leq \lambda_{max}(\nabla x,\nabla x)$
 $(\nabla u,\nabla v) = ||u||_{W_2^1(\Omega)}^2$
 $[u, v] = (A\nabla u,\nabla v)_{L_2(\Omega)}$
+![[IMG_9909.jpg]]
+
+Доказали теорему о существовании решения. Единственность очевидна из свойств скалярного произведения
