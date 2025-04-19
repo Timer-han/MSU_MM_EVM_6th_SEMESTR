@@ -55,4 +55,8 @@ $$
 7. Соболев. Теорема о вложении
 	$W_2^1(\Omega) \subset L_2(\Omega)$
 	$W_2^1(\Omega) \subset L_p(\Omega) \forall p \geq 2 ?$
-	$W_2^1(\Omega) \subset L_p(\Omega)$
+	$n = 2:W_2^1(\Omega) \subset L_{\infty}(\Omega)$
+	$n = 3:W_2^1(\Omega) \subset L_{n}(\Omega)$
+8. $W_p^l (\Omega) = \{u \in L_p(\Omega): \exists \frac{\partial u}{\partial x_i}\}$
+9. Неравенства Фридрихса
+	$\exists c_1 = c_1(\Omega): \forall u \in W_2^1(\Omega), u|_{\partial \Omega} = 0$
