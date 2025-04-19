@@ -96,4 +96,5 @@ $$
 $(A \nabla u, \nabla v)_{L_2(\Omega)} = (f, v)_{L_2(\Omega)}$
 $\lambda_{min}(x,x) \leq (Ax,x) \leq \lambda_{max}(x,x)$
 $\lambda_{min}(\nabla x,\nabla x) \leq (A\nabla x,\nabla x) \leq \lambda_{max}(\nabla x,\nabla x)$
-$(\nabla u,\nabla v) = ||u||_{W_2^1(\Omega)}$
+$(\nabla u,\nabla v) = ||u||_{W_2^1(\Omega)}^2$
+$[u, v] = (A\nabla u,\nabla v)_{L_2(\Omega)}$
