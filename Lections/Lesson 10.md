@@ -64,4 +64,5 @@ $$
 	$||u||^2_{W_2^1(\Omega)}$
 
 10. Неравенства Пуанкаре
-	$\exists c_2 = c_2(\Omega): \forall u \in W_2^1(\Omega) (\navlau, n)$
+	$\exists c_2 = c_2(\Omega): \forall u \in W_2^1(\Omega) \quad (\nabla u, n)|_{\partial \Omega} = 0$
+	$\int_{\Omega}udx = 1 \quad (u, )$
