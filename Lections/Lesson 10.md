@@ -14,3 +14,11 @@ $$
 $$
 (a_{ij} \in L_{\infty(\Omega)})
 $$
+Дирихле 
+$$
+\begin {cases}
+-div(A, \nabla u) = f \\
+u|_{\partial \Omega} = g
+\end {cases}
+$$
+Гаус-Остроградский, Грин
