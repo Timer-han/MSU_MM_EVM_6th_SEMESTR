@@ -101,3 +101,15 @@ $[u, v] = (A\nabla u,\nabla v)_{L_2(\Omega)}$
 ![[IMG_9909.jpg]]
 ![[IMG_9911.jpg]]
 Доказали теорему о существовании решения. Единственность очевидна из свойств скалярного произведения
+$u|_{\partial \Omega} = g$- такая что является спец $W_2^1(\Omega)$
+$g \in W_2^1(\Omega), g|_{\partial \Omega} = g$
+$\widehat u = u - g |_{\partial \Omega} = 0$
+$(A \nabla \widehat u, \nabla v) = ()f, v$
+$$
+\begin {cases}
+(A \nabla \widehat u, \nabla v) = (f, v) + (A \nabla v, g) \\
+\widehat u \in W_2^1(\Omega)
+\end {cases}
+$$
+$(A \nabla u, \overrightarrow n) =\varphi$
+$(A \nabla u, \nabla v) - \int_{\partial \Omega (A)} \dots$
