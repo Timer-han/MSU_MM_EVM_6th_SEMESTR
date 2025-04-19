@@ -62,9 +62,21 @@ $$
 	$\exists c_1 = c_1(\Omega): \forall u \in W_2^1(\Omega), u|_{\partial \Omega} = 0$
 	$||u||_{L_2(\Omega)} \leq c_1 ||\nabla u||_{L_2(\Omega)}$
 	$||u||^2_{W_2^1(\Omega)}$
-
+	![[IMG_9903.jpg]]
 10. Неравенства Пуанкаре
 	$\exists c_2 = c_2(\Omega): \forall u \in W_2^1(\Omega) \quad (\nabla u, n)|_{\partial \Omega} = 0$
 	$\int_{\Omega}udx = 1 \quad (u, n) = 1$
 	$||u||_{L_2(\Omega)} \leq C_2 ||\nabla u||_{L_2(\Omega)}$
 	$W_2^1(\Omega) / \Real = \{u \in W_0^1(\Omega):(\)$
+	![[IMG_9904.jpg]]
+
+$$
+\begin {cases}
+-div(A \nabla u) = f \\
+u|_{\partial \Omega} = 0
+\end {cases} \\
+\begin {cases}
+-div(A \nabla u) = f \\
+u|_{\partial \Omega} = 0
+\end {cases} \\
+$$
