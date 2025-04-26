@@ -38,3 +38,9 @@ $$
 $$
 x_i = a + ih_x \quad y_j = c + jh_y
 $$
+
+![[IMG_9951.jpg]]
+
+![[IMG_9952.jpg]]
+
+![[IMG_9953.jpg]]
