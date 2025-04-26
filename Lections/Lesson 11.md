@@ -15,3 +15,11 @@ $$
 $$
 (A\nabla u, \nabla u)_{L_2(\Omega_h)} = (f, v)_{L_2(\Omega_h)}
 $$
+
+$$
+\varphi_k(x)=
+\begin {cases}
+1\quad(в\quad P_k) \\
+0\quad(в\quad остальных)
+\end {cases}
+$$
