@@ -23,3 +23,18 @@ $$
 0\quad(в\quad остальных)
 \end {cases}
 $$
+$$
+P_k =(x_i, y_j) \forall i \in{1\dots n_x}\forall j \in{1\dots n_y}
+$$
+$$
+\Omega_k = [a,b]*[c,d]
+$$
+
+$$
+x_i = a + ih_x \quad y_j = c + jh_y
+$$
+
+
+$$
+x_i = a + ih_x \quad y_j = c + jh_y
+$$
