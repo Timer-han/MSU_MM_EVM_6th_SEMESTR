@@ -57,7 +57,11 @@ $$
 
 ![[IMG_9965.jpg]]
 
+![[IMG_9967.jpg]]
 
+![[IMG_9969.jpg]]
+
+![[IMG_9971.jpg]]
 $$
 (\nabla \varphi_A,\nabla \varphi_A) =\int_{\Delta}(\frac{1}{h_x^2} + \frac{1}{h_y^2}) = \frac{1}{2} (\frac{h_y}{h_x} + \frac{h_x}{h_y})
 $$
@@ -73,3 +77,5 @@ $$
 $$
 (\nabla \varphi_A,\nabla \varphi_C) =\int_{\Delta}(-\frac{1}{h_y^2}) = -\frac{h_y}{2h_x}
 $$
+
+![[IMG_9973.jpg]]
