@@ -65,6 +65,11 @@ $$
 $$
 (\nabla \varphi_A,\nabla \varphi_B) =\int_{\Delta}(-\frac{1}{h_x^2}) = -\frac{h_y}{2h_x}
 $$
+
 $$
-(\nabla \varphi_A,\nabla \varphi_B) =\int_{\Delta}(-\frac{1}{h_y^2}) = -\frac{h_y}{2h_x}
+(\nabla \varphi_A,\nabla \varphi_C) =\int_{\Delta}(-\frac{1}{h_y^2}) = -\frac{h_y}{2h_x}
+$$
+
+$$
+(\nabla \varphi_A,\nabla \varphi_C) =\int_{\Delta}(-\frac{1}{h_y^2}) = -\frac{h_y}{2h_x}
 $$
