@@ -1,4 +1,4 @@
-#include "/usr/local/intel/impi/5.1.3.223/intel64/include/mpi.h"
+#include "mpi.h"
 
 #include <stdio.h>
 
