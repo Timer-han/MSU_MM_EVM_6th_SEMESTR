@@ -91,22 +91,15 @@ int main(int argc, char *argv[])
             return 1;
         }
         filename = argv[5];
-        read_matrix(matrix, n, m, p, rank, filename, buffer, MPI_COMM_WORLD);
+        if (read_matrix(matrix, n, m, p, rank, filename, buffer, MPI_COMM_WORLD)) {
+            MPI_Finalize();
+            return -2;
+        }
 
     } else {
         initmatrix(matrix, n, m, p, rank, s);
     }
     
-    MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-    if (reduce_sum > 0)
-    {
-        if (rank == 0)
-        {
-            printf("[-] Can't open file \"%s\"\n", filename);
-        }
-        MPI_Finalize();
-        return -2;
-    }
 
     for (i = 0; i < p; i++)
     {
