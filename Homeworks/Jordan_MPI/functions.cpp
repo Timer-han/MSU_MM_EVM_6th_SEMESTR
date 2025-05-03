@@ -1159,7 +1159,7 @@ int read_matrix(
 			}
 		} else {
 			if (owner == k) {
-				MPI_Status &st;
+				MPI_Status st;
 				MPI_Recv(
 					a + b_loc * n * m,
 					n * rows,
@@ -1168,7 +1168,7 @@ int read_matrix(
 					0, //tag
 					com,
 					&st
-				)
+				);
 			}
 		}
 	}
@@ -1184,7 +1184,7 @@ int read_matrix(
 
 int read_array(FILE *fp, double *a, int len)
 {
-	for (int i = 0, i < len, i++) {
+	for (int i = 0; i < len; i++) {
 		if (fscanf(fp, "%lf", a + i) != 1) return -2;
 	}
 	return 0;
