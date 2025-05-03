@@ -1091,3 +1091,86 @@ void initmatrix(
 		}
 	}
 }
+
+int read_matrix(
+	double *a,
+	int n,
+	int m,
+	int p,
+	int k,
+	const char *name,
+	double *buf, // буффер - блочная строка n * m
+	MPI_Comm com
+) {
+	int main_k = 0; // кто читает файл
+	FILE *fp = nullptr;
+	int err = 0;
+	if (k == main_k) {
+		fp = fopen("r", name);
+		if (fp == nullptr) err = 1;
+	}
+	MPI_Bcast(&err, 1, MPI_INT, main_k, com);
+	if (err) return err; // во всех процессах
+	
+	memset(buf, 0, n * m * sizeof(double));
+	
+	// число блочных строк
+	int b, max_b = (n + m - 1) / m;
+	for (b = 0, b < max_b, b++) {
+		// владелец строки
+		int owner = b % p;
+		int rows = b * m + m <= n ? m : n - b * m;
+		// rows = min (m, n - b * m)
+		
+		// лок номер строки
+		int b_loc = b / p;
+		if (k == main_k) {
+			err += read_array(fp, buf, n * rows);
+			// ошибки обрабатываем потом
+			if (owner == main_k) {
+				// владалец - главный, копируем строку на место
+				memcpy(a + b_loc * n * m, buf, n * rows);
+			} else {
+				// надо отправить процессу owner
+				MPI_Send(
+					buf,
+					n * rows,
+					MPI_DOUBLE,
+					owner, 
+					0 /*tag*/,
+					com
+				);
+			}
+		} else {
+			if (owner == k) {
+				MPI_Status &st;
+				MPI_Recv(
+					a + b_loc * n * m,
+					n * rows,
+					MPI_DOUBLE,
+					main_k,
+					0, //tag
+					com,
+					&st
+				)
+			}
+		}
+	}
+	
+	if (k == main_k) {
+		fclose(fp);
+		fp = nullptr;
+	}
+	MPI_Bcast(&err, 1, MPI_INT, main_k, com);
+	if (err) return err;
+	return 0;
+}
+
+int read_array(FILE *fp, double *a, int len)
+{
+	for (int i = 0, i < len, i++) {
+		if (fscanf(fp, "%lf", a + i) != 1) return -2;
+	}
+	return 0;
+}
+
