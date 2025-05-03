@@ -1146,12 +1146,14 @@ int read_matrix(
 
         MPI_Bcast(buf, n * rows, MPI_DOUBLE, main_pi, com);
 
+        int cols = get_cols(n, m, p, pi);
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < n; j++) {
-                // лок номер столбца
-                int j_loc = g2l(n, m, p, pi, j);
-                
-                a[]
+            for (int j = 0; j < max_b; j++) {
+                for (int k = 0; k < m && k + j * m < ; k++) {
+                    if (j * m + k < n) {
+                        a[i * n + j * m + k] = buf[i * n + j * m + k];
+                    }
+                }
             }
         }
 	}
