@@ -1119,7 +1119,7 @@ void initmatrix(
 		i_glob = l2g(n, m, p, pi, i_loc);
 		for (j_loc = 0; j_loc < n; j_loc++) {
 			j_glob = j_loc;
-			a[i_loc *  n + j_loc] = function(s, n, i_glob, j_glob);
+			a[i_loc + j_loc * n] = function(s, n, i_glob, j_glob);
 		}
 	}
 }

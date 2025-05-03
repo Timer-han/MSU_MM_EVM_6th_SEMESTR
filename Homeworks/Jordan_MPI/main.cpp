@@ -54,16 +54,7 @@ int main(int argc, char *argv[])
         }
         filename = argv[6];
         
-        reduce_sum = 0;
-        if (rank == 0)
-        {
-            file = fopen(filename, "r");
-            if (!file)
-            {
-                printf("[-] Can't open file \"%s\"\n", filename);
-                reduce_sum = 1;
-            }
-        }
+        read
     }
     
     MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
