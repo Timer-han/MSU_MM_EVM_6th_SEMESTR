@@ -1040,7 +1040,7 @@ int g2l (
 }
 
 // максимальное число столбцов локальной матрицы
-int get_max_rows(
+int get_max_cols(
 	int n,
 	int m,
 	int p
@@ -1050,7 +1050,7 @@ int get_max_rows(
 }
 
 // число блочных столбцов на процесс
-int get_rows(
+int get_cols(
 	int n,
 	int m,
 	int p,
@@ -1097,10 +1097,11 @@ void initmatrix(
 ) {
 	int i_loc, j_loc, i_glob, j_glob, rows;
 	// сколько строк в процессе
-	rows = get_rows(n, m, p, k);
-	for (i_loc = 0, i_loc < rows; i_loc++) {
+	rows = get_cols(n, m, p, k);
+
+	for (i_loc = 0; i_loc < rows; i_loc++) {
 		i_glob = l2g(n, m, p, k, i_loc);
-		for (j_loc = 0, j_loc < n, j_loc++) {
+		for (j_loc = 0; j_loc < n; j_loc++) {
 			j_glob = j_loc;
 			a[i_loc *  n + j_loc] = (*f)(s, n, i_glob, j_glob);
 		}
