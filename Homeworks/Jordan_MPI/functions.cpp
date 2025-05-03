@@ -1148,7 +1148,10 @@ int read_matrix(
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < n; j++) {
-                // лок номер 
+                // лок номер столбца
+                int j_loc = g2l(n, m, p, pi, j);
+                
+                
             }
         }
 	}
