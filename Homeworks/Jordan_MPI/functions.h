@@ -39,7 +39,7 @@ public:
     // Данные для отладки
 	size_t p = 0; // количество потоков
 	size_t pi = 0; // номер потока
-	pthread_t tid = 1;
+    MPI_Comm com = MPI_COMM_WORLD;
 	const char * name = nullptr;
 	io_status error_type = io_status::undef;
 	double error_flag = 0;
