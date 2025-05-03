@@ -8,34 +8,34 @@ static double EPS = 1e-16;
 
 
 
-class Args
-{
-public:
-    // Данные для отладки
-	size_t p = 0; // количество потоков
-	size_t pi = 0; // номер потока
-    MPI_Comm com = MPI_COMM_WORLD;
-	const char * name = nullptr;
-	double error_flag = 0;
+// class Args
+// {
+// public:
+//     // Данные для отладки
+// 	size_t p = 0; // количество потоков
+// 	size_t pi = 0; // номер потока
+//     MPI_Comm com = MPI_COMM_WORLD;
+// 	const char * name = nullptr;
+// 	double error_flag = 0;
 
-    // Данные для вычислений
-	size_t n = 0;  // размер матрицы
-	size_t m = 0;  // размер блока
-	size_t l = 0;  // размер последнего блока
-	size_t k = 0;  // количество блоков размера m в строке
-	size_t s = 0;  // номер формулы
-	size_t r = 0;  // размер выводимой
-    double r1 = 0; // невязка 1
-    double r2 = 0; // невязка 2
-    double t1 = 0; // time 1
-    double t2 = 0; // time 2
-    FILE *file;
-    double *block = nullptr;
-    double *matrix = nullptr;
-    double *inversed_matrix = nullptr;
-    double *thread_part = nullptr;
-    double *norm = nullptr;
-};
+//     // Данные для вычислений
+// 	size_t n = 0;  // размер матрицы
+// 	size_t m = 0;  // размер блока
+// 	size_t l = 0;  // размер последнего блока
+// 	size_t k = 0;  // количество блоков размера m в строке
+// 	size_t s = 0;  // номер формулы
+// 	size_t r = 0;  // размер выводимой
+//     double r1 = 0; // невязка 1
+//     double r2 = 0; // невязка 2
+//     double t1 = 0; // time 1
+//     double t2 = 0; // time 2
+//     FILE *file;
+//     double *block = nullptr;
+//     double *matrix = nullptr;
+//     double *inversed_matrix = nullptr;
+//     double *thread_part = nullptr;
+//     double *norm = nullptr;
+// };
 
 void *thread_func(void *args);
 int find_diff(double *matrix, double *inversed_matrix, double *block, double *norm, FILE*file, int n, int m, int s, double &r1, double &r2, size_t p, size_t pi);

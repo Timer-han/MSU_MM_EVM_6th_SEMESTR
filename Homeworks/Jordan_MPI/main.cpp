@@ -50,7 +50,6 @@ int main(int argc, char *argv[])
     double *buffer = new double[m * n];
     double *block_A = new double[m * m];
     double *norm = new double[n];
-    Args a;
 
     if (!matrix || !inversed_matrix || !norm)
     {
