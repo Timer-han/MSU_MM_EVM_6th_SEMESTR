@@ -1118,14 +1118,14 @@ int read_matrix(
 	double *buf, // буффер - блочная строка n * m
 	MPI_Comm com
 ) {
-	int main_k = 0; // кто читает файл
+	int main_pi = 0; // кто читает файл
 	FILE *fp = nullptr;
 	int err = 0;
-	if (k == main_k) {
+	if (k == main_pi) {
 		fp = fopen("r", name);
 		if (fp == nullptr) err = 1;
 	}
-	MPI_Bcast(&err, 1, MPI_INT, main_k, com);
+	MPI_Bcast(&err, 1, MPI_INT, main_pi, com);
 	if (err) return err; // во всех процессах
 	
 	memset(buf, 0, n * m * sizeof(double));
@@ -1140,10 +1140,10 @@ int read_matrix(
 		
 		// лок номер строки
 		int b_loc = b / p;
-		if (k == main_k) {
+		if (k == main_pi) {
 			err += read_array(fp, buf, n * rows);
 			// ошибки обрабатываем потом
-			if (owner == main_k) {
+			if (owner == main_pi) {
 				// владалец - главный, копируем строку на место
 				memcpy(a + b_loc * n * m, buf, n * rows);
 			} else {
@@ -1164,7 +1164,7 @@ int read_matrix(
 					a + b_loc * n * m,
 					n * rows,
 					MPI_DOUBLE,
-					main_k,
+					main_pi,
 					0, //tag
 					com,
 					&st
@@ -1173,11 +1173,11 @@ int read_matrix(
 		}
 	}
 	
-	if (k == main_k) {
+	if (k == main_pi) {
 		fclose(fp);
 		fp = nullptr;
 	}
-	MPI_Bcast(&err, 1, MPI_INT, main_k, com);
+	MPI_Bcast(&err, 1, MPI_INT, main_pi, com);
 	if (err) return err;
 	return 0;
 }
