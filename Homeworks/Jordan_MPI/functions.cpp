@@ -1093,7 +1093,7 @@ void initmatrix(
 	int m,
 	int p,
 	int pi,
-	double (*f)(int s, int n, int i, int j)
+	int s
 ) {
 	int i_loc, j_loc, i_glob, j_glob, rows;
 	// сколько строк в процессе
@@ -1103,7 +1103,7 @@ void initmatrix(
 		i_glob = l2g(n, m, p, pi, i_loc);
 		for (j_loc = 0; j_loc < n; j_loc++) {
 			j_glob = j_loc;
-			a[i_loc *  n + j_loc] = (*f)(s, n, i_glob, j_glob);
+			a[i_loc *  n + j_loc] = function(s, n, i_glob, j_glob);
 		}
 	}
 }
@@ -1132,7 +1132,7 @@ int read_matrix(
 	
 	// число блочных строк
 	int b, max_b = (n + m - 1) / m;
-	for (b = 0, b < max_b, b++) {
+	for (b = 0; b < max_b; b++) {
 		// владелец строки
 		int owner = b % p;
 		int rows = b * m + m <= n ? m : n - b * m;
