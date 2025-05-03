@@ -1115,7 +1115,7 @@ int read_matrix(
 	int p,
 	int pi,
 	const char *name,
-	double *buf, // буффер - блочн строка n * m
+	double *buf, // буффер - блочная строка n * m
 	MPI_Comm com
 ) {
 	int main_pi = 0; // кто читает файл
@@ -1142,41 +1142,15 @@ int read_matrix(
 		int b_loc = b / p;
 		if (pi == main_pi) {
 			err += read_array(fp, buf, n * rows);
-
-
-            for (int i = 0; i < p; i++)
-            {
-                
-            }
-			// ошибки обрабатываем потом
-			if (owner == main_pi) {
-				// владалец - главный, копируем строку на место
-				memcpy(a + b_loc * n * m, buf, n * rows);
-			} else {
-				// надо отправить процессу owner
-				MPI_Send(
-					buf,
-					n * rows,
-					MPI_DOUBLE,
-					owner, 
-					0 /*tag*/,
-					com
-				);
-			}
-		} else {
-			if (owner == pi) {
-				MPI_Status st;
-				MPI_Recv(
-					a + b_loc * n * m,
-					n * rows,
-					MPI_DOUBLE,
-					main_pi,
-					0, //tag
-					com,
-					&st
-				);
-			}
 		}
+
+        MPI_Bcast(buf, n * rows, MPI_DOUBLE, main_pi, com);
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < n; j++) {
+                // лок номер 
+            }
+        }
 	}
 	
 	if (pi == main_pi) {
