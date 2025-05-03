@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     size_t p = world_size;
     size_t l = n % m;
     size_t k = n / m;
-    int reduce_sum;
+    int reduce_sum = 0;
 
     if (l > 0 && k + 1 < p)
         p = k + 1;
@@ -45,8 +45,9 @@ int main(int argc, char *argv[])
 
     int max_cols = get_max_cols(n, m, p);
 
-    double *matrix = new double[n * n];
-    double *inversed_matrix = new double[n * n];
+    double *matrix = new double[n * max_cols];
+    double *inversed_matrix = new double[n * max_cols];
+    double *buffer = new double[m * n];
     double *block_A = new double[m * m];
     double *norm = new double[n];
     Args *a = new Args[p];
@@ -64,8 +65,16 @@ int main(int argc, char *argv[])
             delete[] norm;
         if (a)
             delete[] a;
-        if (file)
-            fclose(file);
+        reduce_sum = 1;
+        return -1;
+    }
+    MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    if (reduce_sum > 0)
+    {
+        if (rank == 0)
+        {
+            printf("[-] Not enough memory!\n");
+        }
         MPI_Finalize();
         return -1;
     }
