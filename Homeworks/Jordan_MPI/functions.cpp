@@ -1113,7 +1113,7 @@ int read_matrix(
 	int n,
 	int m,
 	int p,
-	int k,
+	int pi,
 	const char *name,
 	double *buf, // буффер - блочная строка n * m
 	MPI_Comm com
@@ -1121,7 +1121,7 @@ int read_matrix(
 	int main_pi = 0; // кто читает файл
 	FILE *fp = nullptr;
 	int err = 0;
-	if (k == main_pi) {
+	if (pi == main_pi) {
 		fp = fopen("r", name);
 		if (fp == nullptr) err = 1;
 	}
@@ -1140,7 +1140,7 @@ int read_matrix(
 		
 		// лок номер строки
 		int b_loc = b / p;
-		if (k == main_pi) {
+		if (pi == main_pi) {
 			err += read_array(fp, buf, n * rows);
 			// ошибки обрабатываем потом
 			if (owner == main_pi) {
@@ -1158,7 +1158,7 @@ int read_matrix(
 				);
 			}
 		} else {
-			if (owner == k) {
+			if (owner == pi) {
 				MPI_Status st;
 				MPI_Recv(
 					a + b_loc * n * m,
@@ -1173,7 +1173,7 @@ int read_matrix(
 		}
 	}
 	
-	if (k == main_pi) {
+	if (pi == main_pi) {
 		fclose(fp);
 		fp = nullptr;
 	}
