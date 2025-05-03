@@ -1151,7 +1151,7 @@ int read_matrix(
                 // лок номер столбца
                 int j_loc = g2l(n, m, p, pi, j);
                 
-                
+                a[]
             }
         }
 	}
