@@ -603,23 +603,6 @@ double get_norm_p(double *matrix, size_t n, size_t m, size_t p, size_t pi)
 }
 
 
-int process_args(Args *a)
-{
-    int error = 0;
-	for (size_t i = 0; i < a->p; i++) {
-		if (a[i].error_type != io_status::success) {
-			printf("[-] Error in thread %s\n    ", a[i].name);
-            if (a[i].error_type == io_status::bad_allocation) printf("Can't allocate memory!\n");
-            if (a[i].error_type == io_status::error_open) printf("Can't open the file!\n");
-            if (a[i].error_type == io_status::error_read) printf("Bad file!\n");
-            if (a[i].error_type == io_status::irreversible) printf("Irreversible matrix!\n");
-            if (a[i].error_type == io_status::unknown_formula) printf("Unknown formula!\n");
-			error++;
-		}
-	}
-	return error;
-}
-
 
 void rows_permutation_p(double *A, double *block1, double *block2, size_t n,
                       size_t m, size_t k, size_t l, size_t i1, size_t i2,
@@ -644,9 +627,25 @@ double get_time() {
 }
 
 
+// Define the Args structure and io_status namespace or class if not already defined
+struct Args {
+    size_t p, pi, n, m, s, k, l, r;
+    double *matrix, *inversed_matrix, *block, *norm;
+    double r1, r2, t1, t2;
+    int error_flag;
+    FILE *file;
+    pthread_t tid;
+    enum class io_status { success, bad_allocation, error_read, unknown_formula, irreversible } error_type;
+};
+
+// Define the synchronize function if not already defined
+void synchronize(size_t p, double* data = nullptr, size_t size = 0, int reduce_type = 0) {
+    // Implementation of synchronize function
+}
+
 void *thread_func(void *args)
 {
-	Args *a = (Args*) args;
+    Args *a = (Args*) args;
 	
 	size_t p = a->p, pi = a->pi, n = a->n, m = a->m, s = a->s, k = a->k, l = a->l, r = a->r;
     size_t diag, i, j, bl = (l == 0) ? k : k + 1, min_norm_ind, row, x, y, z, begin;
