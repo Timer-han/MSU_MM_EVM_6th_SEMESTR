@@ -1007,3 +1007,87 @@ void *thread_func(void *args)
     delete[] block_C;
 	return nullptr;
 }
+
+
+// local to global
+int l2g (
+	int n,
+	int m,
+	int p,
+	int k,
+	int i_loc
+) { 
+	// Номер блочной строки локальный
+	int i_loc_m = i_loc / m;
+	// Номер блочной строки глобальной
+	int i_glob_m = i_loc_m * p + k;
+	return i_glob_m * m + i_loc % m;
+}
+
+// global to local
+int g2l (
+	int n,
+	int m,
+	int p,
+	int k,
+	int i_glob
+) {
+	// номер блочной строки глобальной
+	int i_glob_m = i_glob / m;
+	// номер блочной строки локальной
+	int i_loc_m = i_glob_m / p;
+	return i_loc_m * m + i_glob % m;
+}
+
+// максимальное число строк локальной матрицы
+int get_max_rows(
+	int n,
+	int m,
+	int p
+) {
+	int b = (n + m - 1) / m;
+	return (b + p - 1) / p;
+}
+
+// число блочных строк на процесс
+int get_rows(
+	int n,
+	int m,
+	int p,
+	int k
+) {
+	int b = (n + m - 1) / m;
+	return b % p <= k ? b / p : b / p + 1;
+}
+
+// в каком процессе лежит строка?
+int get_k(
+	int n,
+	int m,
+	int p,
+	int i_glob
+) {
+	int i_glob_m = i_glob / m;
+	return i_glob_m % p;
+}
+
+//a_ij = f(s, n, i, j)
+void initmatrix(
+	double *a,
+	int n,
+	int m,
+	int p,
+	int k,
+	double (*f)(int s, int n, int i, int j)
+) {
+	int i_loc, j_loc, i_glob, j_glob, rows;
+	// сколько строк в процессе
+	rows = get_rows(n, m, p, k);
+	for (i_loc = 0, i_loc < rows; i_loc++) {
+		i_glob = l2g(n, m, p, k, i_loc);
+		for (j_loc = 0, j_loc < n, j_loc++) {
+			j_glob = j_loc;
+			a[i_loc *  n + j_loc] = (*f)(s, n, i_glob, j_glob);
+		}
+	}
+}
