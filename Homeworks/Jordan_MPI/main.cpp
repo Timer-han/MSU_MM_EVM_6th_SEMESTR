@@ -13,23 +13,30 @@ int main(int argc, char *argv[])
     if (argc < 6)
     {
         fprintf(stderr, "[-] Not enough arguments.\n");
+        MPI_Finalize();
         return 1;
     }
 
-    size_t n = 0, m = 0, p = 0, r = 0, s = 0;
+    size_t n = 0, m = 0, r = 0, s = 0;
     if (
         sscanf(argv[1], "%lu", &n) != 1 ||
         sscanf(argv[2], "%lu", &m) != 1 ||
-        sscanf(argv[3], "%lu", &p) != 1 ||
         sscanf(argv[4], "%lu", &r) != 1 ||
         sscanf(argv[5], "%lu", &s) != 1)
     {
         printf("[-] Mistake in args!\n");
+        MPI_Finalize();
         return 2;
     }
 
+    int rank, world_size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
+    size_t p = world_size;
     size_t l = n % m;
     size_t k = n / m;
+    int reduce_sum;
 
     if (l > 0 && k + 1 < p)
         p = k + 1;
@@ -39,20 +46,37 @@ int main(int argc, char *argv[])
     char *filename = nullptr;
     if (s == 0)
     {
-        if (argc < 7)
+        if (argc < 6)
         {
             fprintf(stderr, "[-] File name do not defined.\n");
+            MPI_Finalize();
             return 1;
         }
         filename = argv[6];
-
-        file = fopen(filename, "r");
-        if (!file)
+        
+        reduce_sum = 0;
+        if (rank == 0)
         {
-            printf("[-] Can't open file \"%s\"\n", filename);
-            return -2;
+            file = fopen(filename, "r");
+            if (!file)
+            {
+                printf("[-] Can't open file \"%s\"\n", filename);
+                reduce_sum = 1;
+            }
         }
     }
+    
+    MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    if (reduce_sum > 0)
+    {
+        if (rank == 0)
+        {
+            printf("[-] Can't open file \"%s\"\n", filename);
+        }
+        MPI_Finalize();
+        return -2;
+    }
+
 
     double *matrix = new double[n * n];
     double *inversed_matrix = new double[n * n];
@@ -75,6 +99,7 @@ int main(int argc, char *argv[])
             delete[] a;
         if (file)
             fclose(file);
+        MPI_Finalize();
         return -1;
     }
     int error;
@@ -108,6 +133,7 @@ int main(int argc, char *argv[])
             delete[] a;
             if (file)
                 fclose(file);
+            MPI_Finalize();
             return error;
         }
     }
@@ -127,6 +153,7 @@ int main(int argc, char *argv[])
         delete[] a;
         if (file)
             fclose(file);
+        MPI_Finalize();
         return error;
     }
 
@@ -141,5 +168,6 @@ int main(int argc, char *argv[])
     delete[] a;
     if (file)
         fclose(file);
+    MPI_Finalize();
     return 0;
 }

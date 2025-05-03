@@ -18,13 +18,26 @@ int main(int argc, char** argv) {
     int name_len;
     MPI_Get_processor_name(processor_name, &name_len);
 
-    if (world_rank == 0) {
-        MPI_Send(&wo)
+    double * data = new double[100];
+
+    for (int i = 0; i < 100; i++) {
+        data[i] = world_rank + i;
     }
 
+    if (world_rank == 1) {
+        MPI_Bcast(data, 100, MPI_DOUBLE, world_rank, MPI_COMM_WORLD);
+    }
+    else {
+        MPI_Bcast(data, 100, MPI_DOUBLE, 1, MPI_COMM_WORLD);
+    }
+
+
+
     // Print off a hello world message
-    printf("Hello world from processor %s, rank %d out of %d processors\n",
-           processor_name, world_rank, world_size);
+    printf("Hello world from processor %s, rank %d out of %d processors\n"
+           "data[0]: %f\n",
+           processor_name, world_rank, world_size, data[0]);
+    
 
     // Finalize the MPI environment.
     MPI_Finalize();
