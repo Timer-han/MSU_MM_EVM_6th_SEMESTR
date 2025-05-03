@@ -627,63 +627,49 @@ double get_time() {
 }
 
 
-void *thread_func(void *args)
-{
-	Args *a = (Args*) args;
-	
-	size_t p = a->p, pi = a->pi, n = a->n, m = a->m, s = a->s, k = a->k, l = a->l, r = a->r;
+void mpi_invert_matrix(
+    double *matrix,
+    double *inversed_matrix,
+    double *block,
+    double *norm_arr,
+    FILE *file,
+    size_t n,
+    size_t m,
+    size_t s,
+    size_t k,
+    size_t l,
+    size_t r,
+    size_t p,
+    size_t pi
+) {
     size_t diag, i, j, bl = (l == 0) ? k : k + 1, min_norm_ind, row, x, y, z, begin;
-    double *matrix = a->matrix, *inversed_matrix = a->inversed_matrix, *block = a->block, *norm_arr = a->norm;
-    // double r1 = a->r1, r2 = a->r2;
     double norm = 0, min_norm, buf_array[2];
-    FILE *file = a->file;
-    pthread_t tid = a->tid;
-    cpu_set_t cpu;
-	int n_cpus = get_nprocs(); // число процессоров
-	int cpu_id = n_cpus - 1 - (pi % n_cpus);
-
-	CPU_ZERO(&cpu); // вместо конструктора
-    CPU_SET(cpu_id, &cpu);
-
-    pthread_setaffinity_np(tid, sizeof(cpu), &cpu);
-
-    double *block_A = new double[m*m];
-    double *block_B = new double[m*m];
-    double *block_C = new double[m*m];
+    double *block_A = new double[m * m];
+    double *block_B = new double[m * m];
+    double *block_C = new double[m * m];
 
     if (!block_A || !block_B || !block_C) {
         if (block_A) delete[] block_A;
         if (block_B) delete[] block_B;
         if (block_C) delete[] block_C;
-        a->error_flag = 1;
-        a->error_type = io_status::bad_allocation;
+        MPI_Abort(MPI_COMM_WORLD, 1);
     }
-	synchronize(p, & a->error_flag, 1);
-	if (a -> error_flag > 0) {
-        delete[] block_A;
-        delete[] block_B;
-        delete[] block_C;
-		return nullptr;
-	}
 
-    a->t1 = get_time();
+    double t1 = MPI_Wtime();
 
     zero_matrix_p(matrix, n, m, p, pi);
     unit_matrix_p(inversed_matrix, n, m, p, pi);
-    synchronize(p);
-
+    MPI_Barrier(MPI_COMM_WORLD);
 
     if (s == 0) {
         if (pi == 0) {
             if (read_matrix_from_file(matrix, n, file) != 0) {
-                a->error_flag = 1;
-                a->error_type = io_status::error_read;
+                MPI_Abort(MPI_COMM_WORLD, 1);
             }
         }
     } else {
         if (fill_matrix_p(matrix, n, s, m, p, pi) != 0) {
-            a->error_flag = 1;
-            a->error_type = io_status::unknown_formula;
+            MPI_Abort(MPI_COMM_WORLD, 1);
         }
     }
 
@@ -691,36 +677,22 @@ void *thread_func(void *args)
         printf("[+] Given matrix:\n");
         print_matrix(matrix, n, 4);
     }
-	// printf("Yep!\n");
-	
-	synchronize(a->p, & a->error_flag, 1);
-	if (a -> error_flag > 0) {
-        delete[] block_A;
-        delete[] block_B;
-        delete[] block_C;
-		return nullptr;
-	}
+
+    MPI_Barrier(MPI_COMM_WORLD);
 
     norm = get_norm_p(matrix, n, m, p, pi);
-	synchronize(a->p, &norm, 1);
-	if (pi == 0) EPS *= norm;
-    // printf("norm = %8.3e, eps = %8.3e\n", norm, EPS);
-	synchronize(a->p);
+    MPI_Allreduce(MPI_IN_PLACE, &norm, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    if (pi == 0) EPS *= norm;
 
-    // Пробегаюсь по диагональным элементам
     for (diag = 0; diag < bl; diag++) {
-        // print_matrix(matrix, n, n);
-        // printf("\n");
         min_norm = -1;
         min_norm_ind = -1;
-        // Ищу в столбце матрицу у кооторой обратная имеет наименьшую норму
+
         if (diag < k) {
             for (row = diag + pi; row < k; row += p) {
                 get_block(matrix, block_A, n, m, k, l, diag, row);
                 if (get_inverse_matrix(block_A, block_B, m) == 0) {
-                    // print_matrix(block_B, m, print_size);
                     norm = get_norm(block_B, m);
-                    // printf("norm is %8.3e\n", norm);
                     if (min_norm < 0 || norm < min_norm) {
                         min_norm = norm;
                         min_norm_ind = row;
@@ -737,178 +709,127 @@ void *thread_func(void *args)
                 }
             }
         }
+
         buf_array[0] = min_norm;
         buf_array[1] = min_norm_ind * 1. > 1e+13 ? -1. : min_norm_ind;
-        // buf_array[1] = buf_array[1] * 1. > 1e+13 ? -1. : buf_array[1];
 
-        
-        // printf("%ld min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
-        // printf("%ld min_norm: %8.3e, ind: %lu\n", pi, min_norm, min_norm_ind);
-        synchronize(p, buf_array, 2, reduce::abs_min_first);
-        // if (pi == 0) printf("%ld min_norm: %8.3e, ind: %.0e\n", pi, buf_array[0], buf_array[1]);
-        // printf("Yep!\n");
+        MPI_Allreduce(MPI_IN_PLACE, buf_array, 2, MPI_DOUBLE, MPI_MINLOC, MPI_COMM_WORLD);
+
         if (buf_array[1] < 0) {
-
-            fprintf(stderr, "[-] Matrix is irreversible, place: 923!\n");
-            a->error_flag = 1;
-            a->error_type = io_status::irreversible;
+            if (pi == 0) fprintf(stderr, "[-] Matrix is irreversible!\n");
             delete[] block_A;
             delete[] block_B;
             delete[] block_C;
-            return nullptr;
+            MPI_Abort(MPI_COMM_WORLD, 1);
         }
-        // min_norm = buf_array[0];
-        min_norm_ind = buf_array[1];
-        // printf("Step: %ld, thread: %ld\n", diag, pi);
 
-        // Переставляю строки так, чтобы на текущем диагональном элементе была
-        // матрица с наименьшей нормой её обратной
+        min_norm_ind = buf_array[1];
+
         rows_permutation_p(
             matrix, block_A, block_B, n, m, k, l, min_norm_ind, diag, diag, p, pi
         );
         rows_permutation_p(
             inversed_matrix, block_A, block_B, n, m, k, l, min_norm_ind, diag, 0, p, pi
         );
-        
-        // Нахожу обратную в потоке pi
+
         if (diag % p == pi) {
             get_block(matrix, block_A, n, m, k, l, diag, diag);
             if (diag != k) {
                 if (get_inverse_matrix(block_A, block, m) != 0) {
-                    fprintf(stderr, "[-] Matrix is irreversible, place 949!\n");
-                    a->error_flag = 1;
-                    a->error_type = io_status::irreversible;
+                    if (pi == 0) fprintf(stderr, "[-] Matrix is irreversible!\n");
                     delete[] block_A;
                     delete[] block_B;
                     delete[] block_C;
-                    return nullptr;
+                    MPI_Abort(MPI_COMM_WORLD, 1);
                 }
             } else {
                 if (get_inverse_matrix(block_A, block, l) != 0) {
-                    fprintf(stderr, "[-] Matrix is irreversible!\n");
-                    a->error_flag = 1;
-                    a->error_type = io_status::irreversible;
+                    if (pi == 0) fprintf(stderr, "[-] Matrix is irreversible!\n");
                     delete[] block_A;
                     delete[] block_B;
                     delete[] block_C;
-                    return nullptr;
+                    MPI_Abort(MPI_COMM_WORLD, 1);
                 }
             }
         }
-        synchronize(p);
 
-        memcpy(block_B, block, m * m * sizeof(double));
-        
-        // Вставляю единичную на место текущего диагонального элемента
-        // put_block(matrix, block_A, n, m, k, l, diag, diag);
+        MPI_Bcast(block, m * m, MPI_DOUBLE, diag % p, MPI_COMM_WORLD);
 
-        // Начиная со следующего каждый элемент в строке домножаю на обратную к диагональному
-        // block_B - обратная к диагональному
         begin = diag + 1;
         if (begin % p <= pi) begin += pi - begin % p;
         else begin += pi + p - begin % p;
 
-        for (i = begin; i < bl; i+=p) {
+        for (i = begin; i < bl; i += p) {
             get_block(matrix, block_A, n, m, k, l, diag, i);
             x = (diag == k ? l : m);
-            y = (i == k    ? l : m);
-            matrix_multiply(block_B, block_A, block_C, x, x, y);
+            y = (i == k ? l : m);
+            matrix_multiply(block, block_A, block_C, x, x, y);
             put_block(matrix, block_C, n, m, k, l, diag, i);
         }
 
-        // Каждый элемент той же строки матрицы В домножаю на эту же обратную
-        for (i = pi; i < bl; i+=p) {
+        for (i = pi; i < bl; i += p) {
             get_block(inversed_matrix, block_A, n, m, k, l, diag, i);
-            // printf("------matrix------\n");
-            // printf("Diag = %ld, i = %ld\n", diag, i);
-            // print_matrix(block_A, (i < k ? m : l), 4);
             x = (diag == k ? l : m);
-            y = (i == k    ? l : m);
-            // printf("x = %ld, y = %ld\n", x, y);
-            // printf("------------------\n");
-            matrix_multiply(block_B, block_A, block_C, x, x, y);
+            y = (i == k ? l : m);
+            matrix_multiply(block, block_A, block_C, x, x, y);
             put_block(inversed_matrix, block_C, n, m, k, l, diag, i);
         }
 
-        synchronize(p);
+        MPI_Barrier(MPI_COMM_WORLD);
 
-        // Для каждой строки, кроме той, на которой есть текущий диагональный
         for (i = 0; i < bl; i++) {
             if (i != diag) {
-                // Запоминаем блок диагонального столбца и текущей строки
-
                 get_block(matrix, block_A, n, m, k, l, i, diag);
-                // Для каждого следующего элемента текущей строки, вычитаем из него А х С
-                for (j = begin; j < bl; j+=p) { // j - номер столбца
-
+                for (j = begin; j < bl; j += p) {
                     get_block(matrix, block_C, n, m, k, l, diag, j);
-
-                    x = (i == k    ? l : m);
+                    x = (i == k ? l : m);
                     y = (diag == k ? l : m);
-                    z = (j == k    ? l : m);
+                    z = (j == k ? l : m);
                     matrix_multiply(block_A, block_C, block_B, x, y, z);
-
                     get_block(matrix, block_C, n, m, k, l, i, j);
                     matrix_subtr(block_C, block_B, x, z);
                     put_block(matrix, block_C, n, m, k, l, i, j);
                 }
 
-                // Аналогично для матрицы В
-                for (j = pi; j < bl; j+=p) {
+                for (j = pi; j < bl; j += p) {
                     get_block(inversed_matrix, block_C, n, m, k, l, diag, j);
-                    x = (i == k    ? l : m);
+                    x = (i == k ? l : m);
                     y = (diag == k ? l : m);
-                    z = (j == k    ? l : m);
+                    z = (j == k ? l : m);
                     matrix_multiply(block_A, block_C, block_B, x, y, z);
-
                     get_block(inversed_matrix, block_C, n, m, k, l, i, j);
                     matrix_subtr(block_C, block_B, x, z);
                     put_block(inversed_matrix, block_C, n, m, k, l, i, j);
                 }
             }
         }
-        synchronize(p);
+
+        MPI_Barrier(MPI_COMM_WORLD);
     }
 
-	synchronize(p, & a-> error_flag, 1);
-	if (a -> error_flag > 0) {
-		delete[] block_A;
-        delete[] block_B;
-        delete[] block_C;
-		return nullptr;
-	}
-
-    a->t1 -= get_time();
+    double t2 = MPI_Wtime();
 
     if (pi == 0) {
         printf("\n[+] Inversed matrix:\n");
         print_matrix(inversed_matrix, n, r);
     }
 
-
-    a->t2 = get_time();
-
-    if (find_diff(matrix, inversed_matrix, block_A, norm_arr, file, n, m, s, a->r1, a->r2, p, pi) != 0) {
-        a->error_type = io_status::error_read;
-        a->error_flag = 1;
-    }
-	synchronize(p, & a-> error_flag, 1);
-    if (a -> error_flag > 0) {
-		delete[] block_A;
+    double r1, r2;
+    if (find_diff(matrix, inversed_matrix, block_A, norm_arr, file, n, m, s, r1, r2, p, pi) != 0) {
+        if (pi == 0) fprintf(stderr, "[-] Error in finding difference!\n");
+        delete[] block_A;
         delete[] block_B;
         delete[] block_C;
-		return nullptr;
-	}
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
 
-    a->t2 -= get_time();
-
-
-	a -> error_type = io_status::success;
+    if (pi == 0) {
+        printf("[+] Time for inversion: %f seconds\n", t2 - t1);
+    }
 
     delete[] block_A;
     delete[] block_B;
     delete[] block_C;
-	return nullptr;
 }
 
 
