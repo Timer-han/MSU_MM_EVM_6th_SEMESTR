@@ -1014,13 +1014,13 @@ int l2g (
 	int n,
 	int m,
 	int p,
-	int k,
+	int pi,
 	int i_loc
 ) { 
 	// Номер блочного локального столбца
 	int i_loc_m = i_loc / m;
 	// Номер блочного глобального столбца
-	int i_glob_m = i_loc_m * p + k;
+	int i_glob_m = i_loc_m * p + pi;
 	return i_glob_m * m + i_loc % m;
 }
 
@@ -1029,7 +1029,7 @@ int g2l (
 	int n,
 	int m,
 	int p,
-	int k,
+	int pi,
 	int i_glob
 ) {
 	// номер блочного глобального столбца
@@ -1054,10 +1054,10 @@ int get_cols(
 	int n,
 	int m,
 	int p,
-	int k
+	int pi
 ) {
 	int b = (n + m - 1) / m;
-	return b % p <= k ? b / p : b / p + 1;
+	return b % p <= pi ? b / p : b / p + 1;
 }
 
 // в каком процессе лежит столбец?
@@ -1092,15 +1092,15 @@ void initmatrix(
 	int n,
 	int m,
 	int p,
-	int k,
+	int pi,
 	double (*f)(int s, int n, int i, int j)
 ) {
 	int i_loc, j_loc, i_glob, j_glob, rows;
 	// сколько строк в процессе
-	rows = get_cols(n, m, p, k);
+	rows = get_cols(n, m, p, pi);
 
 	for (i_loc = 0; i_loc < rows; i_loc++) {
-		i_glob = l2g(n, m, p, k, i_loc);
+		i_glob = l2g(n, m, p, pi, i_loc);
 		for (j_loc = 0; j_loc < n; j_loc++) {
 			j_glob = j_loc;
 			a[i_loc *  n + j_loc] = (*f)(s, n, i_glob, j_glob);
