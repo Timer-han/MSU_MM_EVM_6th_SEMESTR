@@ -1115,7 +1115,7 @@ int read_matrix(
 	int p,
 	int pi,
 	const char *name,
-	double *buf, // буффер - блочная строка n * m
+	double *buf, // буффер - блочн строка n * m
 	MPI_Comm com
 ) {
 	int main_pi = 0; // кто читает файл
@@ -1142,6 +1142,12 @@ int read_matrix(
 		int b_loc = b / p;
 		if (pi == main_pi) {
 			err += read_array(fp, buf, n * rows);
+
+
+            for (int i = 0; i < p; i++)
+            {
+                
+            }
 			// ошибки обрабатываем потом
 			if (owner == main_pi) {
 				// владалец - главный, копируем строку на место
