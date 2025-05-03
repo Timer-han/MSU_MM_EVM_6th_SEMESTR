@@ -1071,6 +1071,21 @@ int get_k(
 	return i_glob_m % p;
 }
 
+int function(
+    int s,
+    int n,
+    int i,
+    int j
+) {
+    // функция для инициализации матрицы
+    // a_ij = f(s, n, i, j)
+    if (s == 1) return n - MAX(i, j);
+    if (s == 2) return MAX(i, j) + 1;
+    if (s == 3) return (i > j ? i - j : j - i);
+    if (s == 4) return 1. / (i + j + 1);
+    return -1;
+}
+
 //a_ij = f(s, n, i, j)
 void initmatrix(
 	double *a,
