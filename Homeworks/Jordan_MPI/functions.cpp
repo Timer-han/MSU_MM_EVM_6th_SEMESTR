@@ -1138,7 +1138,7 @@ int read_matrix(
 		int rows = b * m + m <= n ? m : n - b * m;
 		// rows = min (m, n - b * m)
 		
-		// лок номер строки
+		// лок номер столбца
 		int b_loc = b / p;
 		if (pi == main_pi) {
 			err += read_array(fp, buf, n * rows);
