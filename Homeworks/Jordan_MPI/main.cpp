@@ -78,6 +78,7 @@ int main(int argc, char *argv[])
         MPI_Finalize();
         return -1;
     }
+
     int error;
     size_t i;
 
@@ -85,23 +86,32 @@ int main(int argc, char *argv[])
     char *filename = nullptr;
     if (s == 0)
     {
-        if (argc < 6)
+        if (argc < 5)
         {
             fprintf(stderr, "[-] File name do not defined.\n");
             MPI_Finalize();
             return 1;
         }
-        filename = argv[6];
+        filename = argv[5];
         
         read_matrix(
-            nullptr,
+            matrix,
             n,
             m,
             p,
             rank,
             filename,
-            nullptr,
+            buffer,
             MPI_COMM_WORLD);
+    } else {
+        initmatrix(
+            matrix,
+            n,
+            m,
+            p,
+            rank,
+            s
+        );
     }
     
     MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
