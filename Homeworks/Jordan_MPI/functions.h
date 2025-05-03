@@ -98,30 +98,14 @@ void rows_permutation_p(double *A, double *block1, double *block2, size_t n,
                       size_t begin, size_t p, size_t pi);
 void *thread_func(void *args);
 double get_time();
+
 int l2g (int n, int m, int p, int pi, int i_loc);
-int g2l ( int n, int m, int p, int pi, int i_glob
-);
-int get_max_cols( int n, int m, int p
-);
-int get_cols( int n, int m, int p, int pi
-);
-int get_loc_cols(
-    int n,
-    int m,
-    int p,
-    int pi
-);
-int get_k( int n, int m, int p, int i_glob
-);
-int function(
-    int s,
-    int n,
-    int i,
-    int j
-);
-void initmatrix( double *a, int n, int m, int p, int pi, int s
-);
-int read_matrix( double *a, int n, int m, int p, int pi, const char *name, double *buf, // буффер - блочная строка n * m
-	MPI_Comm com
-);
+int g2l (int n, int m, int p, int pi, int i_glob);
+int get_max_cols(int n, int m, int p);
+int get_cols(int n, int m, int p, int pi);
+int get_loc_cols(int n, int m, int p, int pi);
+int get_k( int n, int m, int p, int i_glob);
+int function(int s, int n, int i, int j);
+void initmatrix( double *a, int n, int m, int p, int pi, int s);
+int read_matrix( double *a, int n, int m, int p, int pi, const char *name, double *buf,	MPI_Comm com);
 int read_array(FILE *fp, double *a, int len);

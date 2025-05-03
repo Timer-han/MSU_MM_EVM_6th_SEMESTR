@@ -43,31 +43,7 @@ int main(int argc, char *argv[])
     if (l == 0 && k < p)
         p = k;
 
-    char *filename = nullptr;
-    if (s == 0)
-    {
-        if (argc < 6)
-        {
-            fprintf(stderr, "[-] File name do not defined.\n");
-            MPI_Finalize();
-            return 1;
-        }
-        filename = argv[6];
-        
-        read
-    }
-    
-    MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-    if (reduce_sum > 0)
-    {
-        if (rank == 0)
-        {
-            printf("[-] Can't open file \"%s\"\n", filename);
-        }
-        MPI_Finalize();
-        return -2;
-    }
-
+    int max_cols = get_max_cols(n, m, p);
 
     double *matrix = new double[n * n];
     double *inversed_matrix = new double[n * n];
@@ -95,6 +71,40 @@ int main(int argc, char *argv[])
     }
     int error;
     size_t i;
+
+
+    char *filename = nullptr;
+    if (s == 0)
+    {
+        if (argc < 6)
+        {
+            fprintf(stderr, "[-] File name do not defined.\n");
+            MPI_Finalize();
+            return 1;
+        }
+        filename = argv[6];
+        
+        read_matrix(
+            nullptr,
+            n,
+            m,
+            p,
+            rank,
+            filename,
+            nullptr,
+            MPI_COMM_WORLD);
+    }
+    
+    MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    if (reduce_sum > 0)
+    {
+        if (rank == 0)
+        {
+            printf("[-] Can't open file \"%s\"\n", filename);
+        }
+        MPI_Finalize();
+        return -2;
+    }
 
     for (i = 0; i < p; i++)
     {
