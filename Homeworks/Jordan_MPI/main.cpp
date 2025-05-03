@@ -50,9 +50,9 @@ int main(int argc, char *argv[])
     double *buffer = new double[m * n];
     double *block_A = new double[m * m];
     double *norm = new double[n];
-    Args *a = new Args[p];
+    Args a;
 
-    if (!matrix || !inversed_matrix || !norm || !a)
+    if (!matrix || !inversed_matrix || !norm)
     {
         printf("[-] Not enough memory!\n");
         if (matrix)
@@ -101,23 +101,7 @@ int main(int argc, char *argv[])
     }
     
 
-    for (i = 0; i < p; i++)
-    {
-        a[i].n = n;
-        a[i].k = k;
-        a[i].l = l;
-        a[i].m = m;
-        a[i].s = s;
-        a[i].p = p;
-        a[i].r = r;
-        a[i].pi = i;
-        a[i].file = file;
-        a[i].norm = norm;
-        a[i].block = block_A;
-        a[i].matrix = matrix;
-        a[i].inversed_matrix = inversed_matrix;
-    }
-
+    
     
 
     printf("%s : Task = %d Res1 = %e Res2 = %e T1 = %.2f T2 = %.2f S = %ld N = "
