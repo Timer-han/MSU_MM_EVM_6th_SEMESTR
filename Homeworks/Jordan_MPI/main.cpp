@@ -118,40 +118,7 @@ int main(int argc, char *argv[])
         a[i].inversed_matrix = inversed_matrix;
     }
 
-    for (i = 1; i < p; i++)
-    {
-        if ((error = pthread_create(&a[i].tid, nullptr, thread_func, a + i)))
-        {
-            delete[] matrix;
-            delete[] inversed_matrix;
-            delete[] block_A;
-            delete[] norm;
-            delete[] a;
-            if (file)
-                fclose(file);
-            MPI_Finalize();
-            return error;
-        }
-    }
-    a[0].tid = pthread_self();
-    thread_func(a);
-
-    for (i = 1; i < p; i++)
-    {
-        pthread_join(a[i].tid, nullptr);
-    }
-    if ((error = process_args(a)))
-    {
-        delete[] matrix;
-        delete[] inversed_matrix;
-        delete[] block_A;
-        delete[] norm;
-        delete[] a;
-        if (file)
-            fclose(file);
-        MPI_Finalize();
-        return error;
-    }
+    
 
     printf("%s : Task = %d Res1 = %e Res2 = %e T1 = %.2f T2 = %.2f S = %ld N = "
            "%ld M = %ld P = %ld\n",
