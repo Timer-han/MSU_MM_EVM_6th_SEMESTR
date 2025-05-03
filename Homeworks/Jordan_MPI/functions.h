@@ -7,31 +7,6 @@
 static double EPS = 1e-16;
 
 
-enum class io_status
-{
-    bad_allocation,
-	error_open,
-	error_read,
-    irreversible,
-	success,
-	undef,
-	unknown_formula
-};
-
-
-enum class reduce
-{
-    abs_max,
-    abs_min,
-    abs_max_first,
-    abs_min_first,
-    max,
-    min,
-    mult,
-	sum,
-    synchronize
-};
-
 
 class Args
 {
@@ -41,7 +16,6 @@ public:
 	size_t pi = 0; // номер потока
     MPI_Comm com = MPI_COMM_WORLD;
 	const char * name = nullptr;
-	io_status error_type = io_status::undef;
 	double error_flag = 0;
 
     // Данные для вычислений
@@ -63,7 +37,6 @@ public:
     double *norm = nullptr;
 };
 
-void synchronize(int p, double *a, int n, reduce reduce_type);
 void *thread_func(void *args);
 int find_diff(double *matrix, double *inversed_matrix, double *block, double *norm, FILE*file, int n, int m, int s, double &r1, double &r2, size_t p, size_t pi);
 int fill_matrix(double *matrix, size_t n, size_t s);
