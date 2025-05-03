@@ -59,15 +59,16 @@ int main(int argc, char *argv[])
             delete[] matrix;
         if (inversed_matrix)
             delete[] inversed_matrix;
+        if (buffer)
+            delete[] buffer;
         if (block_A)
             delete[] block_A;
         if (norm)
             delete[] norm;
-        if (a)
-            delete[] a;
         reduce_sum = 1;
         return -1;
     }
+
     MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     if (reduce_sum > 0)
     {
