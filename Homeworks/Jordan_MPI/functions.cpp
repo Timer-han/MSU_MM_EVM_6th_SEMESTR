@@ -1060,6 +1060,9 @@ int get_cols(
 	return b % p <= pi ? b / p : b / p + 1;
 }
 
+// число столбцов в локальной матрице
+
+
 // в каком процессе лежит столбец?
 int get_k(
 	int n,
@@ -1147,12 +1150,11 @@ int read_matrix(
         MPI_Bcast(buf, n * rows, MPI_DOUBLE, main_pi, com);
 
         int cols = get_cols(n, m, p, pi);
+        int pos = 0;
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < max_b; j++) {
-                for (int k = 0; k < m && k + j * m < ; k++) {
-                    if (j * m + k < n) {
-                        a[i * n + j * m + k] = buf[i * n + j * m + k];
-                    }
+            for (int j = pi; j < cols; j += p) {
+                for (int k = j * m; k < (j + 1) * m && k < n; k++) {
+                    a[i * n + pos++] = buf[i * n + k];
                 }
             }
         }
