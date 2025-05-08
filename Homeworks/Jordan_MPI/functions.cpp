@@ -115,7 +115,7 @@ int fill_matrix(double *matrix, int n, int s)
                 matrix[i * n + j] = 1. / (i + j + 1);
         break;
     default:
-        fprintf(stderr, "[-] Unknown formula %ld\n", s);
+        fprintf(stderr, "[-] Unknown formula %d\n", s);
         return -1;
     }
     return 0;
@@ -124,7 +124,7 @@ int fill_matrix(double *matrix, int n, int s)
 int read_matrix_from_file(double *matrix, int n, FILE* file)
 {
     rewind(file);
-    // printf("size is %ld\n", n * n);
+    // printf("size is %d\n", n * n);
     for (int i = 0; i < n * n; i++) {
         if (fscanf(file, "%lf", &matrix[i]) != 1) {
             fprintf(stderr, "[-] Can't read file.\n");
@@ -237,7 +237,7 @@ int get_inverse_matrix(double *A, double *B, int m)
                 max_ind = i;
             }
         }
-        // printf("max: %lf, max_ind: %ld\n", max, max_ind);
+        // printf("max: %lf, max_ind: %d\n", max, max_ind);
 
         if (max < EPS) {
             return -1;
@@ -246,7 +246,7 @@ int get_inverse_matrix(double *A, double *B, int m)
         // printf("^^^A0\n");
         // print_matrix(B, m, m);
         // printf("^^^B0\n");
-        // printf("max_ind is %ld\n", max_ind);
+        // printf("max_ind is %d\n", max_ind);
 
         // Меняем местами строки, если нашли нужную
         if (max_ind != j) {
@@ -512,7 +512,7 @@ void print_matrix_l_x_n(double *matrix, int l, int n)
 
 //         r1 = mult_sub_norm_p(matrix, inversed_matrix, block, norm, n, m, p, pi);
 //         r2 = mult_sub_norm_p(inversed_matrix, matrix, block, norm, n, m, p, pi);
-//         // printf("F pi: %ld r1 = %8.3e, r2 = %8.3e\n", pi, r1, r2);
+//         // printf("F pi: %d r1 = %8.3e, r2 = %8.3e\n", pi, r1, r2);
 
 //     } else {
 //         r1 = 0;
@@ -536,7 +536,7 @@ void zero_matrix_p(double *matrix, int n, int m, int p, int pi)
 // void unit_matrix_p(double *matrix, int n, int m, int p, int pi)
 // {
 //     zero_matrix_p(matrix, n, m, p, pi);
-//     // printf("pi: %ld\n", pi);
+//     // printf("pi: %d\n", pi);
 //     synchronize(p);
 
 //     // if (pi == 0) {
@@ -581,7 +581,7 @@ int fill_matrix_p(double *matrix, int n, int s, int m, int p, int pi)
                     matrix[i * n + k] = 1. / (i + k + 1);
         break;
     default:
-        fprintf(stderr, "[-] Unknown formula %ld\n", s);
+        fprintf(stderr, "[-] Unknown formula %d\n", s);
         return -1;
     }
     return 0;
@@ -747,10 +747,10 @@ double get_time() {
 //         // buf_array[1] = buf_array[1] * 1. > 1e+13 ? -1. : buf_array[1];
 
         
-//         // printf("%ld min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
-//         // printf("%ld min_norm: %8.3e, ind: %lu\n", pi, min_norm, min_norm_ind);
+//         // printf("%d min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
+//         // printf("%d min_norm: %8.3e, ind: %lu\n", pi, min_norm, min_norm_ind);
 //         synchronize(p, buf_array, 2, reduce::abs_min_first);
-//         // if (pi == 0) printf("%ld min_norm: %8.3e, ind: %.0e\n", pi, buf_array[0], buf_array[1]);
+//         // if (pi == 0) printf("%d min_norm: %8.3e, ind: %.0e\n", pi, buf_array[0], buf_array[1]);
 //         // printf("Yep!\n");
 //         if (buf_array[1] < 0) {
 
@@ -764,7 +764,7 @@ double get_time() {
 //         }
 //         // min_norm = buf_array[0];
 //         min_norm_ind = buf_array[1];
-//         // printf("Step: %ld, thread: %ld\n", diag, pi);
+//         // printf("Step: %d, thread: %d\n", diag, pi);
 
 //         // Переставляю строки так, чтобы на текущем диагональном элементе была
 //         // матрица с наименьшей нормой её обратной
@@ -825,11 +825,11 @@ double get_time() {
 //         for (i = pi; i < bl; i+=p) {
 //             get_block(inversed_matrix, block_A, n, m, k, l, diag, i);
 //             // printf("------matrix------\n");
-//             // printf("Diag = %ld, i = %ld\n", diag, i);
+//             // printf("Diag = %d, i = %d\n", diag, i);
 //             // print_matrix(block_A, (i < k ? m : l), 4);
 //             x = (diag == k ? l : m);
 //             y = (i == k    ? l : m);
-//             // printf("x = %ld, y = %ld\n", x, y);
+//             // printf("x = %d, y = %d\n", x, y);
 //             // printf("------------------\n");
 //             matrix_multiply(block_B, block_A, block_C, x, x, y);
 //             put_block(inversed_matrix, block_C, n, m, k, l, diag, i);
@@ -1275,7 +1275,7 @@ int mpi_calculate(
     MPI_Allreduce(&err, &err, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     if (err) {
         if (pi == 0)
-            fprintf(stderr, "[-] Error in allocation: %ld\n", __LINE__);
+            fprintf(stderr, "[-] Error in allocation: %d\n", __LINE__);
         if (block_A) delete[] block_A;
         if (block_B) delete[] block_B;
         if (block_C) delete[] block_C;
@@ -1318,8 +1318,8 @@ int mpi_calculate(
         // buf_array[1] = buf_array[1] * 1. > 1e+13 ? -1. : buf_array[1];
 
         
-        // printf("%ld min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
-        // printf("%ld min_norm: %8.3e, ind: %lu\n", pi, min_norm, min_norm_ind);
+        // printf("%d min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
+        // printf("%d min_norm: %8.3e, ind: %lu\n", pi, min_norm, min_norm_ind);
         MPI_Allgather(buf_array, 2, MPI_DOUBLE, buf_array, 2, MPI_DOUBLE, MPI_COMM_WORLD);
 
         min_norm = -1;
@@ -1396,11 +1396,11 @@ int mpi_calculate(
         for (int i = pi; i < bl; i+=p) {
             get_block(inversed_matrix, block_A, n, cols, m, k, l, diag, i, p, pi);
             // printf("------matrix------\n");
-            // printf("Diag = %ld, i = %ld\n", diag, i);
+            // printf("Diag = %d, i = %d\n", diag, i);
             // print_matrix(block_A, (i < k ? m : l), 4);
             x = (diag == k ? l : m);
             y = (i == k    ? l : m);
-            // printf("x = %ld, y = %ld\n", x, y);
+            // printf("x = %d, y = %d\n", x, y);
             // printf("------------------\n");
             matrix_multiply(block_B, block_A, block_C, x, x, y);
             put_block(inversed_matrix, block_C, n, cols, m, k, l, diag, i, p, pi);
