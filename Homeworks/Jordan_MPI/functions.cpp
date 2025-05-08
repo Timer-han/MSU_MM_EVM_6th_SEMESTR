@@ -1152,20 +1152,20 @@ void print_matrix_mpi(
 	int n,
 	int m,
 	int p,
-	int k,
+	int pi,
 	double *buf, // n * m блочная строка
 	int max_print,
 	MPI_Comm com
 ) {
-	int main_k = 0; // только 0 в большинстве систем
+	int main_pi = 0; // только 0 в большинстве систем
 	int b, max_b = (n + m - 1) / m;
 	int printed_rows = 0;
 	for (b = 0; b < max_b; b++) {
 		int owner = b % p; // где эта строка
 		int rows = std::min(m, n - b * m);
 		int b_loc = b / p;
-		if (k == main_k) {
-			if (owner == main_k) {
+		if (pi == main_pi) {
+			if (owner == main_pi) {
 				// печать массива, который есть локально
 				printed_rows += print_array(
 					a + b_loc * n * m,
@@ -1197,12 +1197,12 @@ void print_matrix_mpi(
 			}
 		} else {
 			// остальные процессы
-			if (k == owner) {
+			if (pi == owner) {
 				MPI_Send(
 					a + b_loc * n * m,
 					n * rows,
 					MPI_DOUBLE,
-					main_k,
+					main_pi,
 					0, //tag
 					com
 				);
