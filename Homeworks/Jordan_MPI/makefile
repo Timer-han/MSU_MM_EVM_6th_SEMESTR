@@ -1,4 +1,5 @@
-CXXFLAGS = -O3 -mfpmath=sse -fstack-protector-all -g \
+CXXFLAGS = -isystem /usr/local/intel/impi/5.1.3.223/intel64/include \
+           -O3 -mfpmath=sse -fstack-protector-all -g \
            -W -Wall -Wextra -Wunused -Wcast-align \
            -Werror -pedantic -pedantic-errors -Wfloat-equal \
            -Wpointer-arith -Wformat-security -Wmissing-format-attribute \
@@ -8,7 +9,7 @@ CXXFLAGS = -O3 -mfpmath=sse -fstack-protector-all -g \
 
 TARGET = a.out
 
-SRCS = main.cpp functions.h
+SRCS = main.cpp functions.h functions.cpp
 
 
 all:

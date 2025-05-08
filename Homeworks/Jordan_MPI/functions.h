@@ -65,7 +65,7 @@ void zero_matrix_p(double *matrix, int n, int m, int p, int pi);
 void unit_matrix_p(double *matrix, int n, int m, int p, int pi);
 int fill_matrix_p(double *matrix, int n, int s, int m, int p, int pi);
 double get_norm_p(double *matrix, int n, int m, int p, int pi);
-int process_args(Args *a);
+// int process_args(Args *a);
 void rows_permutation_p(double *A, double *block1, double *block2, int n,
                       int m, int k, int l, int i1, int i2,
                       int begin, int p, int pi);

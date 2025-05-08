@@ -19,10 +19,10 @@ int main(int argc, char *argv[])
 
     int n = 0, m = 0, r = 0, s = 0;
     if (
-        sscanf(argv[1], "%lu", &n) != 1 ||
-        sscanf(argv[2], "%lu", &m) != 1 ||
-        sscanf(argv[4], "%lu", &r) != 1 ||
-        sscanf(argv[5], "%lu", &s) != 1)
+        sscanf(argv[1], "%d", &n) != 1 ||
+        sscanf(argv[2], "%d", &m) != 1 ||
+        sscanf(argv[4], "%d", &r) != 1 ||
+        sscanf(argv[5], "%d", &s) != 1)
     {
         printf("[-] Mistake in args!\n");
         MPI_Finalize();
@@ -100,19 +100,16 @@ int main(int argc, char *argv[])
         initmatrix(matrix, n, m, p, rank, s);
     }
     
-
-    
     
 
     printf("%s : Task = %d Res1 = %e Res2 = %e T1 = %.2f T2 = %.2f S = %ld N = "
            "%ld M = %ld P = %ld\n",
-           argv[0], 18, a[0].r1, a[0].r2, -a[0].t1, -a[0].t2, s, n, m, p);
+           argv[0], 18, 0, 0, -0, 0, s, n, m, p);
 
     delete[] matrix;
     delete[] inversed_matrix;
     delete[] block_A;
     delete[] norm;
-    delete[] a;
     if (file)
         fclose(file);
     MPI_Finalize();
