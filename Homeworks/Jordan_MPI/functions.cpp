@@ -1100,14 +1100,14 @@ int read_array(FILE *fp, double *a, int len)
 	return 0;
 }
 
-double get_norm_pi(double *matrix, int n, int m, int cols)
+double get_norm_pi(double *matrix, int n, int cols)
 {
-    int i, j, k;
+    int i, j;
     double max = 0, sum;
     for (j = 0; j < cols; j++) {
         sum = 0;
         for (i = 0; i < n; i++) {
-            sum += std::abs(matrix[j * cols + i]);
+            sum += std::abs(matrix[j + i * cols]);
         }
         max = std::max(max, sum);
     }
@@ -1253,7 +1253,7 @@ int mpi_calculate(
     int cols = get_loc_cols(n, m, p, pi);
     int err = 0;
 
-    double norm = get_norm_pi(matrix, n, m, cols);
+    double norm = get_norm_pi(matrix, n, cols);
 	MPI_Allreduce(&norm, buffer, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     if (pi == 0) EPS *= norm;
     // printf("norm = %8.3e, eps = %8.3e\n", norm, EPS);
