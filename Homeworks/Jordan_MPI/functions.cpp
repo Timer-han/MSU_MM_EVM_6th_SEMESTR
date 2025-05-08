@@ -1137,11 +1137,11 @@ void get_column(
     int i
 )
 {
-    int bl_cols = get_bl_cols(n, m, p, pi);
+    // int bl_cols = get_bl_cols(n, m, p, pi);
     int cols = get_loc_cols(n, m, p, pi);
     for (int j = 0; j < m; j++) {
         for (int k = 0; k < n; k++) {
-            buffer[k * n + j] = matrix[i * m + k * n + j];
+            buffer[k * n + j] = matrix[i * m + k * cols + j];
         }
     }
 }
