@@ -1147,14 +1147,14 @@ void get_column(
 
 
 // печать матрицы
-void print_matrix(
+void print_matrix_mpi(
 	double * a,
 	int n,
 	int m,
 	int p,
 	int k,
 	double *buf, // n * m блочная строка
-	int max_prtint,
+	int max_print,
 	MPI_Comm com
 ) {
 	int main_k = 0; // только 0 в большинстве систем
@@ -1189,11 +1189,11 @@ void print_matrix(
 				);
 				printed_rows += print_array(
 					buf,
-					n
+					n,
 					rows,
 					printed_rows,
 					max_print
-				)
+				);
 			}
 		} else {
 			// остальные процессы
@@ -1205,7 +1205,7 @@ void print_matrix(
 					main_k,
 					0, //tag
 					com
-				)
+				);
 			}
 		}
 	}
@@ -1452,7 +1452,10 @@ int mpi_calculate(
 
     if (pi == 0) {
         printf("\n[+] Inversed matrix:\n");
-        print_matrix(inversed_matrix, n, r);
+        print_matrix_mpi(
+            inversed_matrix, n, m, p, pi, buffer, 4, MPI_COMM_WORLD
+        );
+        // print_matrix(inversed_matrix, n, r);
     }
 
 
