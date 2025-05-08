@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "ostream": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "cmath": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/mpicc"
 }
