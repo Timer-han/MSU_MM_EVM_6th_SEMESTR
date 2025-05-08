@@ -9,12 +9,12 @@
 #include <time.h>
 
 
-void get_block(double *a, double *block, size_t n, size_t m, size_t k, size_t l,
-               size_t i, size_t j)
+void get_block(double *a, double *block, int n, int m, int k, int l,
+               int i, int j)
 {
-    size_t row_count, col_count;
-    size_t row_offset, col_offset;
-    size_t block_row, block_col;
+    int row_count, col_count;
+    int row_offset, col_offset;
+    int block_row, block_col;
 
     // Определяем размеры блока
     if (i < k)
@@ -42,12 +42,12 @@ void get_block(double *a, double *block, size_t n, size_t m, size_t k, size_t l,
     }
 }
 
-void put_block(double *a, double *block, size_t n, size_t m, size_t k, size_t l,
-               size_t i, size_t j)
+void put_block(double *a, double *block, int n, int m, int k, int l,
+               int i, int j)
 {
-    size_t row_size, col_size;
-    size_t row_offset, col_offset;
-    size_t block_row, block_col;
+    int row_size, col_size;
+    int row_offset, col_offset;
+    int block_row, block_col;
 
     // Определяем размеры блока
     if (i < k)
@@ -75,21 +75,21 @@ void put_block(double *a, double *block, size_t n, size_t m, size_t k, size_t l,
     }
 }
 
-void print_matrix(double *matrix, size_t n, size_t r)
+void print_matrix(double *matrix, int n, int r)
 {
-    size_t rows = (r > n) ? n : r;
-    size_t cols = (r > n) ? n : r;
-    for (size_t i = 0; i < rows; i++) {
-        for (size_t j = 0; j < cols; j++) {
+    int rows = (r > n) ? n : r;
+    int cols = (r > n) ? n : r;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
             printf(" %10.3e", matrix[i * n + j]);
         }
         printf("\n");
     }
 }
 
-int fill_matrix(double *matrix, size_t n, size_t s)
+int fill_matrix(double *matrix, int n, int s)
 {
-    size_t i, j;
+    int i, j;
     switch (s) {
     case 1:
         for (i = 0; i < n; i++)
@@ -118,11 +118,11 @@ int fill_matrix(double *matrix, size_t n, size_t s)
     return 0;
 }
 
-int read_matrix_from_file(double *matrix, size_t n, FILE* file)
+int read_matrix_from_file(double *matrix, int n, FILE* file)
 {
     rewind(file);
     // printf("size is %ld\n", n * n);
-    for (size_t i = 0; i < n * n; i++) {
+    for (int i = 0; i < n * n; i++) {
         if (fscanf(file, "%lf", &matrix[i]) != 1) {
             fprintf(stderr, "[-] Can't read file.\n");
             return -1;
@@ -131,22 +131,22 @@ int read_matrix_from_file(double *matrix, size_t n, FILE* file)
     return 0;
 }
 
-void unit_matrix(double *matrix, size_t n)
+void unit_matrix(double *matrix, int n)
 {
     memset(matrix, 0, n * n * sizeof(double));
-    for (size_t i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         matrix[i * n + i] = 1;
     }
 }
 
-void zero_matrix(double *matrix, size_t n, size_t m)
+void zero_matrix(double *matrix, int n, int m)
 {
     memset(matrix, 0, n * m * sizeof(double));
 }
 
-void matrix_multiply(const double *A, const double *B, double *C, size_t p,
-                     size_t q, size_t r) {
-    size_t i, j, k;
+void matrix_multiply(const double *A, const double *B, double *C, int p,
+                     int q, int r) {
+    int i, j, k;
     for (i = 0; i < p; ++i) {
         for (k = 0; k < r; ++k) {
             C[i * r + k] = 0.0;
@@ -173,11 +173,11 @@ void matrix_multiply(const double *A, const double *B, double *C, size_t p,
     }
 }
 
-void rows_permutation(double *A, double *block1, double *block2, size_t n,
-                      size_t m, size_t k, size_t l, size_t i1, size_t i2,
-                      size_t begin)
+void rows_permutation(double *A, double *block1, double *block2, int n,
+                      int m, int k, int l, int i1, int i2,
+                      int begin)
 {
-    size_t i;
+    int i;
     for (i = begin; i < k + 1; i++) {
         get_block(A, block1, n, m, k, l, i1, i);
         get_block(A, block2, n, m, k, l, i2, i);
@@ -186,26 +186,26 @@ void rows_permutation(double *A, double *block1, double *block2, size_t n,
     }
 }
 
-void matrix_sum(double *A, double *B, double *C, size_t n,
-                size_t m) // C = A + B
+void matrix_sum(double *A, double *B, double *C, int n,
+                int m) // C = A + B
 {
-    size_t i;
+    int i;
     for (i = 0; i < n * m; i++) {
         C[i] = A[i] + B[i];
     }
 }
 
-void matrix_subtr(double *A, double *B, size_t n, size_t m) // A -= B
+void matrix_subtr(double *A, double *B, int n, int m) // A -= B
 {
-    size_t i;
+    int i;
     for (i = 0; i < n * m; i++) {
         A[i] -= B[i];
     }
 }
 
-double get_norm(double *matrix, size_t m)
+double get_norm(double *matrix, int m)
 {
-    size_t i, j;
+    int i, j;
     double max = 0, sum;
     for (j = 0; j < m; j++) {
         sum = 0;
@@ -218,9 +218,9 @@ double get_norm(double *matrix, size_t m)
     return max;
 }
 
-int get_inverse_matrix(double *A, double *B, size_t m)
+int get_inverse_matrix(double *A, double *B, int m)
 {
-    size_t i, j, k, max_ind;
+    int i, j, k, max_ind;
     double max, buf;
     unit_matrix(B, m);
     for (j = 0; j < m; j++) {
@@ -297,13 +297,13 @@ int get_inverse_matrix(double *A, double *B, size_t m)
     return 0;
 }
 
-double mult_sub_norm_p(double *a, double *b, double *pc, double *norm, size_t n, size_t m, size_t p, size_t pi)
+double mult_sub_norm_p(double *a, double *b, double *pc, double *norm, int n, int m, int p, int pi)
 {
-    size_t i, j, s, r, t, q;
-    size_t k = n / m;
-    size_t l = n - k * m; // n = k * m + l
-    size_t bl = (l != 0 ? k + 1 : k); // Общее количество блоков
-    size_t v, h, ah;
+    int i, j, s, r, t, q;
+    int k = n / m;
+    int l = n - k * m; // n = k * m + l
+    int bl = (l != 0 ? k + 1 : k); // Общее количество блоков
+    int v, h, ah;
     double max_norm = 0;
 
     for (i = 0; i < n; i++) norm[i] = 0;
@@ -335,8 +335,8 @@ double mult_sub_norm_p(double *a, double *b, double *pc, double *norm, size_t n,
                 double *pb = b + (s * m) * n + j * m; // блок B[s][j]
 
                 // Основные циклы с разверткой для блоков 3x3
-                size_t r_end = (v / 3) * 3;
-                size_t t_end = (h / 3) * 3;
+                int r_end = (v / 3) * 3;
+                int t_end = (h / 3) * 3;
 
                 // Обработка блоков размером 3x3
                 for (r = 0; r < r_end; r += 3) {
@@ -483,17 +483,17 @@ double mult_sub_norm_p(double *a, double *b, double *pc, double *norm, size_t n,
     return max_norm;
 }
 
-void print_matrix_l_x_n(double *matrix, size_t l, size_t n)
+void print_matrix_l_x_n(double *matrix, int l, int n)
 {
-    for (size_t i = 0; i < l; i++) {
-        for (size_t j = 0; j < n; j++) {
+    for (int i = 0; i < l; i++) {
+        for (int j = 0; j < n; j++) {
             printf(" %10.3e", matrix[i * n + j]);
         }
         printf("\n");
     }
 }
 
-int find_diff(double *matrix, double *inversed_matrix, double* block, double *norm, FILE *file, int n, int m, int s, double &r1, double &r2, size_t p, size_t pi)
+int find_diff(double *matrix, double *inversed_matrix, double* block, double *norm, FILE *file, int n, int m, int s, double &r1, double &r2, int p, int pi)
 {
     if (n < 11000) {
         if (s == 0 && pi == 0) {
@@ -519,39 +519,39 @@ int find_diff(double *matrix, double *inversed_matrix, double* block, double *no
 }
 
 
-void zero_matrix_p(double *matrix, size_t n, size_t m, size_t p, size_t pi)
+void zero_matrix_p(double *matrix, int n, int m, int p, int pi)
 {
-    size_t l = n % m, k = n / m, bl = (l > 0 ? k + 1 : k);
-    for (size_t i = 0; i < n; i++) {
-        for (size_t j = pi; j < bl; j += p) {
+    int l = n % m, k = n / m, bl = (l > 0 ? k + 1 : k);
+    for (int i = 0; i < n; i++) {
+        for (int j = pi; j < bl; j += p) {
             memset(matrix + i * n + j * m, 0, (j == k ? l : m) * sizeof(double));
         }
     }
 }
 
 
-void unit_matrix_p(double *matrix, size_t n, size_t m, size_t p, size_t pi)
+void unit_matrix_p(double *matrix, int n, int m, int p, int pi)
 {
     zero_matrix_p(matrix, n, m, p, pi);
     // printf("pi: %ld\n", pi);
     synchronize(p);
 
     // if (pi == 0) {
-    //     for (size_t i = 0; i < n; i++) {
+    //     for (int i = 0; i < n; i++) {
     //         matrix[i * n + i] = 1;
     //     }
     // }
-    for (size_t i = pi * m; i < n; i += p * m) {
-        for (size_t j = i; j < i + m && j < n; j++) {
+    for (int i = pi * m; i < n; i += p * m) {
+        for (int j = i; j < i + m && j < n; j++) {
             matrix[j * n + j] = 1;
         }
     }
 }
 
 
-int fill_matrix_p(double *matrix, size_t n, size_t s, size_t m, size_t p, size_t pi)
+int fill_matrix_p(double *matrix, int n, int s, int m, int p, int pi)
 {
-    size_t i, j, k;
+    int i, j, k;
     switch (s) {
     case 1:
         for (i = 0; i < n; i++)
@@ -585,9 +585,9 @@ int fill_matrix_p(double *matrix, size_t n, size_t s, size_t m, size_t p, size_t
 }
 
 
-double get_norm_p(double *matrix, size_t n, size_t m, size_t p, size_t pi)
+double get_norm_p(double *matrix, int n, int m, int p, int pi)
 {
-    size_t i, j, k;
+    int i, j, k;
     double max = 0, sum;
     for (j = pi * m; j < n; j += p * m) {
         for (k = j; k < j + m && k < n; k++) {
@@ -604,11 +604,11 @@ double get_norm_p(double *matrix, size_t n, size_t m, size_t p, size_t pi)
 
 
 
-void rows_permutation_p(double *A, double *block1, double *block2, size_t n,
-                      size_t m, size_t k, size_t l, size_t i1, size_t i2,
-                      size_t begin, size_t p, size_t pi)
+void rows_permutation_p(double *A, double *block1, double *block2, int n,
+                      int m, int k, int l, int i1, int i2,
+                      int begin, int p, int pi)
 {
-    size_t i;
+    int i;
     if (begin % p <= pi) begin += pi - begin % p;
     else begin += p + pi - begin % p;
 
@@ -631,8 +631,8 @@ void *thread_func(void *args)
 {
 	Args *a = (Args*) args;
 	
-	size_t p = a->p, pi = a->pi, n = a->n, m = a->m, s = a->s, k = a->k, l = a->l, r = a->r;
-    size_t diag, i, j, bl = (l == 0) ? k : k + 1, min_norm_ind, row, x, y, z, begin;
+	int p = a->p, pi = a->pi, n = a->n, m = a->m, s = a->s, k = a->k, l = a->l, r = a->r;
+    int diag, i, j, bl = (l == 0) ? k : k + 1, min_norm_ind, row, x, y, z, begin;
     double *matrix = a->matrix, *inversed_matrix = a->inversed_matrix, *block = a->block, *norm_arr = a->norm;
     // double r1 = a->r1, r2 = a->r2;
     double norm = 0, min_norm, buf_array[2];
@@ -953,7 +953,7 @@ int get_max_cols(
 }
 
 // число блочных столбцов на процесс
-int get_cols(
+int get_bl_cols(
 	int n,
 	int m,
 	int p,
@@ -1016,7 +1016,7 @@ void initmatrix(
 ) {
 	int i_loc, j_loc, i_glob, j_glob, rows;
 	// сколько строк в процессе
-	rows = get_cols(n, m, p, pi);
+	rows = get_bl_cols(n, m, p, pi);
 
 	for (i_loc = 0; i_loc < rows; i_loc++) {
 		i_glob = l2g(n, m, p, pi, i_loc);
@@ -1065,7 +1065,7 @@ int read_matrix(
 
         MPI_Bcast(buf, n * rows, MPI_DOUBLE, main_pi, com);
 
-        int cols = get_cols(n, m, p, pi);
+        int cols = get_bl_cols(n, m, p, pi);
         int cols_loc = get_loc_cols(n, m, p, pi);
         int pos = 0;
         for (int i = 0; i < rows; i++) {
@@ -1092,5 +1092,278 @@ int read_array(FILE *fp, double *a, int len)
 		if (fscanf(fp, "%lf", a + i) != 1) return -2;
 	}
 	return 0;
+}
+
+double get_norm_pi(double *matrix, int n, int m, int cols)
+{
+    int i, j, k;
+    double max = 0, sum;
+    for (j = 0; j < cols; j++) {
+        sum = 0;
+        for (i = 0; i < n; i++) {
+            sum += std::abs(matrix[j * cols + i]);
+        }
+        max = std::max(max, sum);
+    }
+    return max;
+}
+
+int get_block_p(
+    double *matrix,
+    double *block,
+    int n,
+    int m,
+    int p,
+    int pi
+)
+{
+    int bl_cols = get_bl_cols(n, m, p, pi);
+    int cols = get_loc_cols(n, m, p, pi);
+}
+
+
+int mpi_calculate(
+    double * matrix,
+    double * inversed_matrix,
+    double * block,
+    double * buffer,
+    int n,
+    int m,
+    int p,
+    int pi
+)
+{
+    int bl_cols = get_bl_cols(n, m, p, pi);
+    int cols = get_loc_cols(n, m, p, pi);
+    int err = 0;
+
+    double norm = get_norm_pi(matrix, n, m, cols);
+	MPI_Allreduce(&norm, buffer, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    if (pi == 0) EPS *= norm;
+    // printf("norm = %8.3e, eps = %8.3e\n", norm, EPS);
+	MPI_Bcast(buffer, 0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    int bl = (n + m - 1) / m;
+    int k = n / m;
+    int l = n % m;
+    int min_norm_ind;
+    double min_norm;
+
+    double *block_A = new double[m*m];
+    double *block_B = new double[m*m];
+    double *block_C = new double[m*m];
+
+    if (!block_A || !block_B || !block_C) {
+        err = 1;
+    }
+    MPI_Allreduce(&err, &err, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    if (err) {
+        if (block_A) delete[] block_A;
+        if (block_B) delete[] block_B;
+        if (block_C) delete[] block_C;
+        return -1;
+    }
+
+
+    // Пробегаюсь по диагональным элементам
+    for (int diag = 0; diag < bl; diag++) {
+        min_norm = -1.;
+        min_norm_ind = -1;
+        // Ищу в столбце матрицу у кооторой обратная имеет наименьшую норму
+        if (diag < k) {
+            for (int row = diag + pi; row < k; row += p) {
+                get_block(matrix, block_A, n, m, k, l, diag, row);
+                if (get_inverse_matrix(block_A, block_B, m) == 0) {
+                    // print_matrix(block_B, m, print_size);
+                    norm = get_norm(block_B, m);
+                    // printf("norm is %8.3e\n", norm);
+                    if (min_norm < 0 || norm < min_norm) {
+                        min_norm = norm;
+                        min_norm_ind = row;
+                    }
+                }
+            }
+        } else {
+            if (pi == 0) {
+                get_block(matrix, block_A, n, m, k, l, k, k);
+                if (get_inverse_matrix(block_A, block_B, l) == 0) {
+                    norm = get_norm(block_B, l);
+                    min_norm = norm;
+                    min_norm_ind = k;
+                }
+            }
+        }
+        buf_array[0] = min_norm;
+        buf_array[1] = min_norm_ind * 1. > 1e+13 ? -1. : min_norm_ind;
+        // buf_array[1] = buf_array[1] * 1. > 1e+13 ? -1. : buf_array[1];
+
+        
+        // printf("%ld min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
+        // printf("%ld min_norm: %8.3e, ind: %lu\n", pi, min_norm, min_norm_ind);
+        synchronize(p, buf_array, 2, reduce::abs_min_first);
+        // if (pi == 0) printf("%ld min_norm: %8.3e, ind: %.0e\n", pi, buf_array[0], buf_array[1]);
+        // printf("Yep!\n");
+        if (buf_array[1] < 0) {
+
+            fprintf(stderr, "[-] Matrix is irreversible, place: 923!\n");
+            a->error_flag = 1;
+            a->error_type = io_status::irreversible;
+            delete[] block_A;
+            delete[] block_B;
+            delete[] block_C;
+            return nullptr;
+        }
+        // min_norm = buf_array[0];
+        min_norm_ind = buf_array[1];
+        // printf("Step: %ld, thread: %ld\n", diag, pi);
+
+        // Переставляю строки так, чтобы на текущем диагональном элементе была
+        // матрица с наименьшей нормой её обратной
+        rows_permutation_p(
+            matrix, block_A, block_B, n, m, k, l, min_norm_ind, diag, diag, p, pi
+        );
+        rows_permutation_p(
+            inversed_matrix, block_A, block_B, n, m, k, l, min_norm_ind, diag, 0, p, pi
+        );
+        
+        // Нахожу обратную в потоке pi
+        if (diag % p == pi) {
+            get_block(matrix, block_A, n, m, k, l, diag, diag);
+            if (diag != k) {
+                if (get_inverse_matrix(block_A, block, m) != 0) {
+                    fprintf(stderr, "[-] Matrix is irreversible, place 949!\n");
+                    a->error_flag = 1;
+                    a->error_type = io_status::irreversible;
+                    delete[] block_A;
+                    delete[] block_B;
+                    delete[] block_C;
+                    return nullptr;
+                }
+            } else {
+                if (get_inverse_matrix(block_A, block, l) != 0) {
+                    fprintf(stderr, "[-] Matrix is irreversible!\n");
+                    a->error_flag = 1;
+                    a->error_type = io_status::irreversible;
+                    delete[] block_A;
+                    delete[] block_B;
+                    delete[] block_C;
+                    return nullptr;
+                }
+            }
+        }
+        synchronize(p);
+
+        memcpy(block_B, block, m * m * sizeof(double));
+        
+        // Вставляю единичную на место текущего диагонального элемента
+        // put_block(matrix, block_A, n, m, k, l, diag, diag);
+
+        // Начиная со следующего каждый элемент в строке домножаю на обратную к диагональному
+        // block_B - обратная к диагональному
+        begin = diag + 1;
+        if (begin % p <= pi) begin += pi - begin % p;
+        else begin += pi + p - begin % p;
+
+        for (i = begin; i < bl; i+=p) {
+            get_block(matrix, block_A, n, m, k, l, diag, i);
+            x = (diag == k ? l : m);
+            y = (i == k    ? l : m);
+            matrix_multiply(block_B, block_A, block_C, x, x, y);
+            put_block(matrix, block_C, n, m, k, l, diag, i);
+        }
+
+        // Каждый элемент той же строки матрицы В домножаю на эту же обратную
+        for (i = pi; i < bl; i+=p) {
+            get_block(inversed_matrix, block_A, n, m, k, l, diag, i);
+            // printf("------matrix------\n");
+            // printf("Diag = %ld, i = %ld\n", diag, i);
+            // print_matrix(block_A, (i < k ? m : l), 4);
+            x = (diag == k ? l : m);
+            y = (i == k    ? l : m);
+            // printf("x = %ld, y = %ld\n", x, y);
+            // printf("------------------\n");
+            matrix_multiply(block_B, block_A, block_C, x, x, y);
+            put_block(inversed_matrix, block_C, n, m, k, l, diag, i);
+        }
+
+        synchronize(p);
+
+        // Для каждой строки, кроме той, на которой есть текущий диагональный
+        for (i = 0; i < bl; i++) {
+            if (i != diag) {
+                // Запоминаем блок диагонального столбца и текущей строки
+
+                get_block(matrix, block_A, n, m, k, l, i, diag);
+                // Для каждого следующего элемента текущей строки, вычитаем из него А х С
+                for (j = begin; j < bl; j+=p) { // j - номер столбца
+
+                    get_block(matrix, block_C, n, m, k, l, diag, j);
+
+                    x = (i == k    ? l : m);
+                    y = (diag == k ? l : m);
+                    z = (j == k    ? l : m);
+                    matrix_multiply(block_A, block_C, block_B, x, y, z);
+
+                    get_block(matrix, block_C, n, m, k, l, i, j);
+                    matrix_subtr(block_C, block_B, x, z);
+                    put_block(matrix, block_C, n, m, k, l, i, j);
+                }
+
+                // Аналогично для матрицы В
+                for (j = pi; j < bl; j+=p) {
+                    get_block(inversed_matrix, block_C, n, m, k, l, diag, j);
+                    x = (i == k    ? l : m);
+                    y = (diag == k ? l : m);
+                    z = (j == k    ? l : m);
+                    matrix_multiply(block_A, block_C, block_B, x, y, z);
+
+                    get_block(inversed_matrix, block_C, n, m, k, l, i, j);
+                    matrix_subtr(block_C, block_B, x, z);
+                    put_block(inversed_matrix, block_C, n, m, k, l, i, j);
+                }
+            }
+        }
+        synchronize(p);
+    }
+
+	synchronize(p, & a-> error_flag, 1);
+	if (a -> error_flag > 0) {
+		delete[] block_A;
+        delete[] block_B;
+        delete[] block_C;
+		return nullptr;
+	}
+
+    a->t1 -= get_time();
+
+    if (pi == 0) {
+        printf("\n[+] Inversed matrix:\n");
+        print_matrix(inversed_matrix, n, r);
+    }
+
+
+    a->t2 = get_time();
+
+    if (find_diff(matrix, inversed_matrix, block_A, norm_arr, file, n, m, s, a->r1, a->r2, p, pi) != 0) {
+        a->error_type = io_status::error_read;
+        a->error_flag = 1;
+    }
+	synchronize(p, & a-> error_flag, 1);
+    if (a -> error_flag > 0) {
+		delete[] block_A;
+        delete[] block_B;
+        delete[] block_C;
+		return nullptr;
+	}
+
+    a->t2 -= get_time();
+
+
+	a -> error_type = io_status::success;
+
+    delete[] block_A;
+    delete[] block_B;
+    delete[] block_C;
+	return nullptr;
 }
 

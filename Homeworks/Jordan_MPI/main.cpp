@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    size_t n = 0, m = 0, r = 0, s = 0;
+    int n = 0, m = 0, r = 0, s = 0;
     if (
         sscanf(argv[1], "%lu", &n) != 1 ||
         sscanf(argv[2], "%lu", &m) != 1 ||
@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
-    size_t p = world_size;
-    size_t l = n % m;
-    size_t k = n / m;
+    int p = world_size;
+    int l = n % m;
+    int k = n / m;
     int reduce_sum = 0;
 
     if (l > 0 && k + 1 < p)
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     }
 
     int error;
-    size_t i;
+    int i;
 
 
     char *filename = nullptr;
