@@ -13,5 +13,5 @@ SRCS = main.cpp functions.h functions.cpp
 
 
 all:
-	mpicc $(CXXFLAGS) $(SRCS) -o $(TARGET)
+	mpicxx $(CXXFLAGS) $(SRCS) -o $(TARGET)
     # g++ -g $(SRCS) -o $(TARGET)
