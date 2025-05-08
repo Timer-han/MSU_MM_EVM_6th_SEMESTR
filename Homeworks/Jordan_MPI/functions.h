@@ -82,3 +82,21 @@ int function(int s, int n, int i, int j);
 void initmatrix( double *a, int n, int m, int p, int pi, int s);
 int read_matrix( double *a, int n, int m, int p, int pi, const char *name, double *buf,	MPI_Comm com);
 int read_array(FILE *fp, double *a, int len);
+
+int print_array(
+	double *a,
+	int n,
+	int rows,
+	int printed_rows,
+	int max_print
+);
+
+int mpi_calculate(
+    double * matrix,            // n x (m * bl_cols)
+    double * inversed_matrix,   // n x (m * bl_cols)
+    double * buffer,            // n x m
+    int n,
+    int m,
+    int p,
+    int pi
+);

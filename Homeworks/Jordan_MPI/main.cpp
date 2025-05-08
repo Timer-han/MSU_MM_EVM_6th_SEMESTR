@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    MPI_Comm comm;
+    // MPI_Comm comm;
     MPI_Init(&argc, &argv);
 
     
@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    int error;
-    int i;
+    // int error;
+    // int i;
 
 
     char *filename = nullptr;
@@ -99,12 +99,16 @@ int main(int argc, char *argv[])
     } else {
         initmatrix(matrix, n, m, p, rank, s);
     }
+
+    mpi_calculate(
+        matrix, inversed_matrix, buffer, n, m, p, rank
+    );
     
     
 
-    printf("%s : Task = %d Res1 = %e Res2 = %e T1 = %.2f T2 = %.2f S = %ld N = "
-           "%ld M = %ld P = %ld\n",
-           argv[0], 18, 0, 0, -0, 0, s, n, m, p);
+    printf("%s : Task = %d Res1 = %e Res2 = %e T1 = %.2f T2 = %.2f S = %d N = "
+           "%d M = %d P = %d\n",
+           argv[0], 18, 0., 0., -0., 0., s, n, m, p);
 
     delete[] matrix;
     delete[] inversed_matrix;

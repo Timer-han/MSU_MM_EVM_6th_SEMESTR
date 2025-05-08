@@ -1141,7 +1141,7 @@ void get_column(
     int cols = get_loc_cols(n, m, p, pi);
     for (int j = 0; j < m; j++) {
         for (int k = 0; k < n; k++) {
-            buffer[k * n + j] = matrix[i * m + k * cols + j];
+            buffer[k * m + j] = matrix[i * m + k * cols + j];
         }
     }
 }
@@ -1241,7 +1241,6 @@ int print_array(
 int mpi_calculate(
     double * matrix,            // n x (m * bl_cols)
     double * inversed_matrix,   // n x (m * bl_cols)
-    double * block,             // m x m
     double * buffer,            // n x m
     int n,
     int m,
@@ -1249,7 +1248,7 @@ int mpi_calculate(
     int pi
 )
 {
-    int bl_cols = get_bl_cols(n, m, p, pi);
+    // int bl_cols = get_bl_cols(n, m, p, pi);
     int cols = get_loc_cols(n, m, p, pi);
     int err = 0;
 
@@ -1326,7 +1325,7 @@ int mpi_calculate(
         min_norm = -1;
         min_norm_ind = -1;
         for (int i = 0; i < p; i++) {
-            if (buf_array[i * 2] < min_norm || min_norm < EPS && buf_array[i * 2] >= EPS) {
+            if (buf_array[i * 2] < min_norm || (min_norm < EPS && buf_array[i * 2] >= EPS)) {
                 min_norm = buf_array[i * 2];
                 min_norm_ind = round(buf_array[i * 2 + 1]);
             }
