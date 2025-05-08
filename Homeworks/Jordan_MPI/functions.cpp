@@ -1114,18 +1114,18 @@ double get_norm_pi(double *matrix, int n, int cols)
     return max;
 }
 
-int get_block_p(
-    double *matrix,
-    double *block,
-    int n,
-    int m,
-    int p,
-    int pi
-)
-{
-    int bl_cols = get_bl_cols(n, m, p, pi);
-    int cols = get_loc_cols(n, m, p, pi);
-}
+// int get_block_p(
+//     double *matrix,
+//     double *block,
+//     int n,
+//     int m,
+//     int p,
+//     int pi
+// )
+// {
+//     int bl_cols = get_bl_cols(n, m, p, pi);
+//     int cols = get_loc_cols(n, m, p, pi);
+// }
 
 void get_column(
     double *matrix,
