@@ -1146,7 +1146,96 @@ void get_column(
 }
 
 
+// печать матрицы
+void print_matrix(
+	double * a,
+	int n,
+	int m,
+	int p,
+	int k,
+	double *buf, // n * m блочная строка
+	int max_prtint,
+	MPI_Comm com
+) {
+	int main_k = 0; // только 0 в большинстве систем
+	int b, max_b = (n + m - 1) / m;
+	int printed_rows = 0;
+	for (b = 0; b < max_b; b++) {
+		int owner = b % p; // где эта строка
+		int rows = std::min(m, n - b * m);
+		int b_loc = b / p;
+		if (k == main_k) {
+			if (owner == main_k) {
+				// печать массива, который есть локально
+				printed_rows += print_array(
+					a + b_loc * n * m,
+					n,
+					rows,
+					printed_rows,
+					max_print
+				);
+			}
+			else {
+				// главный должен получить от владельца
+				MPI_Status st;
+				MPI_Recv(
+					buf,
+					n*rows,
+					MPI_DOUBLE,
+					owner,
+					0, //tag
+					com,
+					&st
+				);
+				printed_rows += print_array(
+					buf,
+					n
+					rows,
+					printed_rows,
+					max_print
+				)
+			}
+		} else {
+			// остальные процессы
+			if (k == owner) {
+				MPI_Send(
+					a + b_loc * n * m,
+					n * rows,
+					MPI_DOUBLE,
+					main_k,
+					0, //tag
+					com
+				)
+			}
+		}
+	}
+}
 
+// печать прямоугольной матрицы с адресом a, длиной строки n, числом строк rows
+// число напечатаных строк <= max_print
+// возвращает число напечатаных строк
+int print_array(
+	double *a,
+	int n,
+	int rows,
+	int printed_rows,
+	int max_print
+) {
+	// число печатаемых столбцов
+	int p_n = (n > max_print ? max_print : n);
+	if (printed_rows >= max_print) return 0;
+	
+	// количество печатаемых строк
+	int p_r = (printed_rows + rows <= max_print ? rows : max_print - rows);
+	
+	for (int i = 0; i < p_r; i++) { // по строкам
+		for (int j = 0; j < p_n; j++) { // по столбцам
+			printf(" %10.3e", a[i * n + j]);
+		}
+		printf("\n");
+	}
+	return p_r;
+}
 
 int mpi_calculate(
     double * matrix,            // n x (m * bl_cols)
