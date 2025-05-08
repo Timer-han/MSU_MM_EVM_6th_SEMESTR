@@ -919,7 +919,7 @@ double get_time() {
 
 // local to global
 int l2g (
-	int n,
+	int /*n*/,
 	int m,
 	int p,
 	int pi,
@@ -934,10 +934,10 @@ int l2g (
 
 // global to local
 int g2l (
-	int n,
+	int /*n*/,
 	int m,
 	int p,
-	int pi,
+	int /*pi*/,
 	int i_glob
 ) {
 	// номер блочного глобального столбца
@@ -975,18 +975,19 @@ int get_loc_cols(
     int p,
     int pi
 ) {
-    int b = (n + m - 1) / m;
-    int l = n % m;
-    if (l == 0) {
-        return b * m;
+    int b = (n + m - 1) / m, b_loc;
+    if (pi <= b % p) {
+        b_loc = b / p + 1;
     } else {
-        return (b - 1) * m + l;
+        b_loc = b / p;
     }
+    
+    return b_loc;
 }
 
 // в каком процессе лежит столбец?
-int get_k(
-	int n,
+int get_pi(
+	int /*n*/,
 	int m,
 	int p,
 	int i_glob
@@ -1058,12 +1059,12 @@ int read_matrix(
 	int b, max_b = (n + m - 1) / m;
 	for (b = 0; b < max_b; b++) {
 		// владелец строки
-		int owner = b % p;
+		// int owner = b % p;
 		int rows = b * m + m <= n ? m : n - b * m;
 		// rows = min (m, n - b * m)
 		
 		// лок номер столбца
-		int b_loc = b / p;
+		// int b_loc = b / p;
 		if (pi == main_pi) {
 			err += read_array(fp, buf, n * rows);
 		}
