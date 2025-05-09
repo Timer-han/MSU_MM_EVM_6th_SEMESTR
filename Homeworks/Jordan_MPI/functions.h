@@ -98,5 +98,6 @@ int mpi_calculate(
     int n,
     int m,
     int p,
-    int pi
+    int pi,
+    MPI_Comm com
 );

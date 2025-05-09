@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    // MPI_Comm comm;
+    MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Init(&argc, &argv);
 
     
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
     }
 
     mpi_calculate(
-        matrix, inversed_matrix, buffer, n, m, p, rank
+        matrix, inversed_matrix, buffer, n, m, p, rank, comm
     );
     
     
