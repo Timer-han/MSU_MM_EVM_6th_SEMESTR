@@ -19,7 +19,8 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
     $(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET)
 
-
+%.o: %.cpp $(HDRS)
+    $(CXX) $(CXXFLAGS) -c $< -o $@
 
 all:
 	mpicxx $(CXXFLAGS) $(SRCS) -o $(TARGET)
