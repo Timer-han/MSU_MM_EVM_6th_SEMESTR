@@ -1241,7 +1241,6 @@ int print_array(
 int mpi_calculate(
     double * matrix,            // n x (m * bl_cols)
     double * inversed_matrix,   // n x (m * bl_cols)
-    double * buffer,            // n x m
     int n,
     int m,
     int p,
@@ -1252,37 +1251,38 @@ int mpi_calculate(
     int cols = get_loc_cols(n, m, p, pi);
     int err = 0;
 
-    double norm = get_norm_pi(matrix, n, cols);
-	MPI_Allreduce(&norm, buffer, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-    if (pi == 0) EPS *= norm;
-    // printf("norm = %8.3e, eps = %8.3e\n", norm, EPS);
-	MPI_Bcast(buffer, 0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
+    
     int bl = (n + m - 1) / m;
     int k = n / m;
     int l = n % m;
     int min_norm_ind;
     double min_norm;
-
+    
+    double *buffer = new double[n * m];
     double *block_A = new double[m*m];
     double *block_B = new double[m*m];
     double *block_C = new double[m*m];
     double *buf_array = new double[2 * p];
-
+    
     if (!block_A || !block_B || !block_C) {
         err = 1;
     }
     MPI_Allreduce(&err, &err, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     if (err) {
         if (pi == 0)
-            fprintf(stderr, "[-] Error in allocation: %d\n", __LINE__);
+        fprintf(stderr, "[-] Error in allocation: %d\n", __LINE__);
         if (block_A) delete[] block_A;
         if (block_B) delete[] block_B;
         if (block_C) delete[] block_C;
         return -1;
     }
-
-
+    
+    double norm = get_norm_pi(matrix, n, cols);
+    MPI_Allreduce(&norm, buffer, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    if (pi == 0) EPS *= norm;
+    // printf("norm = %8.3e, eps = %8.3e\n", norm, EPS);
+    MPI_Bcast(buffer, 0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    
     // Пробегаюсь по диагональным элементам
     for (int diag = 0; diag < bl; diag++) {
         min_norm = -1.;
