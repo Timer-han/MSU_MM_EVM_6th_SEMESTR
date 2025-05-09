@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
     }
 
     mpi_calculate(
-        matrix, inversed_matrix, buffer, n, m, p, rank, comm
+        matrix, inversed_matrix, n, m, p, rank, comm
     );
     
     

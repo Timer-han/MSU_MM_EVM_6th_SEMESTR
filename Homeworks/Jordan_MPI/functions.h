@@ -94,7 +94,6 @@ int print_array(
 int mpi_calculate(
     double * matrix,            // n x (m * bl_cols)
     double * inversed_matrix,   // n x (m * bl_cols)
-    double * buffer,            // n x m
     int n,
     int m,
     int p,
