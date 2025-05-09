@@ -1258,13 +1258,13 @@ int mpi_calculate(
     int l = n % m;
     int min_norm_ind;
     double min_norm;
-    
+
     double *buffer = new double[n * m];
-    double *block_A = new double[m*m];
-    double *block_B = new double[m*m];
-    double *block_C = new double[m*m];
+    double *block_A = new double[m * m];
+    double *block_B = new double[m * m];
+    double *block_C = new double[m * m];
     double *buf_array = new double[2 * p];
-    
+
     if (!block_A || !block_B || !block_C) {
         err = 1;
     }
