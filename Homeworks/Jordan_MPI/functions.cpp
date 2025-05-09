@@ -1244,7 +1244,8 @@ int mpi_calculate(
     int n,
     int m,
     int p,
-    int pi
+    int pi,
+    MPI_Comm com
 )
 {
     // int bl_cols = get_bl_cols(n, m, p, pi);
@@ -1267,7 +1268,7 @@ int mpi_calculate(
     if (!block_A || !block_B || !block_C) {
         err = 1;
     }
-    MPI_Allreduce(&err, &err, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&err, &err, 1, MPI_INT, MPI_SUM, com);
     if (err) {
         if (pi == 0)
         fprintf(stderr, "[-] Error in allocation: %d\n", __LINE__);
@@ -1278,17 +1279,17 @@ int mpi_calculate(
     }
     
     double norm = get_norm_pi(matrix, n, cols);
-    MPI_Allreduce(&norm, buffer, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&norm, buffer, 1, MPI_DOUBLE, MPI_MAX, com);
     if (pi == 0) EPS *= norm;
     // printf("norm = %8.3e, eps = %8.3e\n", norm, EPS);
-    MPI_Bcast(buffer, 0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(buffer, 0, MPI_DOUBLE, 0, com);
     
     // Пробегаюсь по диагональным элементам
     for (int diag = 0; diag < bl; diag++) {
         min_norm = -1.;
         min_norm_ind = -1;
         get_column(matrix, buffer, n, m, p, pi, diag);
-        MPI_Bcast(buffer, n * m, MPI_DOUBLE, diag % p, MPI_COMM_WORLD);
+        MPI_Bcast(buffer, n * m, MPI_DOUBLE, diag % p, com);
         // Ищу в столбце матрицу у кооторой обратная имеет наименьшую норму
         if (diag < k) {
             for (int row = diag + pi; row < k; row += p) {
@@ -1320,7 +1321,7 @@ int mpi_calculate(
         
         // printf("%d min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
         // printf("%d min_norm: %8.3e, ind: %lu\n", pi, min_norm, min_norm_ind);
-        MPI_Allgather(buf_array, 2, MPI_DOUBLE, buf_array, 2, MPI_DOUBLE, MPI_COMM_WORLD);
+        MPI_Allgather(buf_array, 2, MPI_DOUBLE, buf_array, 2, MPI_DOUBLE, com);
 
         min_norm = -1;
         min_norm_ind = -1;
@@ -1371,7 +1372,7 @@ int mpi_calculate(
             }
         }
 
-        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(com);
 
         
         // Вставляю единичную на место текущего диагонального элемента
@@ -1406,7 +1407,7 @@ int mpi_calculate(
             put_block(inversed_matrix, block_C, n, cols, m, k, l, diag, i, p, pi);
         }
 
-        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(com);
 
         // Для каждой строки, кроме той, на которой есть текущий диагональный
         for (int i = 0; i < bl; i++) {
@@ -1443,17 +1444,17 @@ int mpi_calculate(
                 }
             }
         }
-        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(com);
     }
 
-	MPI_Barrier(MPI_COMM_WORLD);
+	MPI_Barrier(com);
 
     // a->t1 -= get_time();
 
     if (pi == 0) {
         printf("\n[+] Inversed matrix:\n");
         print_matrix_mpi(
-            inversed_matrix, n, m, p, pi, buffer, 4, MPI_COMM_WORLD
+            inversed_matrix, n, m, p, pi, buffer, 4, com
         );
         // print_matrix(inversed_matrix, n, r);
     }
@@ -1464,7 +1465,7 @@ int mpi_calculate(
     // if (find_diff(matrix, inversed_matrix, block_A, norm_arr, file, n, m, s, a->r1, a->r2, p, pi) != 0) {
     //     err = 1;
     // }
-    // MPI_Allreduce(&err, &err, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    // MPI_Allreduce(&err, &err, 1, MPI_INT, MPI_SUM, com);
     // if (err > 0) {
 	// 	delete[] block_A;
     //     delete[] block_B;
