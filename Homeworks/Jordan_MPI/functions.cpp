@@ -1268,20 +1268,27 @@ int mpi_calculate(
     if (!block_A || !block_B || !block_C) {
         err = 1;
     }
+    
     MPI_Allreduce(&err, &err, 1, MPI_INT, MPI_SUM, com);
     if (err) {
         if (pi == 0)
-        fprintf(stderr, "[-] Error in allocation: %d\n", __LINE__);
-        if (block_A) delete[] block_A;
-        if (block_B) delete[] block_B;
-        if (block_C) delete[] block_C;
+            fprintf(stderr, "[-] Error in allocation: %d\n", __LINE__);
+        if (block_A)
+            delete[] block_A;
+        if (block_B)
+            delete[] block_B;
+        if (block_C)
+            delete[] block_C;
+        if (buffer)
+            delete[] buffer;
+        if (buf_array)
+            delete[] buf_array;
         return -1;
     }
     
     double norm = get_norm_pi(matrix, n, cols);
     MPI_Allreduce(&norm, buffer, 1, MPI_DOUBLE, MPI_MAX, com);
     if (pi == 0) EPS *= norm;
-    // printf("norm = %8.3e, eps = %8.3e\n", norm, EPS);
     MPI_Bcast(buffer, 0, MPI_DOUBLE, 0, com);
     
     // Пробегаюсь по диагональным элементам
@@ -1338,6 +1345,8 @@ int mpi_calculate(
             delete[] block_A;
             delete[] block_B;
             delete[] block_C;
+            delete[] buffer;
+            delete[] buf_array;
             return -2;
         }
 
@@ -1359,6 +1368,8 @@ int mpi_calculate(
                 delete[] block_A;
                 delete[] block_B;
                 delete[] block_C;
+                delete[] buffer;
+                delete[] buf_array;
                 return -2;
             }
         } else {
@@ -1368,6 +1379,8 @@ int mpi_calculate(
                 delete[] block_A;
                 delete[] block_B;
                 delete[] block_C;
+                delete[] buffer;
+                delete[] buf_array;
                 return -2;
             }
         }
@@ -1481,6 +1494,7 @@ int mpi_calculate(
     delete[] block_A;
     delete[] block_B;
     delete[] block_C;
+    delete[] buffer;
     delete[] buf_array;
 	return 0;
 }
