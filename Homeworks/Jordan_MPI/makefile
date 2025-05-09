@@ -9,7 +9,9 @@ CXXFLAGS = -isystem /usr/local/intel/impi/5.1.3.223/intel64/include \
 
 TARGET = a.out
 
-SRCS = main.cpp functions.h functions.cpp
+SRCS = main.cpp functions.cpp
+HDRS = functions.h
+OBJS = $($SRCS:.cpp=.o)
 
 
 all:
