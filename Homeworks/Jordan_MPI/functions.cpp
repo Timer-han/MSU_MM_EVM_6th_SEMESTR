@@ -92,18 +92,6 @@ void print_matrix(double *matrix, int n, int r)
 }
 
 
-int read_matrix_from_file(double *matrix, int n, FILE* file)
-{
-    rewind(file);
-    // printf("size is %d\n", n * n);
-    for (int i = 0; i < n * n; i++) {
-        if (fscanf(file, "%lf", &matrix[i]) != 1) {
-            fprintf(stderr, "[-] Can't read file.\n");
-            return -1;
-        }
-    }
-    return 0;
-}
 
 void unit_matrix(double *matrix, int n)
 {
@@ -491,23 +479,23 @@ void zero_matrix_p(double *matrix, int n, int m, int p, int pi)
 }
 
 
-// void unit_matrix_p(double *matrix, int n, int m, int p, int pi)
-// {
-//     zero_matrix_p(matrix, n, m, p, pi);
-//     // printf("pi: %d\n", pi);
-//     synchronize(p);
+void unit_matrix_p(double *matrix, int n, int m, int p, int pi)
+{
+    zero_matrix_p(matrix, n, m, p, pi);
+    // printf("pi: %d\n", pi);
+    // synchronize(p);
 
-//     // if (pi == 0) {
-//     //     for (int i = 0; i < n; i++) {
-//     //         matrix[i * n + i] = 1;
-//     //     }
-//     // }
-//     for (int i = pi * m; i < n; i += p * m) {
-//         for (int j = i; j < i + m && j < n; j++) {
-//             matrix[j * n + j] = 1;
-//         }
-//     }
-// }
+    // if (pi == 0) {
+    //     for (int i = 0; i < n; i++) {
+    //         matrix[i * n + i] = 1;
+    //     }
+    // }
+    for (int i = pi * m; i < n; i += p * m) {
+        for (int j = i; j < i + m && j < n; j++) {
+            matrix[j * n + j] = 1;
+        }
+    }
+}
 
 
 int fill_matrix_p(double *matrix, int n, int s, int m, int p, int pi)
