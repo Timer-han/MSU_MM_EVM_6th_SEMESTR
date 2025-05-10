@@ -917,7 +917,6 @@ int get_loc_cols(
     int b = get_bl_cols(n, m, p, pi);
     int b_loc = b * m;
     int l = n % m;
-    std::cout << "b, b_loc, l, pi: " << b << ", " << b_loc << ", " << l << ", " << pi << std::endl;
 
     if (pi == b % p && l > 0) {
         b_loc = b * m - m + l;
