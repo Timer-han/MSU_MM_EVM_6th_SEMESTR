@@ -1109,6 +1109,7 @@ void print_matrix_mpi(
 
             // печать всей блочной строки
             print_array(buf, n, m, m, max_print, printed_rows, p);
+            std::cout << "printed_rows: " << printed_rows << std::endl;
         }
         else {
             MPI_Send(a + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
@@ -1130,6 +1131,7 @@ void print_matrix_mpi(
 
         // печать всей блочной строки
         print_array(buf, n, m, l, max_print, printed_rows, p);
+        std::cout << "printed_rows: " << printed_rows << std::endl;
     }
     else {
         MPI_Send(a + k * m * cols, cols * l, MPI_DOUBLE, main_pi, 0, com);
