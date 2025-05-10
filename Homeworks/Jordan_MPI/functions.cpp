@@ -1094,7 +1094,7 @@ void print_matrix_mpi(
 	for (b = 0; b < max_b; b++) {
 		int owner = b % p; // где эта строка
 		int rows = std::min(m, n - b * m);
-		int b_loc = b / p;
+		int b_loc = get_bl_cols(n, m, p, pi);
 		if (pi == main_pi) {
 			if (owner == main_pi) {
 				// печать массива, который есть локально
