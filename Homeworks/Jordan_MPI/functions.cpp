@@ -1096,12 +1096,26 @@ void print_matrix_mpi(
     int k = n / m;
     int l = n % m;
 
+    int sum = 0, err;
+    double * bl_row = new double[n * m];
+    if (!bl_row) {
+        err = 1;
+    }
+    MPI_Allreduce(&err, &sum, 1, MPI_INT, MPI_SUM, com);
+    if (sum) {
+        if (pi == 0)
+            fprintf(stderr, "[-] Error in allocation: %s:%d\n", __FILE__, __LINE__);
+        if (bl_row)
+            delete[] bl_row;
+        return;
+    }
+
     // Отправка всех строк толщиной m
     for (int i = 0; i < k; i++) {
         if (pi == main_pi) {
             for (int pk = 1; pk < p; pk++) {
-
-                MPI_Recv(buf, n * m, MPI_DOUBLE, pk, 0, com, &st);
+                int pk_cols = get_loc_cols(n, m, p, pk);
+                MPI_Recv(buf, pk_cols * m, MPI_DOUBLE, pk, 0, com, &st);
                 
             }
         }
