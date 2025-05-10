@@ -1093,11 +1093,8 @@ void print_matrix_mpi(
     MPI_Status st;
     int cols = get_loc_cols(n, m, p, pi);
     int k = n / m;
-
-    if (pi == main_pi) {
-        std::cout << "max_print: " << max_print << std::endl;
-    }
-
+    
+    printf("[+] Process %d, cols: %d\n", pi, cols);
     MPI_Barrier(com);
     for (int i = 0; i < p; i++) {
         MPI_Barrier(com);
