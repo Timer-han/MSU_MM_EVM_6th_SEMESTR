@@ -1174,23 +1174,33 @@ void print_matrix_mpi(
 // печать прямоугольной матрицы с адресом a, длиной строки n, числом строк rows
 // число напечатаных строк <= max_print
 // возвращает число напечатаных строк
-int print_array(
+void print_array(
 	double *a,
 	int n,
     int m,
-	int printed_rows,
 	int max_print,
     int p,
     int pi
 ) {
     int cols = get_loc_cols(n, m, p, 0);
+    int bl_cols = get_bl_cols(n, m, p, 0);
+    int printed_rows = 0;
 
     for (int i = 0; i < m; i++) {
-        for (int pk = 0; pk < p; pk++) {
-            int pk_cols = get_loc_cols(n, m, p, pk);
-            
+        for (int j = 0; j < bl_cols; j++) {
+            int shift = 0;
+            for (int pi = 0; pi < p; pi++) {
+                int pi_cols = get_loc_cols(n, m, p, pi);
+                int pi_bl_cols = get_bl_cols(n, m, p, pi);
+                
+                for (int k = 0; k < m; k++) {
+                    printf(" %10.3e", a[i * n + shift + j * m + k]);
+                }
+                shift += pi_cols * m;
+            }
         }
         printf("\n");
+
     }
     
 
