@@ -1111,7 +1111,7 @@ void print_matrix_mpi(
             }
 
             // печать всей блочной строки
-
+            print_array(buf, n, m, printed_rows, max_print);
         }
         else {
             MPI_Send(a + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
@@ -1179,46 +1179,28 @@ void print_array(
 	int n,
     int m,
 	int max_print,
-    int p,
-    int pi
+    int p
 ) {
     int cols = get_loc_cols(n, m, p, 0);
     int bl_cols = get_bl_cols(n, m, p, 0);
     int printed_rows = 0;
 
-    for (int i = 0; i < m; i++) {
+    for (int i = 0; i < m && printed_rows < max_print; i++) {
         for (int j = 0; j < bl_cols; j++) {
             int shift = 0;
             for (int pi = 0; pi < p; pi++) {
                 int pi_cols = get_loc_cols(n, m, p, pi);
                 int pi_bl_cols = get_bl_cols(n, m, p, pi);
                 
-                for (int k = 0; k < m; k++) {
+                for (int k = 0; k < m && shift + j * m + k < max_print; k++) {
                     printf(" %10.3e", a[i * n + shift + j * m + k]);
                 }
                 shift += pi_cols * m;
             }
         }
         printf("\n");
-
+        printed_rows++;
     }
-    
-
-
-	// число печатаемых столбцов
-	int p_n = (n > max_print ? max_print : n);
-	if (printed_rows >= max_print) return 0;
-	
-	// количество печатаемых строк
-	int p_r = (printed_rows + rows <= max_print ? rows : max_print - rows);
-	
-	for (int i = 0; i < p_r; i++) { // по строкам
-		for (int j = 0; j < p_n; j++) { // по столбцам
-			printf(" %10.3e", a[i * n + j]);
-		}
-		printf("\n");
-	}
-	return p_r;
 }
 
 int mpi_calculate(
