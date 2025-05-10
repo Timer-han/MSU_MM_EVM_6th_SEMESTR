@@ -1129,7 +1129,7 @@ void print_matrix_mpi(
 
             // печать всей блочной строки
             printf("-------------------------------------------------\n");
-            printf("\n[+] Process %d:\n", pi);
+            printf("\n[+] Step %d:\n", i);
             for (int j = 0; j < m; j++) {
                 for (int k = 0; k < n; k++) {
                     printf(" %10.3e", buf[j * n + k]);
@@ -1163,6 +1163,15 @@ void print_matrix_mpi(
         }
 
         // печать всей блочной строки
+        printf("-------------------------------------------------\n");
+        printf("\n[+] Step %d:\n", k);
+        for (int j = 0; j < m; j++) {
+            for (int k = 0; k < n; k++) {
+                printf(" %10.3e", buf[j * n + k]);
+            }
+            printf("\n");
+        }
+        printf("-------------------------------------------------\n");
         print_array(buf, n, m, l, max_print, printed_rows, p);
     }
     else {
