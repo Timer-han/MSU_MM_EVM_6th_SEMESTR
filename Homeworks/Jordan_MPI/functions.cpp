@@ -629,7 +629,7 @@ double get_time() {
 //         if (fill_matrix_p(matrix, n, s, m, p, pi) != 0) {
 //             a->error_flag = 1;
 //             a->error_type = io_status::unknown_formula;
-//         }
+//     
 //     }
 
 //     if (pi == 0) {
