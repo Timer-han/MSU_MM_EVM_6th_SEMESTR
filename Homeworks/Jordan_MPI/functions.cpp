@@ -1165,6 +1165,7 @@ int print_array(
 int mpi_calculate(
     double * matrix,            // n x (m * bl_cols)
     double * inversed_matrix,   // n x (m * bl_cols)
+    double * buffer,
     int n,
     int m,
     int p,
@@ -1183,7 +1184,6 @@ int mpi_calculate(
     int min_norm_ind;
     double min_norm;
 
-    double *buffer = new double[n * m];
     double *block_A = new double[m * m];
     double *block_B = new double[m * m];
     double *block_C = new double[m * m];
@@ -1203,8 +1203,6 @@ int mpi_calculate(
             delete[] block_B;
         if (block_C)
             delete[] block_C;
-        if (buffer)
-            delete[] buffer;
         if (buf_array)
             delete[] buf_array;
         return -1;
@@ -1213,7 +1211,7 @@ int mpi_calculate(
     double norm = get_norm_pi(matrix, n, cols);
     MPI_Allreduce(&norm, buffer, 1, MPI_DOUBLE, MPI_MAX, com);
     if (pi == 0) EPS *= norm;
-    MPI_Bcast(buffer, 0, MPI_DOUBLE, 0, com);
+    MPI_Barrier(com);
     
     // Пробегаюсь по диагональным элементам
     for (int diag = 0; diag < bl; diag++) {
@@ -1269,7 +1267,6 @@ int mpi_calculate(
             delete[] block_A;
             delete[] block_B;
             delete[] block_C;
-            delete[] buffer;
             delete[] buf_array;
             return -2;
         }
@@ -1292,7 +1289,6 @@ int mpi_calculate(
                 delete[] block_A;
                 delete[] block_B;
                 delete[] block_C;
-                delete[] buffer;
                 delete[] buf_array;
                 return -2;
             }
@@ -1303,7 +1299,6 @@ int mpi_calculate(
                 delete[] block_A;
                 delete[] block_B;
                 delete[] block_C;
-                delete[] buffer;
                 delete[] buf_array;
                 return -2;
             }
@@ -1418,7 +1413,6 @@ int mpi_calculate(
     delete[] block_A;
     delete[] block_B;
     delete[] block_C;
-    delete[] buffer;
     delete[] buf_array;
 	return 0;
 }
