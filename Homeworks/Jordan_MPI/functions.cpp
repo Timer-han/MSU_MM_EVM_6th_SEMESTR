@@ -468,35 +468,21 @@ void print_matrix_l_x_n(double *matrix, int l, int n)
 // }
 
 
-void zero_matrix_p(double *matrix, int n, int m, int p, int pi)
+void zero_matrix_mpi(double *matrix, int n, int m, int p, int pi)
 {
     int cols = get_loc_cols(n, m, p, pi);
     memset(matrix, 0, cols * n * sizeof(double));
 }
 
-void unit_matrix_p(double *matrix, int n, int m, int p, int pi)
+void unit_matrix_mpi(double *matrix, int n, int m, int p, int pi)
 {
     int cols = get_loc_cols(n, m, p, pi);
-    int bl_cols = get_bl_cols(n, m, p, pi);
-    zero_matrix_p(matrix, n, m, p, pi);
+    zero_matrix_mpi(matrix, n, m, p, pi);
 
-    
-}
-
-void unit_matrix_p(double *matrix, int n, int m, int p, int pi)
-{
-    zero_matrix_p(matrix, n, m, p, pi);
-    // printf("pi: %d\n", pi);
-    // synchronize(p);
-
-    // if (pi == 0) {
-    //     for (int i = 0; i < n; i++) {
-    //         matrix[i * n + i] = 1;
-    //     }
-    // }
     for (int i = pi * m; i < n; i += p * m) {
-        for (int j = i; j < i + m && j < n; j++) {
-            matrix[j * n + j] = 1;
+        int j_loc = g2l(n, m, p, pi, i);
+        for (int j = 0; j < m; j++) {
+            matrix[(i + j) * cols + (j_loc + j)] = 1;
         }
     }
 }

@@ -27,9 +27,9 @@ int print_array(double *a, int n, int rows, int printed_rows, int max_print);
 
 // filling
 void unit_matrix(double *matrix, int n);
-void unit_matrix_p(double *matrix, int n, int m, int p, int pi);
+void unit_matrix_mpi(double *matrix, int n, int m, int p, int pi);
 void zero_matrix(double *matrix, int n, int m);
-void zero_matrix_p(double *matrix, int n, int m, int p, int pi);
+void zero_matrix_mpi(double *matrix, int n, int m, int p, int pi);
 int fill_matrix_p(double *matrix, int n, int s, int m, int p, int pi);
 int function(int s, int n, int i, int j);
 void init_matrix(double *a, int n, int m, int p, int pi, int s);
