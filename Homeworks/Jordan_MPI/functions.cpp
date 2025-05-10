@@ -484,6 +484,7 @@ void unit_matrix_mpi(double *matrix, int n, int m, int p, int pi)
         int j_loc = g2l(n, m, p, pi, i);
         std::cout << "i, j_loc: " << i << ", " << j_loc << std::endl;
         for (int j = 0; j < m && j_loc + j < cols; j++) {
+            std::cout << "pos: " << (i + j) * cols + (j_loc + j) << std::endl;
             matrix[(i + j) * cols + (j_loc + j)] = 1;
         }
     }
