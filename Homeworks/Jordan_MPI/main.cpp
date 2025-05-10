@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
         }
 
     } else {
-        initmatrix(matrix, n, m, p, rank, s);
+        init_matrix(matrix, n, m, p, rank, s);
     }
 
     mpi_calculate(

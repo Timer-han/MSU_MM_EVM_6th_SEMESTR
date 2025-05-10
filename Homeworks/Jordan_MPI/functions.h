@@ -9,6 +9,14 @@ void get_block(double *a, double *block, int n, int cols, int m, int k, int l,
                int i, int j, int p, int pi);
 void put_block(double *a, double *block, int n, int cols, int m, int k, int l,
                int i, int j, int p, int pi);
+void rows_permutation_p(double *A, double *block1, double *block2, int n, int cols,
+                        int m, int k, int l, int i1, int i2,
+                        int begin, int p, int pi);
+
+// reading
+int read_matrix(double *a, int n, int m, int p, int pi, const char *name,
+                double *buf, MPI_Comm com);
+int read_array(FILE *fp, double *a, int len);
 
 // printing
 void print_matrix(double *matrix, int n, int r);
@@ -17,47 +25,43 @@ void print_matrix_mpi(double *a, int n, int m, int p, int pi,
     double *buf, int max_print, MPI_Comm com);
 int print_array(double *a, int n, int rows, int printed_rows, int max_print);
 
+// filling
 void unit_matrix(double *matrix, int n);
 void unit_matrix_p(double *matrix, int n, int m, int p, int pi);
 void zero_matrix(double *matrix, int n, int m);
 void zero_matrix_p(double *matrix, int n, int m, int p, int pi);
 int fill_matrix_p(double *matrix, int n, int s, int m, int p, int pi);
+int function(int s, int n, int i, int j);
+void init_matrix(double *a, int n, int m, int p, int pi, int s);
 
 
+// matrix operations
 void matrix_multiply(const double *A, const double *B, double *C, int p,
                      int q, int r);
 void matrix_sum(double *A, double *B, double *C, int n, int m);
 void matrix_subtr(double *A, double *B, int n, int m);
-
-
-double get_norm(double *matrix, int m);
-double get_norm_p(double *matrix, int n, int m, int p, int pi);
 int get_inverse_matrix(double *A, double *B, int m);
 
+// norm calculation
+double get_norm(double *matrix, int m);
+double get_norm_p(double *matrix, int n, int m, int p, int pi);
+double get_norm_pi(double *matrix, int n, int cols);
 
-void rows_permutation_p(double *A, double *block1, double *block2, int n, int cols,
-    int m, int k, int l, int i1, int i2,
-    int begin, int p, int pi);
-
+// time calculation
 double get_time();
 
+// index calculation
 int l2g(int n, int m, int p, int pi, int i_loc);
 int g2l(int n, int m, int p, int pi, int i_glob);
 int get_max_cols(int n, int m, int p);
 int get_bl_cols(int n, int m, int p, int pi);
 int get_loc_cols(int n, int m, int p, int pi);
 int get_pi(int n, int m, int p, int i_glob);
-
-
-int function(int s, int n, int i, int j);
-void init_matrix(double *a, int n, int m, int p, int pi, int s);
-int read_matrix(double *a, int n, int m, int p, int pi, const char *name,
-                double *buf, MPI_Comm com);
-int read_array(FILE *fp, double *a, int len);
-double get_norm_pi(double *matrix, int n, int cols);
 void get_column(double *matrix, double *buffer,
-                int n, int m, int p, int pi, int i);
+    int n, int m, int p, int pi, int i);
 
+// main functions
+void init_matrix(double *a, int n, int m, int p, int pi, int s);
 int mpi_calculate(
     double *matrix,          // n x (m * bl_cols)
     double *inversed_matrix, // n x (m * bl_cols)
