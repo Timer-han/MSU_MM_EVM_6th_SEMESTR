@@ -479,6 +479,7 @@ void unit_matrix_mpi(double *matrix, int n, int m, int p, int pi)
     int cols = get_loc_cols(n, m, p, pi);
     std::cout << "cols: " << cols << std::endl;
     zero_matrix_mpi(matrix, n, m, p, pi);
+    print_matrix_mpi(matrix, n, m, p, pi, cols, 4);
 
     for (int i = pi * m; i < n; i += p * m) {
         int j_loc = g2l(n, m, p, pi, i);
@@ -913,11 +914,9 @@ int get_loc_cols(
     int p,
     int pi
 ) {
-    std::cout << "n, m, p, pi: " << n << ", " << m << ", " << p << ", " << pi << std::endl;
-    // b - число блочных ст
+    // b - число блочных столбцов в глобальной матрице
     int b = (n + m - 1) / m, b_loc;
-    std::cout << "b: " << b << std::endl;
-    std::cout << "b %% p: " << b % p << std::endl;
+
     if (pi < b % p) {
         b_loc = b / p + 1;
     } else {
