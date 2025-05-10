@@ -1096,6 +1096,8 @@ void print_matrix_mpi(
     int k = n / m;
     int l = n % m;
 
+    
+
     // Отправка всех строк толщиной m
     for (int i = 0; i < k; i++) {
         if (pi == main_pi) {
@@ -1175,12 +1177,23 @@ void print_matrix_mpi(
 int print_array(
 	double *a,
 	int n,
-	int rows,
+    int m,
 	int printed_rows,
-	int max_print
+	int max_print,
+    int p,
+    int pi
 ) {
+    int cols = get_loc_cols(n, m, p, 0);
 
-
+    for (int i = 0; i < m; i++) {
+        for (int pk = 0; pk < p; pk++) {
+            int pk_cols = get_loc_cols(n, m, p, pk);
+            for (int j = i * m; j < i * m + m && j < pk_cols; j++) {
+                printf(" %10.3e", a[]);
+            }
+        }
+        printf("\n");
+    }
     
 
 
