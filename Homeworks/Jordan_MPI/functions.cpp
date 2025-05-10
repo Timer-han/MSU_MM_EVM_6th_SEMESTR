@@ -1098,6 +1098,7 @@ void print_matrix_mpi(
         std::cout << "max_print: " << max_print << std::endl;
     }
 
+    MPI_Barrier(com);
     for (int i = 0; i < p; i++) {
         MPI_Barrier(com);
         if (i == pi) {
@@ -1111,6 +1112,7 @@ void print_matrix_mpi(
         }
         MPI_Barrier(com);
     }
+    MPI_Barrier(com);
 
     
     // Отправка всех строк толщиной m
