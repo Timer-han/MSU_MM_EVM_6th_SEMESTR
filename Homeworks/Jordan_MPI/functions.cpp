@@ -470,20 +470,17 @@ void print_matrix_l_x_n(double *matrix, int l, int n)
 
 void zero_matrix_p(double *matrix, int n, int m, int p, int pi)
 {
-    int l = n % m, k = n / m, bl = (l > 0 ? k + 1 : k);
-    int bl_cols = get_bl_cols(n, m, p, pi);
-
-    memset(matrix, 0, bl_cols * n * sizeof(double));
+    int cols = get_loc_cols(n, m, p, pi);
+    memset(matrix, 0, cols * n * sizeof(double));
 }
 
-void zero_matrix_p(double *matrix, int n, int m, int p, int pi)
+void unit_matrix_p(double *matrix, int n, int m, int p, int pi)
 {
-    int l = n % m, k = n / m, bl = (l > 0 ? k + 1 : k);
-    for (int i = 0; i < n; i++) {
-        for (int j = pi; j < bl; j += p) {
-            memset(matrix + i * n + j * m, 0, (j == k ? l : m) * sizeof(double));
-        }
-    }
+    int cols = get_loc_cols(n, m, p, pi);
+    int bl_cols = get_bl_cols(n, m, p, pi);
+    zero_matrix_p(matrix, n, m, p, pi);
+
+    
 }
 
 void unit_matrix_p(double *matrix, int n, int m, int p, int pi)
