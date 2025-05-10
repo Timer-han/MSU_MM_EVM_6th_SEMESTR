@@ -1094,10 +1094,8 @@ void print_matrix_mpi(
     MPI_Status st;
     int cols = get_loc_cols(n, m, p, pi);
     int k = n / m;
-    int l = n % m;
 
     
-
     // Отправка всех строк толщиной m
     for (int i = 0; i < k; i++) {
         if (pi == main_pi) {
@@ -1111,64 +1109,12 @@ void print_matrix_mpi(
             }
 
             // печать всей блочной строки
-            print_array(buf, n, m, printed_rows, max_print);
+            print_array(buf, n, m, max_print, p);
         }
         else {
             MPI_Send(a + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
         }
     }
-
-
-
-
-	for (b = 0; b < max_b; b++) {
-		int owner = b % p; // где эта строка
-		int rows = std::min(m, n - b * m);
-		int b_loc = get_bl_cols(n, m, p, owner);
-		if (pi == main_pi) {
-			if (owner == main_pi) {
-				// печать массива, который есть локально
-				printed_rows += print_array(
-					a + b_loc * n * m,
-					n,
-					rows,
-					printed_rows,
-					max_print
-				);
-			}
-			else {
-				// главный должен получить от владельца
-				MPI_Recv(
-					buf,
-					n*rows,
-					MPI_DOUBLE,
-					owner,
-					0, //tag
-					com,
-					&st
-				);
-				printed_rows += print_array(
-					buf,
-					n,
-					rows,
-					printed_rows,
-					max_print
-				);
-			}
-		} else {
-			// остальные процессы
-			if (pi == owner) {
-				MPI_Send(
-					a + b_loc * n * m,
-					n * rows,
-					MPI_DOUBLE,
-					main_pi,
-					0, //tag
-					com
-				);
-			}
-		}
-	}
 }
 
 // печать прямоугольной матрицы с адресом a, длиной строки n, числом строк rows
@@ -1179,13 +1125,13 @@ void print_array(
 	int n,
     int m,
 	int max_print,
+    int printed_rows,
     int p
 ) {
     int cols = get_loc_cols(n, m, p, 0);
     int bl_cols = get_bl_cols(n, m, p, 0);
-    int printed_rows = 0;
 
-    for (int i = 0; i < m && printed_rows < max_print; i++) {
+    for (int i = 0; i < m; i++) {
         for (int j = 0; j < bl_cols; j++) {
             int shift = 0;
             for (int pi = 0; pi < p; pi++) {
@@ -1200,6 +1146,9 @@ void print_array(
         }
         printf("\n");
         printed_rows++;
+        if (printed_rows >= max_print) {
+            return;
+        }
     }
 }
 
