@@ -1109,7 +1109,7 @@ void print_matrix_mpi(
             }
 
             // печать всей блочной строки
-            
+
         }
         else {
             MPI_Send(a + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
@@ -1179,6 +1179,11 @@ int print_array(
 	int printed_rows,
 	int max_print
 ) {
+
+
+    
+
+
 	// число печатаемых столбцов
 	int p_n = (n > max_print ? max_print : n);
 	if (printed_rows >= max_print) return 0;
