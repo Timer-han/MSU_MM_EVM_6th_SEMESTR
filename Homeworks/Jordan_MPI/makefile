@@ -12,16 +12,15 @@ TARGET = a.out
 
 SRCS = main.cpp functions.cpp
 HDRS = functions.h
-OBJS = $($SRCS:.cpp=.o)
+OBJS = $(SRCS:.cpp=.o)
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-    $(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET)
 
 %.o: %.cpp $(HDRS)
-    $(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-all:
-	mpicxx $(CXXFLAGS) $(SRCS) -o $(TARGET)
-    # g++ -g $(SRCS) -o $(TARGET)
+clean:
+	rm -f $(OBJS) $(TARGET)

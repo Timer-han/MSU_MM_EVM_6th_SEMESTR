@@ -9,6 +9,7 @@
 #include <cmath>
 #include <time.h>
 
+static double EPS = 1e-16;
 
 void get_block(double *a, double *block, int n, int cols, int m, int k, int l,
                int i, int j, int p, int pi)
@@ -173,19 +174,6 @@ void matrix_multiply(const double *A, const double *B, double *C, int p,
                 C[i * r + k] += a_ij * B[j * r + k];
             }
         }
-    }
-}
-
-void rows_permutation(double *A, double *block1, double *block2, int n,
-                      int m, int k, int l, int i1, int i2,
-                      int begin)
-{
-    int i;
-    for (i = begin; i < k + 1; i++) {
-        get_block(A, block1, n, m, k, l, i1, i);
-        get_block(A, block2, n, m, k, l, i2, i);
-        put_block(A, block2, n, m, k, l, i1, i);
-        put_block(A, block1, n, m, k, l, i2, i);
     }
 }
 
@@ -1268,7 +1256,7 @@ int mpi_calculate(
     if (!block_A || !block_B || !block_C) {
         err = 1;
     }
-    
+
     MPI_Allreduce(&err, &err, 1, MPI_INT, MPI_SUM, com);
     if (err) {
         if (pi == 0)
@@ -1353,10 +1341,10 @@ int mpi_calculate(
         // Переставляю строки так, чтобы на текущем диагональном элементе была
         // матрица с наименьшей нормой её обратной
         rows_permutation_p(
-            matrix, block_A, block_B, n, m, k, l, min_norm_ind, diag, diag, p, pi
+            matrix, block_A, block_B, n, cols, m, k, l, min_norm_ind, diag, diag, p, pi
         );
         rows_permutation_p(
-            inversed_matrix, block_A, block_B, n, m, k, l, min_norm_ind, diag, 0, p, pi
+            inversed_matrix, block_A, block_B, n, cols, m, k, l, min_norm_ind, diag, 0, p, pi
         );
         
         // Нахожу обратную
