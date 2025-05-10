@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     int p = world_size;
     int l = n % m;
     int k = n / m;
-    int reduce_sum = 0;
+    int sum = 0, reduce_sum = 0;
 
     if (l > 0 && k + 1 < p)
         p = k + 1;
@@ -64,11 +64,10 @@ int main(int argc, char *argv[])
             delete[] block_A;
         if (norm)
             delete[] norm;
-        reduce_sum = 1;
-        return -1;
+        sum = 1;
     }
 
-    MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, comm);
+    MPI_Allreduce(&sum, &reduce_sum, 1, MPI_INT, MPI_SUM, comm);
     if (reduce_sum > 0)
     {
         if (rank == 0)
