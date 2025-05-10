@@ -37,3 +37,10 @@ void rows_permutation_p(double *A, double *block1, double *block2, int n, int co
     int begin, int p, int pi);
 
 double get_time();
+
+int l2g(int n, int m, int p, int pi, int i_loc);
+int g2l(int n, int m, int p, int pi, int i_glob);
+int get_max_cols(int n, int m, int p);
+int get_bl_cols(int n, int m, int p, int pi);
+int get_loc_cols(int n, int m, int p, int pi);
+int get_pi(int n, int m, int p, int i_glob);
