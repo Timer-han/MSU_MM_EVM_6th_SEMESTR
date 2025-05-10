@@ -91,36 +91,6 @@ void print_matrix(double *matrix, int n, int r)
     }
 }
 
-int fill_matrix(double *matrix, int n, int s)
-{
-    int i, j;
-    switch (s) {
-    case 1:
-        for (i = 0; i < n; i++)
-            for (j = 0; j < n; j++)
-                matrix[i * n + j] = n - MAX(i, j);
-        break;
-    case 2:
-        for (i = 0; i < n; i++)
-            for (j = 0; j < n; j++)
-                matrix[i * n + j] = MAX(i, j) + 1;
-        break;
-    case 3:
-        for (i = 0; i < n; i++)
-            for (j = 0; j < n; j++)
-                matrix[i * n + j] = (i > j ? i - j : j - i);
-        break;
-    case 4:
-        for (i = 0; i < n; i++)
-            for (j = 0; j < n; j++)
-                matrix[i * n + j] = 1. / (i + j + 1);
-        break;
-    default:
-        fprintf(stderr, "[-] Unknown formula %d\n", s);
-        return -1;
-    }
-    return 0;
-}
 
 int read_matrix_from_file(double *matrix, int n, FILE* file)
 {
