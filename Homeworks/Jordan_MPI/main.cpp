@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
     }
 
     int rank, world_size;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    MPI_Comm_rank(comm, &rank);
+    MPI_Comm_size(comm, &world_size);
 
     int p = world_size;
     int l = n % m;
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&reduce_sum, &reduce_sum, 1, MPI_INT, MPI_SUM, comm);
     if (reduce_sum > 0)
     {
         if (rank == 0)
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
             return 1;
         }
         filename = argv[5];
-        if (read_matrix(matrix, n, m, p, rank, filename, buffer, MPI_COMM_WORLD)) {
+        if (read_matrix(matrix, n, m, p, rank, filename, buffer, comm)) {
             MPI_Finalize();
             return -2;
         }
@@ -99,12 +99,14 @@ int main(int argc, char *argv[])
     } else {
         init_matrix(matrix, n, m, p, rank, s);
     }
+    print_matrix_mpi(matrix, n, m, p, rank, buffer, 4, comm);
 
     unit_matrix_mpi(inversed_matrix, n, m, p, rank);
+    print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
 
-    mpi_calculate(
-        matrix, inversed_matrix, n, m, p, rank, comm
-    );
+    // mpi_calculate(
+    //     matrix, inversed_matrix, n, m, p, rank, comm
+    // );
     
     
 
