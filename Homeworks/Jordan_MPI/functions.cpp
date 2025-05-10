@@ -1168,6 +1168,7 @@ void print_matrix_mpi(
     else {
         MPI_Send(a + k * m * cols, cols * l, MPI_DOUBLE, main_pi, 0, com);
     }
+    MPI_Barrier(com);
 }
 
 // печать прямоугольной матрицы с адресом a, длиной строки n, числом строк rows
