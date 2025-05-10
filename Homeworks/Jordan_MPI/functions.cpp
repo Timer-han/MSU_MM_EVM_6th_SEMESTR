@@ -894,7 +894,7 @@ int get_max_cols(
 	int p
 ) {
 	int b = (n + m - 1) / m;
-	return (b + p - 1) / p;
+	return (b + p - 1) / p * m;
 }
 
 // число блочных столбцов на процесс
