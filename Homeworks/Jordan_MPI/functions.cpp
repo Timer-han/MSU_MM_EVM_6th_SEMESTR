@@ -924,9 +924,7 @@ int get_loc_cols(
 
     if (pi == b % p) {
         if (l > 0) {
-            b_loc = b * m + l;
-        } else {
-            b_loc = b * m - m;
+            b_loc = b * m - m + l;
         }
     }
     
