@@ -41,6 +41,8 @@ int main(int argc, char *argv[])
     if (l == 0 && k < p)
         p = k;
 
+    if (rank >)
+
     int max_cols = get_max_cols(n, m, p);
 
     double *matrix = new double[n * max_cols];
