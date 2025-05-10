@@ -7,8 +7,6 @@ int main(int argc, char *argv[])
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Init(&argc, &argv);
 
-    
-    FILE *file = nullptr;
 
     if (argc < 5)
     {
@@ -117,8 +115,6 @@ int main(int argc, char *argv[])
     delete[] inversed_matrix;
     delete[] block_A;
     delete[] norm;
-    if (file)
-        fclose(file);
     MPI_Finalize();
     return 0;
 }
