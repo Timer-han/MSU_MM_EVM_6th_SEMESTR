@@ -46,22 +46,10 @@ int main(int argc, char *argv[])
     double *matrix = new double[n * max_cols];
     double *inversed_matrix = new double[n * max_cols];
     double *buffer = new double[m * n];
-    double *block_A = new double[m * m];
     double *norm = new double[n];
 
     if (!matrix || !inversed_matrix || !norm)
     {
-        printf("[-] Not enough memory!\n");
-        if (matrix)
-            delete[] matrix;
-        if (inversed_matrix)
-            delete[] inversed_matrix;
-        if (buffer)
-            delete[] buffer;
-        if (block_A)
-            delete[] block_A;
-        if (norm)
-            delete[] norm;
         sum = 1;
     }
 
@@ -72,6 +60,14 @@ int main(int argc, char *argv[])
         {
             printf("[-] Not enough memory!\n");
         }
+        if (matrix)
+            delete[] matrix;
+        if (inversed_matrix)
+            delete[] inversed_matrix;
+        if (buffer)
+            delete[] buffer;
+        if (norm)
+            delete[] norm;
         MPI_Finalize();
         return -1;
     }
@@ -84,11 +80,19 @@ int main(int argc, char *argv[])
     if (s == 0) {
         if (argc < 5) {
             fprintf(stderr, "[-] File name do not defined.\n");
+            delete[] matrix;
+            delete[] inversed_matrix;
+            delete[] buffer;
+            delete[] norm;
             MPI_Finalize();
             return 1;
         }
         filename = argv[5];
         if (read_matrix(matrix, n, m, p, rank, filename, buffer, comm)) {
+            delete[] matrix;
+            delete[] inversed_matrix;
+            delete[] buffer;
+            delete[] norm;
             MPI_Finalize();
             return -2;
         }
@@ -113,7 +117,7 @@ int main(int argc, char *argv[])
 
     delete[] matrix;
     delete[] inversed_matrix;
-    delete[] block_A;
+    delete[] buffer;
     delete[] norm;
     MPI_Finalize();
     return 0;
