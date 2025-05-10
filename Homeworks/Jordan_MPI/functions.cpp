@@ -1123,6 +1123,7 @@ void print_matrix_mpi(
             int p_shift = cols * m;
             for (int pk = 1; pk < p; pk++) {
                 int pk_cols = get_loc_cols(n, m, p, pk);
+                printf("[+] pk, pk_cols: %d, %d\n", pk, pk_cols);
                 MPI_Recv(buf + p_shift, pk_cols * m, MPI_DOUBLE, pk, 0, com, &st);
                 p_shift += pk_cols * m;
             }
