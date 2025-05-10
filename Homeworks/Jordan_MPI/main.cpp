@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     double *buffer = new double[m * n];
     double *norm = new double[n];
 
-    if (!matrix || !inversed_matrix || !norm)
+    if (!matrix || !inversed_matrix || !norm || !buffer)
     {
         sum = 1;
     }
