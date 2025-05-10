@@ -1109,7 +1109,7 @@ void print_matrix_mpi(
             }
 
             // печать всей блочной строки
-            print_array(buf, n, m, max_print, p);
+            print_array(buf, n, m, m, max_print, printed_rows, p);
         }
         else {
             MPI_Send(a + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
@@ -1124,14 +1124,15 @@ void print_array(
 	double *a,
 	int n,
     int m,
+    int l,
 	int max_print,
-    int printed_rows,
+    int &printed_rows,
     int p
 ) {
     int cols = get_loc_cols(n, m, p, 0);
     int bl_cols = get_bl_cols(n, m, p, 0);
 
-    for (int i = 0; i < m; i++) {
+    for (int i = 0; i < l; i++) {
         for (int j = 0; j < bl_cols; j++) {
             int shift = 0;
             for (int pi = 0; pi < p; pi++) {
