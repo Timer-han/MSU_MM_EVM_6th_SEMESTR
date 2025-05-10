@@ -1188,9 +1188,7 @@ int print_array(
     for (int i = 0; i < m; i++) {
         for (int pk = 0; pk < p; pk++) {
             int pk_cols = get_loc_cols(n, m, p, pk);
-            for (int j = i * m; j < i * m + m && j < pk_cols; j++) {
-                printf(" %10.3e", a[]);
-            }
+            
         }
         printf("\n");
     }
