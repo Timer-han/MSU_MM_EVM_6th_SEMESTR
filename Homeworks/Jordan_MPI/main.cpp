@@ -100,6 +100,8 @@ int main(int argc, char *argv[])
         init_matrix(matrix, n, m, p, rank, s);
     }
 
+    unit_matrix_p(inversed_matrix, n, m, p, rank);
+
     mpi_calculate(
         matrix, inversed_matrix, n, m, p, rank, comm
     );
