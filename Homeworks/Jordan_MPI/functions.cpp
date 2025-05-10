@@ -917,12 +917,17 @@ int get_loc_cols(
     int pi
 ) {
     // b - число блочных столбцов в глобальной матрице
-    int b = (n + m - 1) / m, b_loc;
+    int b = get_bl_cols(n, m, p, pi);
+    int b_loc = b * m;
+    int l = n % m;
+    std::cout << "b, b_loc, l, pi: " << b << ", " << b_loc << ", " << l << ", " << pi << std::endl;
 
-    if (pi < b % p) {
-        b_loc = b / p + 1;
-    } else {
-        b_loc = b / p;
+    if (pi == b % p) {
+        if (l > 0) {
+            b_loc = b * m + l;
+        } else {
+            b_loc = b * m - m;
+        }
     }
     
     return b_loc;
