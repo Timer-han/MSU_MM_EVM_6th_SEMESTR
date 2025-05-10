@@ -962,17 +962,17 @@ void init_matrix(
 	int pi,
 	int s
 ) {
-	int i_loc, j_loc, i_glob, j_glob, rows;
+	int i_loc, j_loc, i_glob, j_glob, cols;
 	// сколько строк в процессе
-	rows = get_bl_cols(n, m, p, pi);
 
-	for (i_loc = 0; i_loc < rows; i_loc++) {
-		i_glob = l2g(n, m, p, pi, i_loc);
-		for (j_loc = 0; j_loc < n; j_loc++) {
-			j_glob = j_loc;
-			a[i_loc + j_loc * n] = function(s, n, i_glob, j_glob);
-		}
-	}
+    cols = get_loc_cols(n, m, p, pi);
+    for (j_loc = 0; j_loc < cols; j_loc++) {
+        j_glob = l2g(n, m, p, pi, j_loc);
+        for (i_loc = 0; i_loc < n; i_loc++) {
+            i_glob = i_loc;
+            a[i_loc * cols + j_loc] = function(s, n, i_glob, j_glob);
+        }
+    }
 }
 
 int read_matrix(
