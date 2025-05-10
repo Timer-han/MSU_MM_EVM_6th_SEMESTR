@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     
     FILE *file = nullptr;
 
-    if (argc < 6)
+    if (argc < 5)
     {
         fprintf(stderr, "[-] Not enough arguments.\n");
         MPI_Finalize();
