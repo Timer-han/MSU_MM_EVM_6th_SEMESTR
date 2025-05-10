@@ -44,3 +44,22 @@ int get_max_cols(int n, int m, int p);
 int get_bl_cols(int n, int m, int p, int pi);
 int get_loc_cols(int n, int m, int p, int pi);
 int get_pi(int n, int m, int p, int i_glob);
+int function(int s, int n, int i, int j);
+void init_matrix(double *a, int n, int m, int p, int pi, int s);
+int read_matrix(double *a, int n, int m, int p, int pi, const char *name,
+                double *buf, MPI_Comm com);
+int read_array(FILE *fp, double *a, int len);
+double get_norm_pi(double *matrix, int n, int cols);
+void get_column(double *matrix, double *buffer,
+                int n, int m, int p, int pi, int i);
+void print_matrix_mpi(double *a, int n, int m, int p, int pi,
+    double *buf, int max_print, MPI_Comm com);
+int print_array(double *a, int n, int rows, int printed_rows, int max_print);
+int mpi_calculate(
+    double *matrix,          // n x (m * bl_cols)
+    double *inversed_matrix, // n x (m * bl_cols)
+    int n,
+    int m,
+    int p,
+    int pi,
+    MPI_Comm com);
