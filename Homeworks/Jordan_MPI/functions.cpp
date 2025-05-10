@@ -1190,6 +1190,7 @@ void print_array(
     int & printed_rows,
     int p
 ) {
+    printf("############### print_array ###############\n");
     int bl_cols = get_bl_cols(n, m, p, 0);
 
     for (int i = 0; i < l; i++) {
@@ -1211,6 +1212,7 @@ void print_array(
             return;
         }
     }
+    printf("############### ___________ ###############\n");
 }
 
 int mpi_calculate(
