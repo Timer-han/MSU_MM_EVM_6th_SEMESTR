@@ -41,7 +41,12 @@ int main(int argc, char *argv[])
     if (l == 0 && k < p)
         p = k;
 
-    if (rank >)
+    if (world_size > p)
+    {
+        fprintf(stderr, "[-] Too many processes.\n");
+        MPI_Finalize();
+        return 3;
+    }
 
     int max_cols = get_max_cols(n, m, p);
 
