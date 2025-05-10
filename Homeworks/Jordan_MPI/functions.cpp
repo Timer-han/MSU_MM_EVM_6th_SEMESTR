@@ -1114,6 +1114,26 @@ void print_matrix_mpi(
             MPI_Send(a + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
         }
     }
+
+    int l = n % m;
+    if (l == 0) return;
+
+    if (pi == main_pi) {
+        memcpy(buf, a + k * m * cols, cols * l * sizeof(double));
+
+        int p_shift = cols * l;
+        for (int pk = 1; pk < p; pk++) {
+            int pk_cols = get_loc_cols(n, m, p, pk);
+            MPI_Recv(buf + p_shift, pk_cols * l, MPI_DOUBLE, pk, 0, com, &st);
+            p_shift += pk_cols * l;
+        }
+
+        // печать всей блочной строки
+        print_array(buf, n, m, l, max_print, printed_rows, p);
+    }
+    else {
+        MPI_Send(a + k * m * cols, cols * l, MPI_DOUBLE, main_pi, 0, com);
+    }
 }
 
 // печать прямоугольной матрицы с адресом a, длиной строки n, числом строк rows
