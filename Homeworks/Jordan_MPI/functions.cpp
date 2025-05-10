@@ -1160,11 +1160,12 @@ void print_array(
     for (int i = 0; i < l; i++) {
         for (int j = 0; j < bl_cols; j++) {
             int shift = 0;
+            int printed_cols = 0;
             for (int pi = 0; pi < p; pi++) {
                 int pi_cols = get_loc_cols(n, m, p, pi);
-                
-                for (int k = 0; k < m && j * m + k < max_print; k++) {
+                for (int k = 0; k < m && printed_cols < max_print; k++) {
                     printf(" %10.3e", a[i * n + shift + j * m + k]);
+                    printed_cols++;
                 }
                 shift += pi_cols * m;
             }
