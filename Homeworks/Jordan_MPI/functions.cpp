@@ -916,6 +916,7 @@ int get_loc_cols(
     std::cout << "n, m, p, pi: " << n << ", " << m << ", " << p << ", " << pi << std::endl;
     int b = (n + m - 1) / m, b_loc;
     std::cout << "b: " << b << std::endl;
+    std::cout << "b %% p: " << b % p << std::endl;
     if (pi <= b % p) {
         b_loc = b / p + 1;
     } else {
