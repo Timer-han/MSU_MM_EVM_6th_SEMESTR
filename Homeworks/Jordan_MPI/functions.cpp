@@ -1098,6 +1098,20 @@ void print_matrix_mpi(
         std::cout << "max_print: " << max_print << std::endl;
     }
 
+    for (int i = 0; i < p; i++) {
+        MPI_Barrier(com);
+        if (i == pi) {
+            printf("\n[+] Process %d:\n", pi);
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < cols; k++) {
+                    printf(" %10.3e", a[j * cols + k]);
+                }
+                printf("\n");
+            }
+        }
+        MPI_Barrier(com);
+    }
+
     
     // Отправка всех строк толщиной m
     for (int i = 0; i < k; i++) {
