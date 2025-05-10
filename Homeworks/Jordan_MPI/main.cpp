@@ -21,8 +21,8 @@ int main(int argc, char *argv[])
     if (
         sscanf(argv[1], "%d", &n) != 1 ||
         sscanf(argv[2], "%d", &m) != 1 ||
-        sscanf(argv[4], "%d", &r) != 1 ||
-        sscanf(argv[5], "%d", &s) != 1)
+        sscanf(argv[3], "%d", &r) != 1 ||
+        sscanf(argv[4], "%d", &s) != 1)
     {
         printf("[-] Mistake in args!\n");
         MPI_Finalize();
