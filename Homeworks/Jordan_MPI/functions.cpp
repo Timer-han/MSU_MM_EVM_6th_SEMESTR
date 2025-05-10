@@ -1091,10 +1091,32 @@ void print_matrix_mpi(
 	int main_pi = 0; // только 0 в большинстве систем
 	int b, max_b = (n + m - 1) / m;
 	int printed_rows = 0;
+    MPI_Status st;
+    int cols = get_loc_cols(n, m, p, pi);
+    int k = n / m;
+    int l = n % m;
+
+    // Отправка всех строк толщиной m
+    for (int i = 0; i < k; i++) {
+        if (pi == main_pi) {
+            for (int pk = 1; pk < p; pk++) {
+
+                MPI_Recv(buf, n * m, MPI_DOUBLE, pk, 0, com, &st);
+                
+            }
+        }
+        else {
+            MPI_Send(a + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
+        }
+    }
+
+
+
+
 	for (b = 0; b < max_b; b++) {
 		int owner = b % p; // где эта строка
 		int rows = std::min(m, n - b * m);
-		int b_loc = get_bl_cols(n, m, p, pi);
+		int b_loc = get_bl_cols(n, m, p, owner);
 		if (pi == main_pi) {
 			if (owner == main_pi) {
 				// печать массива, который есть локально
@@ -1108,7 +1130,6 @@ void print_matrix_mpi(
 			}
 			else {
 				// главный должен получить от владельца
-				MPI_Status st;
 				MPI_Recv(
 					buf,
 					n*rows,
