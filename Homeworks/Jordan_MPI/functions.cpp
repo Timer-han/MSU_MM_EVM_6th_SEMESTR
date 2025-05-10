@@ -958,7 +958,7 @@ int function(
 }
 
 //a_ij = f(s, n, i, j)
-void initmatrix(
+void init_matrix(
 	double *a,
 	int n,
 	int m,
