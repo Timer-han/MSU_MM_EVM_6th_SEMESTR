@@ -480,9 +480,6 @@ void unit_matrix_mpi(double *matrix, int n, int m, int p, int pi)
     std::cout << "cols: " << cols << std::endl;
     zero_matrix_mpi(matrix, n, m, p, pi);
 
-    double * buffer = new double[n * n];
-    print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, MPI_COMM_WORLD);
-
     for (int i = pi * m; i < n; i += p * m) {
         int j_loc = g2l(n, m, p, pi, i);
         std::cout << "i, j_loc: " << i << ", " << j_loc << std::endl;
@@ -922,10 +919,8 @@ int get_loc_cols(
     int l = n % m;
     std::cout << "b, b_loc, l, pi: " << b << ", " << b_loc << ", " << l << ", " << pi << std::endl;
 
-    if (pi == b % p) {
-        if (l > 0) {
-            b_loc = b * m - m + l;
-        }
+    if (pi == b % p && l > 0) {
+        b_loc = b * m - m + l;
     }
     
     return b_loc;
