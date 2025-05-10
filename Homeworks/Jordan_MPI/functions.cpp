@@ -1094,6 +1094,10 @@ void print_matrix_mpi(
     int cols = get_loc_cols(n, m, p, pi);
     int k = n / m;
 
+    if (pi == main_pi) {
+        std::cout << "max_print: " << max_print << std::endl;
+    }
+
     
     // Отправка всех строк толщиной m
     for (int i = 0; i < k; i++) {
