@@ -4,15 +4,18 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define ABS(a) ((a) > 0 ? (a) : (-a))
 
+// work with blocks
 void get_block(double *a, double *block, int n, int cols, int m, int k, int l,
                int i, int j, int p, int pi);
 void put_block(double *a, double *block, int n, int cols, int m, int k, int l,
                int i, int j, int p, int pi);
 
-
+// printing
 void print_matrix(double *matrix, int n, int r);
 void print_matrix_l_x_n(double *matrix, int l, int n);
-
+void print_matrix_mpi(double *a, int n, int m, int p, int pi,
+    double *buf, int max_print, MPI_Comm com);
+int print_array(double *a, int n, int rows, int printed_rows, int max_print);
 
 void unit_matrix(double *matrix, int n);
 void unit_matrix_p(double *matrix, int n, int m, int p, int pi);
@@ -44,6 +47,8 @@ int get_max_cols(int n, int m, int p);
 int get_bl_cols(int n, int m, int p, int pi);
 int get_loc_cols(int n, int m, int p, int pi);
 int get_pi(int n, int m, int p, int i_glob);
+
+
 int function(int s, int n, int i, int j);
 void init_matrix(double *a, int n, int m, int p, int pi, int s);
 int read_matrix(double *a, int n, int m, int p, int pi, const char *name,
@@ -52,9 +57,7 @@ int read_array(FILE *fp, double *a, int len);
 double get_norm_pi(double *matrix, int n, int cols);
 void get_column(double *matrix, double *buffer,
                 int n, int m, int p, int pi, int i);
-void print_matrix_mpi(double *a, int n, int m, int p, int pi,
-    double *buf, int max_print, MPI_Comm com);
-int print_array(double *a, int n, int rows, int printed_rows, int max_print);
+
 int mpi_calculate(
     double *matrix,          // n x (m * bl_cols)
     double *inversed_matrix, // n x (m * bl_cols)
