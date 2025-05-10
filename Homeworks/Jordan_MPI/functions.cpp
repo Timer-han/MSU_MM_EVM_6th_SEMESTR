@@ -478,6 +478,15 @@ void zero_matrix_p(double *matrix, int n, int m, int p, int pi)
     }
 }
 
+void zero_matrix_p(double *matrix, int n, int m, int p, int pi)
+{
+    int l = n % m, k = n / m, bl = (l > 0 ? k + 1 : k);
+    for (int i = 0; i < n; i++) {
+        for (int j = pi; j < bl; j += p) {
+            memset(matrix + i * n + j * m, 0, (j == k ? l : m) * sizeof(double));
+        }
+    }
+}
 
 void unit_matrix_p(double *matrix, int n, int m, int p, int pi)
 {
