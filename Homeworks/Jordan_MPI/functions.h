@@ -65,6 +65,7 @@ void init_matrix(double *a, int n, int m, int p, int pi, int s);
 int mpi_calculate(
     double *matrix,          // n x (m * bl_cols)
     double *inversed_matrix, // n x (m * bl_cols)
+    double *buffer,
     int n,
     int m,
     int p,

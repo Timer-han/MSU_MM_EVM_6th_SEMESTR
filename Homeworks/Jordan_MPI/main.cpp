@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
 
     // mpi_calculate(
-    //     matrix, inversed_matrix, n, m, p, rank, comm
+    //     matrix, inversed_matrix, buffer, n, m, p, rank, comm
     // );
     
     
