@@ -477,11 +477,13 @@ void zero_matrix_mpi(double *matrix, int n, int m, int p, int pi)
 void unit_matrix_mpi(double *matrix, int n, int m, int p, int pi)
 {
     int cols = get_loc_cols(n, m, p, pi);
+    std::cout << "cols: " << cols << std::endl;
     zero_matrix_mpi(matrix, n, m, p, pi);
 
     for (int i = pi * m; i < n; i += p * m) {
         int j_loc = g2l(n, m, p, pi, i);
-        for (int j = 0; j < m; j++) {
+        std::cout << "i, j_loc: " << i << ", " << j_loc << std::endl;
+        for (int j = 0; j < m && j_loc + j < cols; j++) {
             matrix[(i + j) * cols + (j_loc + j)] = 1;
         }
     }
@@ -911,7 +913,9 @@ int get_loc_cols(
     int p,
     int pi
 ) {
+    std::cout << "n, m, p, pi: " << n << ", " << m << ", " << p << ", " << pi << std::endl;
     int b = (n + m - 1) / m, b_loc;
+    std::cout << "b: " << b << std::endl;
     if (pi <= b % p) {
         b_loc = b / p + 1;
     } else {
