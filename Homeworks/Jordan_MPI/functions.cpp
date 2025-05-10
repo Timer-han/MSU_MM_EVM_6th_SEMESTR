@@ -471,6 +471,7 @@ void print_matrix_l_x_n(double *matrix, int l, int n)
 void zero_matrix_mpi(double *matrix, int n, int m, int p, int pi)
 {
     int cols = get_loc_cols(n, m, p, pi);
+    std::cout << "count: " << cols * n << std::endl;
     memset(matrix, 0, cols * n * sizeof(double));
 }
 
