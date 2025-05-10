@@ -1089,7 +1089,6 @@ void print_matrix_mpi(
 	MPI_Comm com
 ) {
 	int main_pi = 0; // только 0 в большинстве систем
-	int b, max_b = (n + m - 1) / m;
 	int printed_rows = 0;
     MPI_Status st;
     int cols = get_loc_cols(n, m, p, pi);
@@ -1126,10 +1125,9 @@ void print_array(
     int m,
     int l,
 	int max_print,
-    int &printed_rows,
+    int & printed_rows,
     int p
 ) {
-    int cols = get_loc_cols(n, m, p, 0);
     int bl_cols = get_bl_cols(n, m, p, 0);
 
     for (int i = 0; i < l; i++) {
@@ -1137,7 +1135,6 @@ void print_array(
             int shift = 0;
             for (int pi = 0; pi < p; pi++) {
                 int pi_cols = get_loc_cols(n, m, p, pi);
-                int pi_bl_cols = get_bl_cols(n, m, p, pi);
                 
                 for (int k = 0; k < m && shift + j * m + k < max_print; k++) {
                     printf(" %10.3e", a[i * n + shift + j * m + k]);
