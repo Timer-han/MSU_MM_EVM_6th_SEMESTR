@@ -1194,6 +1194,7 @@ void print_array(
     int p
 ) {
     int bl_cols = get_bl_cols(n, m, p, 0);
+    max_print = std::min(max_print, n);
 
     for (int row = 0; row < m && printed_rows < max_print; row++) {
         int printed = 0;
@@ -1215,9 +1216,9 @@ void print_array(
                 if (printed >= max_print) break;
             }
             if (printed >= max_print) break;
+            printf("\n");
         }
     }
-    printf("\n");
 }
 
 int mpi_calculate(
