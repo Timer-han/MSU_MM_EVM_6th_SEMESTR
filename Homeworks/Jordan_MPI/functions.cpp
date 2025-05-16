@@ -1331,7 +1331,10 @@ int mpi_calculate(
         min_norm_ind = -1;
         for (int i = 0; i < p; i++) {
             
-            if (buf_array[i * 2] < min_norm || (min_norm < EPS && buf_array[i * 2] >= EPS)) {
+            if (
+                (buf_array[i * 2] > EPS && buf_array[i * 2] < min_norm) || 
+                (min_norm < EPS         && buf_array[i * 2] >= EPS)
+            ) {
                 printf("[+] I'm here!\n");
                 min_norm = buf_array[i * 2];
                 min_norm_ind = round(buf_array[i * 2 + 1]);
