@@ -1145,21 +1145,20 @@ void print_matrix_mpi(
 
 
             print_array(buf, n, m, m, max_print, printed_rows, p, m);
-            if (printed_rows >= max_print) {
-                break;
-            }
         }
         else {
             MPI_Send(a + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
         }
+        MPI_Bcast(&printed_rows, 1, MPI_INT, main_pi, com);
+        if (printed_rows >= max_print) {
+            return;
+        }
     }
 
-    MPI_Bcast(&printed_rows, 1, MPI_INT, main_pi, com);
     // printf("[+] printed_rows: %d\n", printed_rows);
 
     int l = n % m;
-    if (l == 0 || printed_rows >= max_print) {
-        printf("[-] %d: No more rows to print\n", pi);
+    if (l == 0) {
         return;
     }
 
