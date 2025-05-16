@@ -1244,7 +1244,7 @@ int mpi_calculate(
 {
     // int bl_cols = get_bl_cols(n, m, p, pi);
     int cols = get_loc_cols(n, m, p, pi);
-    int err = 0;
+    int err = 0, sum = 0;
 
     
     int bl = (n + m - 1) / m;
@@ -1262,8 +1262,8 @@ int mpi_calculate(
         err = 1;
     }
 
-    MPI_Allreduce(&err, &err, 1, MPI_INT, MPI_SUM, com);
-    if (err) {
+    MPI_Allreduce(&err, &sum, 1, MPI_INT, MPI_SUM, com);
+    if (sum) {
         if (pi == 0)
             fprintf(stderr, "[-] Error in allocation: %d\n", __LINE__);
         if (block_A)

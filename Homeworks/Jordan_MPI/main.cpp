@@ -117,10 +117,12 @@ int main(int argc, char *argv[])
     print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
     MPI_Barrier(comm);
 
-    // mpi_calculate(
-    //     matrix, inversed_matrix, buffer, n, m, p, rank, comm
-    // );
+    mpi_calculate(
+        matrix, inversed_matrix, buffer, n, m, p, rank, comm
+    );
+    MPI_Barrier(comm);
     
+    print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
     
 
     printf("%s : Task = %d Res1 = %e Res2 = %e T1 = %.2f T2 = %.2f S = %d N = "
