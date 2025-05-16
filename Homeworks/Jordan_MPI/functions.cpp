@@ -916,15 +916,15 @@ int get_loc_cols(
     int pi
 ) {
     // b - число блочных столбцов в глобальной матрице
-    int b = get_bl_cols(n, m, p, 0);
+    int b = get_bl_cols(n, m, p, pi);
     int b_loc = b * m - m;
     int l = n % m;
     int k = n / m;
 
-    if ((k + 1) % p < pi) {
-        b_loc += m;
-    } else if ((k + 1) % p == pi) {
+    if ((k + 1) % p == pi) {
         b_loc += l;
+    } else {
+        b_loc += m;
     }
     
     return b_loc;
