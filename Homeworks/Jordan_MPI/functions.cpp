@@ -1257,6 +1257,7 @@ int mpi_calculate(
     double *block_B = new double[m * m];
     double *block_C = new double[m * m];
     double *buf_array = new double[2 * p];
+    double min_elem[2];
 
     if (!block_A || !block_B || !block_C) {
         err = 1;
@@ -1312,14 +1313,14 @@ int mpi_calculate(
                 }
             }
         }
-        buf_array[0] = min_norm;
-        buf_array[1] = min_norm_ind;
+        min_elem[0] = min_norm;
+        min_elem[1] = min_norm_ind;
         // buf_array[1] = buf_array[1] * 1. > 1e+13 ? -1. : buf_array[1];
 
         
         // printf("%d min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
         // printf("%d min_norm: %8.3e, ind: %lu\n", pi, min_norm, min_norm_ind);
-        MPI_Allgather(buf_array, 2, MPI_DOUBLE, buf_array, 2, MPI_DOUBLE, com);
+        MPI_Allgather(min_elem, 2, MPI_DOUBLE, buf_array, 2, MPI_DOUBLE, com);
 
         min_norm = -1;
         min_norm_ind = -1;
