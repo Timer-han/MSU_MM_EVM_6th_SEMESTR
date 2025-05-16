@@ -1193,13 +1193,37 @@ void print_array(
     printf("############### print_array ###############\n");
     int bl_cols = get_bl_cols(n, m, p, 0);
 
-    for (int bl_col = 0; bl_col < bl_cols; bl_col++) {
-        for (int pi = 0; pi < p; pi++) {
-            if (bl_col < bl_cols - 1) {
-                for (int i = 0; i < m; i++) {
-                    printf(" %10.3e", );
+    for (int row = 0; row < m && printed_rows < max_print; row++) {
+        int printed = 0;
+        for (int bl_col = 0; bl_col < bl_cols; bl_col++) {
+            int skip = 0;
+            for (int pi = 0; pi < p; pi++) {
+                int cols = get_loc_cols(n, m, p, pi);
+                if (bl_col < bl_cols - 1) {
+                    for (int i = 0; i < m; i++) {
+                        printf(" %10.3e", a[skip + bl_col * m + i + row * cols]);
+                        printed++;
+                        if (printed >= max_print) {
+                            printed_rows++;
+                            printf("\n");
+                            break;
+                        }
+                    }
+                } else if (l > 0) {
+                    for (int i = 0; i < l; i++) {
+                        printf(" %10.3e", a[skip + bl_col * m + i + row * cols]);
+                        printed++;
+                        if (printed >= max_print) {
+                            printed_rows++;
+                            printf("\n");
+                            break;
+                        }
+                    }
                 }
+                skip += cols * m;
+                if (printed >= max_print) break;
             }
+            if (printed >= max_print) break;
         }
     }
     printf("############### ___________ ###############\n");
