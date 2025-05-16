@@ -1153,11 +1153,10 @@ void print_matrix_mpi(
         else {
             MPI_Send(a + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
         }
-        MPI_Barrier(com);
     }
 
     MPI_Bcast(&printed_rows, 1, MPI_INT, main_pi, com);
-    // printf("[+] printed_rows: %d\n", printed_rows);
+    printf("[+] printed_rows: %d\n", printed_rows);
 
     int l = n % m;
     if (l == 0 || printed_rows >= max_print) return;
@@ -1187,6 +1186,7 @@ void print_matrix_mpi(
     else {
         MPI_Send(a + k * m * cols, cols * l, MPI_DOUBLE, main_pi, 0, com);
     }
+    printf("pi = %d", pi);
     MPI_Barrier(com);
 }
 
