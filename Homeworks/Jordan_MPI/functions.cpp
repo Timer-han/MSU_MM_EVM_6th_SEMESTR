@@ -1199,6 +1199,7 @@ void print_array(
             int skip = 0;
             for (int pi = 0; pi < p; pi++) {
                 int cols = get_loc_cols(n, m, p, pi);
+                printf(" |pi: %d, cols: %d|", pi, cols);
                 for (int i = 0; i < std::min(m, cols - bl_col * m); i++) {
                     printf(" %10.3e", a[skip + bl_col * m + i + row * cols]);
                     printed++;
