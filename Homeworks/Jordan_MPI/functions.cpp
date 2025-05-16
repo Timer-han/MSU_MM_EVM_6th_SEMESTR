@@ -1131,8 +1131,8 @@ void print_matrix_mpi(
             // печать всей блочной строки
             printf("-------------------------------------------------\n");
             printf("\n[+] Step %d:\n", i);
-            for (int j = 0; j < m; j++) {
-                for (int k = 0; k < n; k++) {
+            for (int k = 0; k < n; k++) {
+                for (int j = 0; j < m; j++) {
                     printf(" %10.3e", buf[j * n + k]);
                 }
                 printf("\n");
