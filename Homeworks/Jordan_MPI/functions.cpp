@@ -1212,7 +1212,7 @@ void print_array(
                 int cols = get_loc_cols(n, m, p, pi);
                 // printf(" |pi: %d, cols: %d|", pi, cols);
                 for (int i = 0; i < std::min(m, cols - bl_col * m); i++) {
-                    printf(" %10.3e", a[skip + bl_col * m + i + row * cols]);
+                    printf("|%d %10.3e", skip + bl_col * m + i + row * cols, a[skip + bl_col * m + i + row * cols]);
                     printed++;
                     if (printed >= max_print) {
                         printed_rows++;
