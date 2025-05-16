@@ -1332,8 +1332,10 @@ int mpi_calculate(
         }
 
         if (min_norm_ind < 0) {
+            printf("[-] min_norm_ind: %d\n[-] min_norm: %8.3e\n", min_norm_ind, min_norm);
             if (pi == 0)
-                fprintf(stderr, "[-] Matrix is irreversible, place: %d!\n", __LINE__);
+                fprintf(stderr, "[-] Matrix is irreversible, place %s:%d!\n", __FILE__, __LINE__);
+
             delete[] block_A;
             delete[] block_B;
             delete[] block_C;
@@ -1355,7 +1357,7 @@ int mpi_calculate(
         if (diag != k) {
             if (get_inverse_matrix(block_A, block_B, m) != 0) {
                 if (pi == 0)
-                    fprintf(stderr, "[-] Matrix is irreversible, place %d!\n", __LINE__);
+                    fprintf(stderr, "[-] Matrix is irreversible, place %s:%d!\n", __FILE__, __LINE__);
                 delete[] block_A;
                 delete[] block_B;
                 delete[] block_C;
