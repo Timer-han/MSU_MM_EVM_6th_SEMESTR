@@ -1098,29 +1098,29 @@ void print_matrix_mpi(
     int cols = get_loc_cols(n, m, p, pi);
     int k = n / m;
     
-    // printf("[+] Process %d, cols: %d\n", pi, cols);
-    MPI_Barrier(com);
-    printf("----------------------------------------------------\n");
-    for (int i = 0; i < p; i++) {
-        MPI_Barrier(com);
-        if (i == pi) {
-            printf("\n[+] Process %d:\n", pi);
-            for (int j = 0; j < n; j++) {
-                for (int k = 0; k < cols; k++) {
-                    printf(" %10.3e", a[j * cols + k]);
-                }
-                printf("\n");
-            }
-        }
-    }
-    printf("----------------------------------------------------\n");
-    MPI_Barrier(com);
+    // // printf("[+] Process %d, cols: %d\n", pi, cols);
+    // MPI_Barrier(com);
+    // printf("----------------------------------------------------\n");
+    // for (int i = 0; i < p; i++) {
+    //     MPI_Barrier(com);
+    //     if (i == pi) {
+    //         printf("\n[+] Process %d:\n", pi);
+    //         for (int j = 0; j < n; j++) {
+    //             for (int k = 0; k < cols; k++) {
+    //                 printf(" %10.3e", a[j * cols + k]);
+    //             }
+    //             printf("\n");
+    //         }
+    //     }
+    // }
+    // printf("----------------------------------------------------\n");
+    // MPI_Barrier(com);
 
 
     
     // Отправка всех строк толщиной m
     for (int i = 0; i < k; i++) {
-        MPI_Barrier(com);
+        // MPI_Barrier(com);
         if (pi == main_pi) {
             memcpy(buf, a + i * m * cols, cols * m * sizeof(double));
 
@@ -1132,16 +1132,16 @@ void print_matrix_mpi(
                 p_shift += pk_cols * m;
             }
 
-            // печать всей блочной строки
-            printf("-------------------------------------------------\n");
-            printf("\n[+] Step %d:\n", i);
-            for (int j = 0; j < m; j++) {
-                for (int k = 0; k < n; k++) {
-                    printf(" %10.3e", buf[j * n + k]);
-                }
-                printf("\n");
-            }
-            printf("-------------------------------------------------\n");
+            // // печать всей блочной строки
+            // printf("-------------------------------------------------\n");
+            // printf("\n[+] Step %d:\n", i);
+            // for (int j = 0; j < m; j++) {
+            //     for (int k = 0; k < n; k++) {
+            //         printf(" %10.3e", buf[j * n + k]);
+            //     }
+            //     printf("\n");
+            // }
+            // printf("-------------------------------------------------\n");
 
 
             print_array(buf, n, m, m, max_print, printed_rows, p, m);
