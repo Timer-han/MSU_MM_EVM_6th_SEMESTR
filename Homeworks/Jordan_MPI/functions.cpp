@@ -1112,11 +1112,10 @@ void print_matrix_mpi(
                 printf("\n");
             }
         }
-        MPI_Barrier(com);
     }
     printf("----------------------------------------------------\n");
-    for (int i = 0; i < 1000; i++)
-        MPI_Barrier(com);
+    MPI_Barrier(com);
+
 
     
     // Отправка всех строк толщиной m
