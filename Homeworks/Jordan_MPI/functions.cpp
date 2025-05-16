@@ -1365,7 +1365,7 @@ int mpi_calculate(
         } else {
             if (get_inverse_matrix(block_A, block_B, l) != 0) {
                 if (pi == 0)
-                    fprintf(stderr, "[-] Matrix is irreversible, place %d!\n", __LINE__);
+                    fprintf(stderr, "[-] Matrix is irreversible, place %s:%d!\n", __FILE__, __LINE__);
                 delete[] block_A;
                 delete[] block_B;
                 delete[] block_C;
