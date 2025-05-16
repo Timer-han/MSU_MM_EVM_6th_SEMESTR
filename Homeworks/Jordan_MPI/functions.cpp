@@ -1097,7 +1097,7 @@ void print_matrix_mpi(
     int cols = get_loc_cols(n, m, p, pi);
     int k = n / m;
     
-    // printf("[+] Process %d, cols: %d\n", pi, cols);
+    printf("[+] Process %d, cols: %d\n", pi, cols);
     MPI_Barrier(com);
     for (int i = 0; i < p; i++) {
         MPI_Barrier(com);
@@ -1112,7 +1112,8 @@ void print_matrix_mpi(
         }
         MPI_Barrier(com);
     }
-    MPI_Barrier(com);
+    for (int i = 0; i < 100; i++)
+        MPI_Barrier(com);
 
     
     // Отправка всех строк толщиной m
