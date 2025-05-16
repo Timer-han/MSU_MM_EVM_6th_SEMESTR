@@ -1193,7 +1193,15 @@ void print_array(
     printf("############### print_array ###############\n");
     int bl_cols = get_bl_cols(n, m, p, 0);
 
-    
+    for (int bl_col = 0; bl_col < bl_cols; bl_col++) {
+        for (int pi = 0; pi < p; pi++) {
+            if (bl_col < bl_cols - 1) {
+                for (int i = 0; i < m; i++) {
+                    printf(" %10.3e", );
+                }
+            }
+        }
+    }
     printf("############### ___________ ###############\n");
 }
 
