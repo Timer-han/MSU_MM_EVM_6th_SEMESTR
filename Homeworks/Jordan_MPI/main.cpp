@@ -107,14 +107,15 @@ int main(int argc, char *argv[])
     } else {
         init_matrix(matrix, n, m, p, rank, s);
     }
-    // MPI_Barrier(comm);
-    // print_matrix_mpi(matrix, n, m, p, rank, buffer, 4, comm);
-    // MPI_Barrier(comm);
+    MPI_Barrier(comm);
+    print_matrix_mpi(matrix, n, m, p, rank, buffer, 4, comm);
+    MPI_Barrier(comm);
 
 
     unit_matrix_mpi(inversed_matrix, n, m, p, rank);
     MPI_Barrier(comm);
     print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
+    printf("%d: I'm here!\n", rank);
     MPI_Barrier(comm);
 
     // mpi_calculate(
@@ -126,6 +127,8 @@ int main(int argc, char *argv[])
     printf("%s : Task = %d Res1 = %e Res2 = %e T1 = %.2f T2 = %.2f S = %d N = "
            "%d M = %d P = %d\n",
            argv[0], 18, 0., 0., -0., 0., s, n, m, p);
+
+    MPI_Barrier(comm);
 
     delete[] matrix;
     delete[] inversed_matrix;
