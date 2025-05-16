@@ -1151,7 +1151,9 @@ void print_matrix_mpi(
     }
 
     int l = n % m;
-    if (l == 0 || printed_rows >= max_print) return;
+    if (l == 0 || printed_rows >= max_print) {
+        
+    };
 
     if (pi == main_pi) {
         memcpy(buf, a + k * m * cols, cols * l * sizeof(double));
