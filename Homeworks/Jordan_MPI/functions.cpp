@@ -916,7 +916,7 @@ int get_loc_cols(
     int pi
 ) {
     // b - число блочных столбцов в глобальной матрице
-    int b = get_bl_cols(n, m, p, pi);
+    int b = get_bl_cols(n, m, p, 0);
     int b_loc = b * m - m;
     int l = n % m;
     int k = n / m;
