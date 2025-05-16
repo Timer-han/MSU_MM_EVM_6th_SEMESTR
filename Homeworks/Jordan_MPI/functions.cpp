@@ -1130,16 +1130,16 @@ void print_matrix_mpi(
                 p_shift += pk_cols * m;
             }
 
-            // // печать всей блочной строки
-            // printf("-------------------------------------------------\n");
-            // printf("\n[+] Step %d:\n", i);
-            // for (int j = 0; j < m; j++) {
-            //     for (int k = 0; k < n; k++) {
-            //         printf(" %10.3e", buf[j * n + k]);
-            //     }
-            //     printf("\n");
-            // }
-            // printf("-------------------------------------------------\n");
+            // печать всей блочной строки
+            printf("-------------------------------------------------\n");
+            printf("\n[+] Step %d:\n", i);
+            for (int j = 0; j < m; j++) {
+                for (int k = 0; k < n; k++) {
+                    printf(" %10.3e", buf[j * n + k]);
+                }
+                printf("\n");
+            }
+            printf("-------------------------------------------------\n");
 
 
             print_array(buf, n, m, m, max_print, printed_rows, p);
@@ -1168,16 +1168,16 @@ void print_matrix_mpi(
             p_shift += pk_cols * l;
         }
 
-        // // печать всей блочной строки
-        // printf("\n-------------------------------------------------\n");
-        // printf("[+] Step %d:\n", k);
-        // for (int j = 0; j < l; j++) {
-        //     for (int k = 0; k < n; k++) {
-        //         printf(" %10.3e", buf[j * n + k]);
-        //     }
-        //     printf("\n");
-        // }
-        // printf("-------------------------------------------------\n");
+        // печать всей блочной строки
+        printf("\n-------------------------------------------------\n");
+        printf("[+] Step %d:\n", k);
+        for (int j = 0; j < l; j++) {
+            for (int k = 0; k < n; k++) {
+                printf(" %10.3e", buf[j * n + k]);
+            }
+            printf("\n");
+        }
+        printf("-------------------------------------------------\n");
         print_array(buf, n, m, l, max_print, printed_rows, p);
     }
     else {
