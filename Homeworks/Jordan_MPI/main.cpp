@@ -107,9 +107,9 @@ int main(int argc, char *argv[])
     } else {
         init_matrix(matrix, n, m, p, rank, s);
     }
-    MPI_Barrier(comm);
-    print_matrix_mpi(matrix, n, m, p, rank, buffer, 4, comm);
-    MPI_Barrier(comm);
+    // MPI_Barrier(comm);
+    // print_matrix_mpi(matrix, n, m, p, rank, buffer, 4, comm);
+    // MPI_Barrier(comm);
 
 
     unit_matrix_mpi(inversed_matrix, n, m, p, rank);
