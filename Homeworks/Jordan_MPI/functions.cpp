@@ -1322,9 +1322,9 @@ int mpi_calculate(
         // printf("%d min_norm: %8.3e, ind: %lu\n", pi, min_norm, min_norm_ind);
         MPI_Allgather(min_elem, 2, MPI_DOUBLE, buf_array, 2, MPI_DOUBLE, com);
 
-        for (int i = 0; i < p; i++) {
-            printf("%d min_norm: %8.3e, ind: %.0e\n", pi, buf_array[i * 2], buf_array[i * 2 + 1]);
-        }
+        // for (int i = 0; i < p; i++) {
+        //     printf("%d min_norm: %8.3e, ind: %.0e\n", pi, buf_array[i * 2], buf_array[i * 2 + 1]);
+        // }
         MPI_Barrier(com);
         min_norm = -1;
         min_norm_ind = -1;
@@ -1335,6 +1335,7 @@ int mpi_calculate(
                 printf("[+] I'm here!\n");
                 min_norm = buf_array[i * 2];
                 min_norm_ind = round(buf_array[i * 2 + 1]);
+                printf("# min_norm, min_norm_ind: %lf, %d\n# buf_array[i * 2], buf_array[i * 2]: %lf, %lf\n", min_norm, min_norm_ind, buf_array[i * 2], buf_array[i * 2]);
             }
         }
 
