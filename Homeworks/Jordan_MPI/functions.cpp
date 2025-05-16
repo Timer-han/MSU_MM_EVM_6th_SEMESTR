@@ -1316,6 +1316,12 @@ int mpi_calculate(
         min_elem[0] = min_norm;
         min_elem[1] = min_norm_ind;
         // buf_array[1] = buf_array[1] * 1. > 1e+13 ? -1. : buf_array[1];
+        printf("----------------------------------------------------\n");
+        print_matrix_mpi(
+            block_B, m, m, p, pi, buffer, 4, com
+        );
+        printf("----------------------------------------------------\n");
+
 
         
         // printf("%d min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
