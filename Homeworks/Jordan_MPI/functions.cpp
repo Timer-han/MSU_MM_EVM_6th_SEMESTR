@@ -1145,7 +1145,7 @@ void print_matrix_mpi(
             printf("-------------------------------------------------\n");
 
 
-            print_array(buf, n, m, m, max_print, printed_rows, p);
+            print_array(buf, n, m, m, max_print, printed_rows, p, m);
             if (printed_rows >= max_print) {
                 break;
             }
@@ -1181,7 +1181,7 @@ void print_matrix_mpi(
             printf("\n");
         }
         printf("-------------------------------------------------\n");
-        print_array(buf, n, m, l, max_print, printed_rows, p);
+        print_array(buf, n, m, l, max_print, printed_rows, p, l);
     }
     else {
         MPI_Send(a + k * m * cols, cols * l, MPI_DOUBLE, main_pi, 0, com);
@@ -1199,12 +1199,13 @@ void print_array(
     int ,
 	int max_print,
     int & printed_rows,
-    int p
+    int p,
+    int rows
 ) {
     int bl_cols = get_bl_cols(n, m, p, 0);
     max_print = std::min(max_print, n);
 
-    for (int row = 0; row < m && printed_rows < max_print; row++) {
+    for (int row = 0; row < rows && printed_rows < max_print; row++) {
         int printed = 0;
         for (int bl_col = 0; bl_col < bl_cols; bl_col++) {
             int skip = 0;
@@ -1220,7 +1221,7 @@ void print_array(
                         break;
                     }
                 }
-                skip += cols * m;
+                skip += cols * rows;
                 if (printed >= max_print) break;
             }
             if (printed >= max_print) break;

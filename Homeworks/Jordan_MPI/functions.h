@@ -23,7 +23,7 @@ void print_matrix(double *matrix, int n, int r);
 void print_matrix_l_x_n(double *matrix, int l, int n);
 void print_matrix_mpi(double *a, int n, int m, int p, int pi,
     double *buf, int max_print, MPI_Comm com);
-void print_array(double *a, int n, int m, int l, int max_print, int & printed_rows, int p);
+void print_array(double *a, int n, int m, int l, int max_print, int & printed_rows, int p, int rows);
 
 // filling
 void unit_matrix(double *matrix, int n);
