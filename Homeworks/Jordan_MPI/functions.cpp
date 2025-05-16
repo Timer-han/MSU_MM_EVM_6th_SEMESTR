@@ -1120,7 +1120,7 @@ void print_matrix_mpi(
     
     // Отправка всех строк толщиной m
     for (int i = 0; i < k; i++) {
-        // MPI_Barrier(com);
+        MPI_Barrier(com);
         if (pi == main_pi) {
             memcpy(buf, a + i * m * cols, cols * m * sizeof(double));
 
@@ -1213,7 +1213,7 @@ void print_array(
                 int cols = get_loc_cols(n, m, p, pi);
                 // printf(" |pi: %d, cols: %d|", pi, cols);
                 for (int i = 0; i < std::min(m, cols - bl_col * m); i++) {
-                    printf("|%2d| %10.3e", skip + bl_col * m + i + row * cols, a[skip + bl_col * m + i + row * cols]);
+                    printf(" %10.3e", a[skip + bl_col * m + i + row * cols]);
                     printed++;
                     if (printed >= max_print) {
                         printed_rows++;
