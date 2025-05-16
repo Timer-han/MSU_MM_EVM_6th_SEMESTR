@@ -1098,25 +1098,25 @@ void print_matrix_mpi(
     int cols = get_loc_cols(n, m, p, pi);
     int k = n / m;
     
-    // // printf("[+] Process %d, cols: %d\n", pi, cols);
-    // MPI_Barrier(com);
-    // printf("----------------------------------------------------\n");
-    // for (int i = 0; i < p; i++) {
-    //     MPI_Barrier(com);
-    //     if (i == pi) {
-    //         printf("\n[+] Process %d:\n", pi);
-    //         for (int j = 0; j < n; j++) {
-    //             for (int k = 0; k < cols; k++) {
-    //                 printf(" %10.3e", a[j * cols + k]);
-    //             }
-    //             printf("\n");
-    //         }
-    //     }
-    //     MPI_Barrier(com);
-    // }
-    // printf("----------------------------------------------------\n");
-    // for (int i = 0; i < 1000; i++)
-    //     MPI_Barrier(com);
+    // printf("[+] Process %d, cols: %d\n", pi, cols);
+    MPI_Barrier(com);
+    printf("----------------------------------------------------\n");
+    for (int i = 0; i < p; i++) {
+        MPI_Barrier(com);
+        if (i == pi) {
+            printf("\n[+] Process %d:\n", pi);
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < cols; k++) {
+                    printf(" %10.3e", a[j * cols + k]);
+                }
+                printf("\n");
+            }
+        }
+        MPI_Barrier(com);
+    }
+    printf("----------------------------------------------------\n");
+    for (int i = 0; i < 1000; i++)
+        MPI_Barrier(com);
 
     
     // Отправка всех строк толщиной m
