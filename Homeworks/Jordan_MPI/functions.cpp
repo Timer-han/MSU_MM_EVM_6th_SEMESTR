@@ -1098,21 +1098,21 @@ void print_matrix_mpi(
     int k = n / m;
     
     // printf("[+] Process %d, cols: %d\n", pi, cols);
-    // MPI_Barrier(com);
-    // for (int i = 0; i < p; i++) {
-    //     MPI_Barrier(com);
-    //     if (i == pi) {
-    //         printf("\n[+] Process %d:\n", pi);
-    //         for (int j = 0; j < n; j++) {
-    //             for (int k = 0; k < cols; k++) {
-    //                 printf(" %10.3e", a[j * cols + k]);
-    //             }
-    //             printf("\n");
-    //         }
-    //     }
-    //     MPI_Barrier(com);
-    // }
-    // MPI_Barrier(com);
+    MPI_Barrier(com);
+    for (int i = 0; i < p; i++) {
+        MPI_Barrier(com);
+        if (i == pi) {
+            printf("\n[+] Process %d:\n", pi);
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < cols; k++) {
+                    printf(" %10.3e", a[j * cols + k]);
+                }
+                printf("\n");
+            }
+        }
+        MPI_Barrier(com);
+    }
+    MPI_Barrier(com);
 
     
     // Отправка всех строк толщиной m
@@ -1128,21 +1128,21 @@ void print_matrix_mpi(
                 p_shift += pk_cols * m;
             }
 
-            // печать всей блочной строки
-            printf("-------------------------------------------------\n");
-            printf("\n[+] Step %d:\n", i);
-            for (int j = 0; j < m; j++) {
-                for (int k = 0; k < n; k++) {
-                    printf(" %10.3e", buf[j * n + k]);
-                }
-                printf("\n");
-            }
-            printf("-------------------------------------------------\n");
+            // // печать всей блочной строки
+            // printf("-------------------------------------------------\n");
+            // printf("\n[+] Step %d:\n", i);
+            // for (int j = 0; j < m; j++) {
+            //     for (int k = 0; k < n; k++) {
+            //         printf(" %10.3e", buf[j * n + k]);
+            //     }
+            //     printf("\n");
+            // }
+            // printf("-------------------------------------------------\n");
 
 
             print_array(buf, n, m, m, max_print, printed_rows, p);
             if (printed_rows >= max_print) {
-                return;
+                break;
             }
         }
         else {
@@ -1150,10 +1150,11 @@ void print_matrix_mpi(
         }
     }
 
+    MPI_Bcast(&printed_rows, 1, MPI_INT, main_pi, com);
+    // printf("[+] printed_rows: %d\n", printed_rows);
+
     int l = n % m;
-    if (l == 0 || printed_rows >= max_print) {
-        
-    };
+    if (l == 0 || printed_rows >= max_print) return;
 
     if (pi == main_pi) {
         memcpy(buf, a + k * m * cols, cols * l * sizeof(double));
@@ -1165,16 +1166,16 @@ void print_matrix_mpi(
             p_shift += pk_cols * l;
         }
 
-        // печать всей блочной строки
-        printf("\n-------------------------------------------------\n");
-        printf("[+] Step %d:\n", k);
-        for (int j = 0; j < l; j++) {
-            for (int k = 0; k < n; k++) {
-                printf(" %10.3e", buf[j * n + k]);
-            }
-            printf("\n");
-        }
-        printf("-------------------------------------------------\n");
+        // // печать всей блочной строки
+        // printf("\n-------------------------------------------------\n");
+        // printf("[+] Step %d:\n", k);
+        // for (int j = 0; j < l; j++) {
+        //     for (int k = 0; k < n; k++) {
+        //         printf(" %10.3e", buf[j * n + k]);
+        //     }
+        //     printf("\n");
+        // }
+        // printf("-------------------------------------------------\n");
         print_array(buf, n, m, l, max_print, printed_rows, p);
     }
     else {
