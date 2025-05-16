@@ -1323,17 +1323,14 @@ int mpi_calculate(
         MPI_Allgather(min_elem, 2, MPI_DOUBLE, buf_array, 2, MPI_DOUBLE, com);
 
         for (int i = 0; i < p; i++) {
-            if (pi == i) 
-                printf("%d min_norm: %8.3e, ind: %.0e\n", pi, buf_array[i * 2], buf_array[i * 2 + 1]);
+            printf("%d min_norm: %8.3e, ind: %.0e\n", pi, buf_array[i * 2], buf_array[i * 2 + 1]);
         }
         MPI_Barrier(com);
         min_norm = -1;
         min_norm_ind = -1;
         for (int i = 0; i < p; i++) {
-            
             if (
-                (buf_array[i * 2] > EPS && buf_array[i * 2] < min_norm) || 
-                (min_norm < EPS         && buf_array[i * 2] >= EPS)
+                buf_array[i * 2] >= EPS && (buf_array[i * 2] < min_norm || min_norm < EPS)
             ) {
                 printf("[+] I'm here!\n");
                 min_norm = buf_array[i * 2];
