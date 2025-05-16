@@ -1129,15 +1129,15 @@ void print_matrix_mpi(
             }
 
             // печать всей блочной строки
-            // printf("-------------------------------------------------\n");
-            // printf("\n[+] Step %d:\n", i);
-            // for (int j = 0; j < m; j++) {
-            //     for (int k = 0; k < n; k++) {
-            //         printf(" %10.3e", buf[j * n + k]);
-            //     }
-            //     printf("\n");
-            // }
-            // printf("-------------------------------------------------\n");
+            printf("-------------------------------------------------\n");
+            printf("\n[+] Step %d:\n", i);
+            for (int j = 0; j < m; j++) {
+                for (int k = 0; k < n; k++) {
+                    printf(" %10.3e", buf[j * n + k]);
+                }
+                printf("\n");
+            }
+            printf("-------------------------------------------------\n");
 
 
             print_array(buf, n, m, m, max_print, printed_rows, p);
@@ -1164,15 +1164,15 @@ void print_matrix_mpi(
         }
 
         // печать всей блочной строки
-        // printf("\n-------------------------------------------------\n");
-        // printf("[+] Step %d:\n", k);
-        // for (int j = 0; j < l; j++) {
-        //     for (int k = 0; k < n; k++) {
-        //         printf(" %10.3e", buf[j * n + k]);
-        //     }
-        //     printf("\n");
-        // }
-        // printf("-------------------------------------------------\n");
+        printf("\n-------------------------------------------------\n");
+        printf("[+] Step %d:\n", k);
+        for (int j = 0; j < l; j++) {
+            for (int k = 0; k < n; k++) {
+                printf(" %10.3e", buf[j * n + k]);
+            }
+            printf("\n");
+        }
+        printf("-------------------------------------------------\n");
         print_array(buf, n, m, l, max_print, printed_rows, p);
     }
     else {
