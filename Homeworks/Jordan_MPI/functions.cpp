@@ -919,9 +919,9 @@ int get_loc_cols(
     int b = get_bl_cols(n, m, p, pi);
     int b_loc = b * m - m;
     int l = n % m;
-    int k = n / m;
+    int k = (n + m - 1) / m;
 
-    if ((k + 1) % p == pi) {
+    if (k % p == pi) {
         b_loc += l;
     } else {
         b_loc += m;
