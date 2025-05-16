@@ -1185,7 +1185,7 @@ void print_array(
 	double *a,
 	int n,
     int m,
-    int l,
+    int ,
 	int max_print,
     int & printed_rows,
     int p
@@ -1199,25 +1199,13 @@ void print_array(
             int skip = 0;
             for (int pi = 0; pi < p; pi++) {
                 int cols = get_loc_cols(n, m, p, pi);
-                if (bl_col < bl_cols - 1) {
-                    for (int i = 0; i < m; i++) {
-                        printf(" %10.3e", a[skip + bl_col * m + i + row * cols]);
-                        printed++;
-                        if (printed >= max_print) {
-                            printed_rows++;
-                            printf("\n");
-                            break;
-                        }
-                    }
-                } else if (l > 0) {
-                    for (int i = 0; i < l; i++) {
-                        printf(" %10.3e", a[skip + bl_col * m + i + row * cols]);
-                        printed++;
-                        if (printed >= max_print) {
-                            printed_rows++;
-                            printf("\n");
-                            break;
-                        }
+                for (int i = 0; i < std::min(m, cols - bl_col * m); i++) {
+                    printf(" %10.3e", a[skip + bl_col * m + i + row * cols]);
+                    printed++;
+                    if (printed >= max_print) {
+                        printed_rows++;
+                        printf("\n");
+                        break;
                     }
                 }
                 skip += cols * m;
