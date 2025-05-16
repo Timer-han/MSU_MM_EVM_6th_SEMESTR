@@ -1226,6 +1226,7 @@ void print_array(
             if (printed >= max_print) break;
         }
     }
+    printf("\n");
     printf("############### ___________ ###############\n");
 }
 
