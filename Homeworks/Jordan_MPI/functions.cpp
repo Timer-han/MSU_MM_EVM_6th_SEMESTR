@@ -1333,7 +1333,7 @@ int mpi_calculate(
             if (pi == 0) printf("[+] min_norm < EPS: %d\n", min_norm < EPS);
             if (pi == 0) printf("[+] buf_array[i * 2] >= EPS: %d\n", buf_array[i * 2] >= EPS);
 
-            if (buf_array[i * 2] < min_norm || (min_norm < EPS && buf_array[i * 2] >= EPS)) {
+            if (buf_array[i * 2] < min_norm || ((min_norm < EPS) && (buf_array[i * 2] >= EPS))) {
                 min_norm = buf_array[i * 2];
                 min_norm_ind = round(buf_array[i * 2 + 1]);
             }
