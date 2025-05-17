@@ -1294,9 +1294,9 @@ int mpi_calculate(
             for (int row = diag + pi; row < k; row += p) {
                 get_block(matrix, block_A, n, cols, m, k, l, diag, row, p, pi);
                 if (get_inverse_matrix(block_A, block_B, m) == 0) {
-                    printf("--------------- Block B ----------------\n");
-                    print_matrix(block_B, m, 4);
-                    printf("-----------------------------------------\n");
+                    // printf("--------------- Block B ----------------\n");
+                    // print_matrix(block_B, m, 4);
+                    // printf("-----------------------------------------\n");
                     norm = get_norm(block_B, m);
                     // printf("norm is %8.3e\n", norm);
                     if (min_norm < 0 || norm < min_norm) {
@@ -1323,10 +1323,11 @@ int mpi_calculate(
         // printf("%d min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
         // printf("%d min_norm: %8.3e, ind: %lu\n", pi, min_norm, min_norm_ind);
         MPI_Allgather(min_elem, 2, MPI_DOUBLE, buf_array, 2, MPI_DOUBLE, com);
-
+        printf("---------------- Allgather ----------------\n");
         for (int i = 0; i < p; i++) {
             printf("%d min_norm: %8.3e, ind: %.0e\n", pi, buf_array[i * 2], buf_array[i * 2 + 1]);
         }
+        printf("----------- diag: %d, pi: %d --------------\n", diag, pi);
         MPI_Barrier(com);
         min_norm = -1;
         min_norm_ind = -1;
@@ -1334,10 +1335,10 @@ int mpi_calculate(
             if (
                 buf_array[i * 2] >= EPS && (buf_array[i * 2] < min_norm || min_norm < EPS)
             ) {
-                printf("[+] I'm here!\n");
+                // printf("[+] I'm here!\n");
                 min_norm = buf_array[i * 2];
                 min_norm_ind = round(buf_array[i * 2 + 1]);
-                printf("# min_norm, min_norm_ind: %lf, %d\n# buf_array[i * 2], buf_array[i * 2 + 1]: %lf, %lf\n", min_norm, min_norm_ind, buf_array[i * 2], buf_array[i * 2 + 1]);
+                // printf("# min_norm, min_norm_ind: %lf, %d\n# buf_array[i * 2], buf_array[i * 2 + 1]: %lf, %lf\n", min_norm, min_norm_ind, buf_array[i * 2], buf_array[i * 2 + 1]);
             }
         }
 
