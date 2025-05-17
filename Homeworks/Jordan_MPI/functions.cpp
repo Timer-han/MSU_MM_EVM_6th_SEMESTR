@@ -1438,23 +1438,29 @@ int mpi_calculate(
 
         // Начиная со следующего каждый элемент в строке домножаю на обратную к диагональному
         // block_B - обратная к диагональному
-        int begin = diag + 1;
-        if (begin % p <= pi) begin += pi - begin % p;
-        else begin += pi + p - begin % p;
-        // printf("#################### pi = %d, begin = %d\n", pi, begin);
-
+        
         int x, y, z;
-        for (int i = begin; i < bl; i+=p) {
-            get_block(matrix, block_A, n, cols, m, k, l, diag, i, p, pi);
-            x = (diag == k ? l : m);
-            y = (i == k    ? l : m);
-            matrix_multiply(block_B, block_A, block_C, x, x, y);
-            printf("------matrix------\n");
-            print_matrix(block_C, m, m);
-            printf("Diag = %d, i = %d\n", diag, i);
-            printf("------------------\n");
-            put_block(matrix, block_C, n, cols, m, k, l, diag, i, p, pi);
-            printf("n, cols, m, k, l, diag, i, p, pi: %d, %d, %d, %d, %d, %d, %d, %d, %d\n", n, cols, m, k, l, diag, i, p, pi);
+        for (int j = 0; j < p; j++) {
+            MPI_Barrier(com);
+            if (j == pi) {
+                int begin = diag + 1;
+                if (begin % p <= pi) begin += pi - begin % p;
+                else begin += pi + p - begin % p;
+                // printf("#################### pi = %d, begin = %d\n", pi, begin);
+
+                for (int i = begin; i < bl; i+=p) {
+                    get_block(matrix, block_A, n, cols, m, k, l, diag, i, p, pi);
+                    x = (diag == k ? l : m);
+                    y = (i == k    ? l : m);
+                    matrix_multiply(block_B, block_A, block_C, x, x, y);
+                    printf("------matrix------\n");
+                    print_matrix(block_C, m, m);
+                    printf("Diag = %d, i = %d\n", diag, i);
+                    printf("------------------\n");
+                    put_block(matrix, block_C, n, cols, m, k, l, diag, i, p, pi);
+                    printf("n, cols, m, k, l, diag, i, p, pi: %d, %d, %d, %d, %d, %d, %d, %d, %d\n", n, cols, m, k, l, diag, i, p, pi);
+                }
+            }
         }
 
 
