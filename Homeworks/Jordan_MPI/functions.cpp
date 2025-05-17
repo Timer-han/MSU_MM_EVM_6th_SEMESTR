@@ -1467,14 +1467,18 @@ int mpi_calculate(
         // Каждый элемент той же строки матрицы В домножаю на эту же обратную
         for (int i = pi; i < bl; i+=p) {
             get_block(inversed_matrix, block_A, n, cols, m, k, l, diag, i, p, pi);
-            // printf("------matrix------\n");
-            // printf("Diag = %d, i = %d\n", diag, i);
-            // print_matrix(block_A, (i < k ? m : l), 4);
+            printf("--------------- Block A ----------------\n");
+            print_matrix(block_A, m, 4);
+            printf("-----------------------------------------\n");
             x = (diag == k ? l : m);
             y = (i == k    ? l : m);
             // printf("x = %d, y = %d\n", x, y);
             // printf("------------------\n");
             matrix_multiply(block_B, block_A, block_C, x, x, y);
+
+            printf("--------------- Block A ----------------\n");
+            print_matrix(block_C, m, 4);
+            printf("-----------------------------------------\n");
             put_block(inversed_matrix, block_C, n, cols, m, k, l, diag, i, p, pi);
         }
 
