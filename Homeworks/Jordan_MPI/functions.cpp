@@ -1294,6 +1294,11 @@ int mpi_calculate(
             for (int row = diag + pi; row < k; row += p) {
                 get_block(matrix, block_A, n, cols, m, k, l, diag, row, p, pi);
                 if (get_inverse_matrix(block_A, block_B, m) == 0) {
+                    printf("--------------- block_B: ---------------\n");
+                    print_matrix_mpi(
+                        block_B, m, m, p, pi, buffer, 4, com
+                    );
+                    printf("----------------------------------------\n");
                     // print_matrix(block_B, m, print_size);
                     norm = get_norm(block_B, m);
                     // printf("norm is %8.3e\n", norm);
@@ -1316,12 +1321,6 @@ int mpi_calculate(
         min_elem[0] = min_norm;
         min_elem[1] = min_norm_ind;
         // buf_array[1] = buf_array[1] * 1. > 1e+13 ? -1. : buf_array[1];
-        printf("----------------------------------------------------\n");
-        print_matrix_mpi(
-            block_B, m, m, p, pi, buffer, 4, com
-        );
-        printf("----------------------------------------------------\n");
-
 
         
         // printf("%d min_norm: %8.3e, ind: %.0e ---buf\n", pi, buf_array[0], buf_array[1]);
