@@ -1341,14 +1341,13 @@ int mpi_calculate(
                 // printf("# min_norm, min_norm_ind: %lf, %d\n# buf_array[i * 2], buf_array[i * 2 + 1]: %lf, %lf\n", min_norm, min_norm_ind, buf_array[i * 2], buf_array[i * 2 + 1]);
             }
         }
+        MPI_Barrier(com);
+        if (pi == 0) printf("------------------------ MATRIX: ------------------------\n");
+        print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, com);
+        if (pi == 0) printf("---------------------------------------------------------\n");
+        MPI_Barrier(com);
 
         if (min_norm_ind < 0) {
-            MPI_Barrier(com);
-            printf("------------------------ MATRIX: ------------------------\n");
-            // printf("n, m, p, pi: %d, %d, %d, %d\n", n, m, p, pi);
-            print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, com);
-            printf("---------------------------------------------------------\n");
-            MPI_Barrier(com);
 
             printf("[-] min_norm_ind: %d\n[-] min_norm: %8.3e\n", min_norm_ind, min_norm);
             if (pi == 0)
@@ -1369,6 +1368,13 @@ int mpi_calculate(
         rows_permutation_p(
             inversed_matrix, block_A, block_B, n, cols, m, k, l, min_norm_ind, diag, 0, p, pi
         );
+
+
+        MPI_Barrier(com);
+        if (pi == 0) printf("----------------- MATRIX, permutation: -----------------\n");
+        print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, com);
+        if (pi == 0) printf("--------------------------------------------------------\n");
+        MPI_Barrier(com);
         
         // Нахожу обратную
         get_block(buffer, block_A, n, m, m, k, l, diag, 0, p, pi);
@@ -1414,6 +1420,13 @@ int mpi_calculate(
             matrix_multiply(block_B, block_A, block_C, x, x, y);
             put_block(matrix, block_C, n, cols, m, k, l, diag, i, p, pi);
         }
+
+
+        MPI_Barrier(com);
+        if (pi == 0) printf("---------------- MATRIX, srting multiply: ----------------\n");
+        print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, com);
+        if (pi == 0) printf("----------------------------------------------------------\n");
+        MPI_Barrier(com);
 
         // Каждый элемент той же строки матрицы В домножаю на эту же обратную
         for (int i = pi; i < bl; i+=p) {
@@ -1468,6 +1481,13 @@ int mpi_calculate(
         }
         MPI_Barrier(com);
     }
+
+
+    MPI_Barrier(com);
+    if (pi == 0) printf("--------------- MATRIX, после обнуления: ---------------\n");
+    print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, com);
+    if (pi == 0) printf("--------------------------------------------------------\n");
+    MPI_Barrier(com);
 
 	MPI_Barrier(com);
 
