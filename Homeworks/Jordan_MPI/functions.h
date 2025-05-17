@@ -6,7 +6,7 @@
 
 // work with blocks
 void get_block(double *a, double *block, int n, int cols, int m, int k, int l,
-               int i, int j, int p, int pi);
+               int i, int j, int p, int pi, int use_local_j = 1);
 void put_block(double *a, double *block, int n, int cols, int m, int k, int l,
                int i, int j, int p, int pi);
 void rows_permutation_p(double *A, double *block1, double *block2, int n, int cols,
@@ -58,7 +58,8 @@ int get_bl_cols(int n, int m, int p, int pi);
 int get_loc_cols(int n, int m, int p, int pi);
 int get_pi(int n, int m, int p, int i_glob);
 void get_column(double *matrix, double *buffer,
-    int n, int m, int p, int pi, int i);
+    int n, int m, int width,
+    int p, int pi, int i);
 
 // main functions
 void init_matrix(double *a, int n, int m, int p, int pi, int s);

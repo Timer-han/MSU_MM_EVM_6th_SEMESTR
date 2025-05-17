@@ -12,12 +12,15 @@
 static double EPS = 1e-16;
 
 void get_block(double *a, double *block, int n, int cols, int m, int k, int l,
-               int i, int j, int p, int pi)
+               int i, int j, int p, int pi, int use_local_j)
 {
     int row_count, col_count;
     int row_offset, col_offset;
     int block_row, block_col;
-    int local_j = g2l(n, m, p, pi, j);
+    int local_j = g2l(n, m, p, pi, j * m) / m;
+    if (!use_local_j) local_j = 0;
+
+    // printf("local_j = %d\n", local_j);
 
     // Определяем размеры блока
     if (i < k)
@@ -39,6 +42,7 @@ void get_block(double *a, double *block, int n, int cols, int m, int k, int l,
     {
         for (block_col = 0; block_col < col_count; block_col++)
         {
+            // printf("i, j, a[i, j]: %d, %d, %lf\n", block_row, block_col, a[(row_offset + block_row) * cols + (col_offset + block_col)]);
             block[block_row * col_count + block_col] =
                 a[(row_offset + block_row) * cols + (col_offset + block_col)];
         }
@@ -51,7 +55,7 @@ void put_block(double *a, double *block, int n, int cols, int m, int k, int l,
     int row_size, col_size;
     int row_offset, col_offset;
     int block_row, block_col;
-    int local_j = g2l(n, m, p, pi, j);
+    int local_j = g2l(n, m, p, pi, j * m) / m;
 
     // Определяем размеры блока
     if (i < k)
@@ -1066,6 +1070,7 @@ void get_column(
     double *buffer,
     int n,
     int m,
+    int width,
     int p,
     int pi,
     int i
@@ -1073,9 +1078,10 @@ void get_column(
 {
     // int bl_cols = get_bl_cols(n, m, p, pi);
     int cols = get_loc_cols(n, m, p, pi);
-    for (int j = 0; j < m; j++) {
+    int j_loc = g2l(n, m, p, pi, i * m) / m;
+    for (int j = 0; j < width; j++) {
         for (int k = 0; k < n; k++) {
-            buffer[k * m + j] = matrix[i * m + k * cols + j];
+            buffer[k * m + j] = matrix[j_loc * m + k * cols + j];
         }
     }
 }
@@ -1253,6 +1259,7 @@ int mpi_calculate(
     int min_norm_ind;
     double min_norm;
 
+    double *print_buf = new double[n * m];
     double *block_A = new double[m * m];
     double *block_B = new double[m * m];
     double *block_C = new double[m * m];
@@ -1287,16 +1294,21 @@ int mpi_calculate(
     for (int diag = 0; diag < bl; diag++) {
         min_norm = -1.;
         min_norm_ind = -1;
-        get_column(matrix, buffer, n, m, p, pi, diag);
-        MPI_Bcast(buffer, n * m, MPI_DOUBLE, diag % p, com);
         // Ищу в столбце матрицу у кооторой обратная имеет наименьшую норму
         if (diag < k) {
+            if (diag % p == pi) get_column(matrix, buffer, n, m, m, p, pi, diag);
+            MPI_Bcast(buffer, n * m, MPI_DOUBLE, diag % p, com);
+            if (pi == 0) print_matrix_l_x_n(buffer, n, m);
+
             for (int row = diag + pi; row < k; row += p) {
-                get_block(matrix, block_A, n, cols, m, k, l, diag, row, p, pi);
+                get_block(buffer, block_A, n, m, m, k, l, diag, row, 1, 0, 0);
+                printf("--------------- Block A ----------------\n");
+                print_matrix(block_A, m, 4);
+                printf("-----------------------------------------\n");
                 if (get_inverse_matrix(block_A, block_B, m) == 0) {
-                    // printf("--------------- Block B ----------------\n");
-                    // print_matrix(block_B, m, 4);
-                    // printf("-----------------------------------------\n");
+                    printf("--------------- Block B ----------------\n");
+                    print_matrix(block_B, m, 4);
+                    printf("-----------------------------------------\n");
                     norm = get_norm(block_B, m);
                     // printf("norm is %8.3e\n", norm);
                     if (min_norm < 0 || norm < min_norm) {
@@ -1306,8 +1318,12 @@ int mpi_calculate(
                 }
             }
         } else {
-            if (pi == k % p) {
-                get_block(matrix, block_A, n, cols, m, k, l, k, k, p, pi);
+            if (diag % p == pi) get_column(matrix, buffer, n, m, l, p, pi, diag);
+            MPI_Bcast(buffer, n * l, MPI_DOUBLE, diag % p, com);
+            if (pi == 0) print_matrix_l_x_n(buffer, n, l);
+
+            if (pi == diag % p) {
+                get_block(buffer, block_A, n, l, m, k, l, k, k, 1, 0, 0);
                 if (get_inverse_matrix(block_A, block_B, l) == 0) {
                     norm = get_norm(block_B, l);
                     min_norm = norm;
@@ -1335,15 +1351,17 @@ int mpi_calculate(
             if (
                 buf_array[i * 2] >= EPS && (buf_array[i * 2] < min_norm || min_norm < EPS)
             ) {
-                // printf("[+] I'm here!\n");
+                // printf("[+] I'm here! %d\n", pi);
                 min_norm = buf_array[i * 2];
                 min_norm_ind = round(buf_array[i * 2 + 1]);
                 // printf("# min_norm, min_norm_ind: %lf, %d\n# buf_array[i * 2], buf_array[i * 2 + 1]: %lf, %lf\n", min_norm, min_norm_ind, buf_array[i * 2], buf_array[i * 2 + 1]);
+                // return -1;
             }
         }
+
         MPI_Barrier(com);
         if (pi == 0) printf("------------------------ MATRIX: ------------------------\n");
-        print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, com);
+        print_matrix_mpi(matrix, n, m, p, pi, print_buf, 4, com);
         if (pi == 0) printf("---------------------------------------------------------\n");
         MPI_Barrier(com);
 
@@ -1372,12 +1390,24 @@ int mpi_calculate(
 
         MPI_Barrier(com);
         if (pi == 0) printf("----------------- MATRIX, permutation: -----------------\n");
-        print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, com);
+        print_matrix_mpi(matrix, n, m, p, pi, print_buf, 4, com);
         if (pi == 0) printf("--------------------------------------------------------\n");
         MPI_Barrier(com);
         
         // Нахожу обратную
-        get_block(buffer, block_A, n, m, m, k, l, diag, 0, p, pi);
+        if (diag < k)
+            get_block(buffer, block_A, n, m, m, k, l, diag, 0, p, pi);
+        else
+            get_block(buffer, block_A, n, l, m, k, l, diag, 0, p, pi);
+
+        // for (int i = 0; i < p; i++) {
+        //     MPI_Barrier (com);
+        //     if (i == pi) {
+        //         print_matrix(block_A, m, 2);
+        //     }
+        // }
+        // return -1;
+        // MPI_Barrier(com);
         if (diag != k) {
             if (get_inverse_matrix(block_A, block_B, m) != 0) {
                 if (pi == 0)
@@ -1411,6 +1441,7 @@ int mpi_calculate(
         int begin = diag + 1;
         if (begin % p <= pi) begin += pi - begin % p;
         else begin += pi + p - begin % p;
+        // printf("#################### pi = %d, begin = %d\n", pi, begin);
 
         int x, y, z;
         for (int i = begin; i < bl; i+=p) {
@@ -1418,13 +1449,18 @@ int mpi_calculate(
             x = (diag == k ? l : m);
             y = (i == k    ? l : m);
             matrix_multiply(block_B, block_A, block_C, x, x, y);
+            printf("------matrix------\n");
+            print_matrix(block_C, m, m);
+            printf("Diag = %d, i = %d\n", diag, i);
+            printf("------------------\n");
             put_block(matrix, block_C, n, cols, m, k, l, diag, i, p, pi);
+            printf("n, cols, m, k, l, diag, i, p, pi: %d, %d, %d, %d, %d, %d, %d, %d, %d\n", n, cols, m, k, l, diag, i, p, pi);
         }
 
 
         MPI_Barrier(com);
         if (pi == 0) printf("---------------- MATRIX, srting multiply: ----------------\n");
-        print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, com);
+        print_matrix_mpi(matrix, n, m, p, pi, print_buf, 4, com);
         if (pi == 0) printf("----------------------------------------------------------\n");
         MPI_Barrier(com);
 
@@ -1480,26 +1516,26 @@ int mpi_calculate(
             }
         }
         MPI_Barrier(com);
+        MPI_Barrier(com);
+        if (pi == 0) printf("--------------- MATRIX, после обнуления: ---------------\n");
+        print_matrix_mpi(matrix, n, m, p, pi, print_buf, 4, com);
+        if (pi == 0) printf("--------------------------------------------------------\n");
+        MPI_Barrier(com);
     }
 
 
-    MPI_Barrier(com);
-    if (pi == 0) printf("--------------- MATRIX, после обнуления: ---------------\n");
-    print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, com);
-    if (pi == 0) printf("--------------------------------------------------------\n");
-    MPI_Barrier(com);
 
-	MPI_Barrier(com);
+	// MPI_Barrier(com);
 
     // a->t1 -= get_time();
 
     if (pi == 0) {
         printf("\n[+] Inversed matrix:\n");
-        print_matrix_mpi(
-            inversed_matrix, n, m, p, pi, buffer, 4, com
-        );
         // print_matrix(inversed_matrix, n, r);
     }
+    print_matrix_mpi(
+        inversed_matrix, n, m, p, pi, print_buf, 4, com
+    );
 
 
     // a->t2 = get_time();
