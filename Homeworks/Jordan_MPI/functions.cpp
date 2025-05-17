@@ -1343,6 +1343,11 @@ int mpi_calculate(
         }
 
         if (min_norm_ind < 0) {
+            if (pi == 0) {
+                printf("------------------------ MATRIX: ------------------------\n");
+                print_matrix_mpi(matrix, n, m, p, pi, buffer, 4, com);
+                printf("---------------------------------------------------------\n");
+            }
             printf("[-] min_norm_ind: %d\n[-] min_norm: %8.3e\n", min_norm_ind, min_norm);
             if (pi == 0)
                 fprintf(stderr, "[-] Matrix is irreversible, place %s:%d!\n", __FILE__, __LINE__);
