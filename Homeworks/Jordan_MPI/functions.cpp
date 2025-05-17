@@ -1294,12 +1294,9 @@ int mpi_calculate(
             for (int row = diag + pi; row < k; row += p) {
                 get_block(matrix, block_A, n, cols, m, k, l, diag, row, p, pi);
                 if (get_inverse_matrix(block_A, block_B, m) == 0) {
-                    printf("--------------- block_B: ---------------\n");
-                    print_matrix_mpi(
-                        block_B, m, m, p, pi, buffer, 4, com
-                    );
-                    printf("----------------------------------------\n");
-                    // print_matrix(block_B, m, print_size);
+                    printf("--------------- Block B ----------------\n");
+                    print_matrix(block_B, m, 4);
+                    printf("-----------------------------------------\n");
                     norm = get_norm(block_B, m);
                     // printf("norm is %8.3e\n", norm);
                     if (min_norm < 0 || norm < min_norm) {
