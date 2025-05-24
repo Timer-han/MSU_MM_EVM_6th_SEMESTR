@@ -121,6 +121,32 @@ int main(int argc, char *argv[])
         matrix, inversed_matrix, buffer, n, m, p, rank, comm
     );
     MPI_Barrier(comm);
+
+
+    if (s == 0) {
+        if (argc < 5) {
+            fprintf(stderr, "[-] File name do not defined.\n");
+            delete[] matrix;
+            delete[] inversed_matrix;
+            delete[] buffer;
+            delete[] norm;
+            MPI_Finalize();
+            return 1;
+        }
+        filename = argv[5];
+        if (read_matrix(matrix, n, m, p, rank, filename, buffer, comm)) {
+            delete[] matrix;
+            delete[] inversed_matrix;
+            delete[] buffer;
+            delete[] norm;
+            MPI_Finalize();
+            return -2;
+        }
+
+    } else {
+        init_matrix(matrix, n, m, p, rank, s);
+    }
+    
     
     // print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
     
