@@ -1786,7 +1786,7 @@ double residual_calculate_mpi(
         MPI_Barrier(com);
         
         buffer_permutation(pc, buf, n, m, p, m);
-        
+        print_matrix_l_x_n(buf, n, m);
 
         for (int pn = pi; pn < k; pn += p) {
             int j_loc = pn / p;
