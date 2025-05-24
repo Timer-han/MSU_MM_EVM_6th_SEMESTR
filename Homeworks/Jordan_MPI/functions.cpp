@@ -1714,3 +1714,36 @@ void matrix_mult_vector(
 		);
 	}
 }
+
+double residual_calculate_mpi(
+    double *a,
+    double *b,
+    int n,
+    int m,
+    int p,
+    int pi
+) {
+    double *buf = new double[n * m];
+    double *residual = new double[n * m];
+    double norm = 0;
+    int cols = get_loc_cols(n, m, p, pi);
+    int rows = get_bl_cols(n, m, p, pi);
+    
+    memset(residual, 0, n * m * sizeof(double));
+    memset(buf, 0, n * m * sizeof(double));
+
+    matrix_mult_vector(a, b, residual, n, m, pi, p);
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            residual[i + j] -= buf[i + j];
+        }
+    }
+
+    norm = get_norm(residual, n);
+    
+    delete[] buf;
+    delete[] residual;
+
+    return norm;
+}
