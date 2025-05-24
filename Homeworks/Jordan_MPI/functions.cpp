@@ -1716,8 +1716,8 @@ void matrix_mult_vector(
 }
 
 double residual_calculate_mpi(
-    double *a,
-    double *b,
+    double *matrix,
+    double *inversed,
     int n,
     int m,
     int p,
@@ -1726,21 +1726,63 @@ double residual_calculate_mpi(
     double *buf = new double[n * m];
     double *residual = new double[n * m];
     double norm = 0;
-    int cols = get_loc_cols(n, m, p, pi);
-    int rows = get_bl_cols(n, m, p, pi);
     
-    memset(residual, 0, n * m * sizeof(double));
-    memset(buf, 0, n * m * sizeof(double));
+int main_pi = 0; // только 0 в большинстве систем
+	int printed_rows = 0;
+    MPI_Status st;
+    int cols = get_loc_cols(n, m, p, pi);
+    int k = n / m;
+    
 
-    matrix_mult_vector(a, b, residual, n, m, pi, p);
+    
+    // Отправка всех строк толщиной m
+    for (int i = 0; i < k; i++) {
+        MPI_Barrier(com);
+        if (pi == main_pi) {
+            memcpy(buf, a + i * m * cols, cols * m * sizeof(double));
 
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            residual[i + j] -= buf[i + j];
+            int p_shift = cols * m;
+            for (int pk = 1; pk < p; pk++) {
+                int pk_cols = get_loc_cols(n, m, p, pk);
+                // printf("[+] pk, pk_cols: %d, %d\n", pk, pk_cols);
+                MPI_Recv(buf + p_shift, pk_cols * m, MPI_DOUBLE, pk, 0, com, &st);
+                p_shift += pk_cols * m;
+            }
+
+
+            print_array(buf, n, m, m, max_print, printed_rows, p, m);
+        }
+        else {
+            MPI_Send(a + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
+        }
+        MPI_Bcast(&printed_rows, 1, MPI_INT, main_pi, com);
+        if (printed_rows >= max_print) {
+            return;
         }
     }
 
-    norm = get_norm(residual, n);
+    // printf("[+] printed_rows: %d\n", printed_rows);
+
+    int l = n % m;
+    if (l == 0) {
+        return;
+    }
+
+    if (pi == main_pi) {
+        memcpy(buf, a + k * m * cols, cols * l * sizeof(double));
+
+        int p_shift = cols * l;
+        for (int pk = 1; pk < p; pk++) {
+            int pk_cols = get_loc_cols(n, m, p, pk);
+            MPI_Recv(buf + p_shift, pk_cols * l, MPI_DOUBLE, pk, 0, com, &st);
+            p_shift += pk_cols * l;
+        }
+
+        print_array(buf, n, m, l, max_print, printed_rows, p, l);
+    }
+    else {
+        MPI_Send(a + k * m * cols, cols * l, MPI_DOUBLE, main_pi, 0, com);
+    }
     
     delete[] buf;
     delete[] residual;
