@@ -1724,20 +1724,20 @@ double residual_calculate_mpi(
     int pi,
     MPI_Comm com
 ) {
-    double *buf = new double[n * m];
-    double *pc = new double[n * m];
-    double *residual = new double[n * m];
     double norm = 0;
-    
     int main_pi = 0; // только 0 в большинстве систем
 	int printed_rows = 0;
     MPI_Status st;
     int cols = get_loc_cols(n, m, p, pi);
+    int bl_cols = get_bl_cols(n, m, p, pi);
     int k = n / m;
     int l = n % m;
     int v, h, r, t, s, q, ah;
     
-
+    double *buf = new double[n * m];
+    double *pc = new double[m * m];
+    double *residual = new double[cols];
+    
     
     // Отправка всех строк толщиной m
     for (int i = 0; i < k; i++) {
@@ -1782,8 +1782,8 @@ double residual_calculate_mpi(
                     ah = (s < k ? m : l);
 
                     // Указатели на текущие блоки A и B
-                    double *pa = a + (i * m) * n + s * m; // блок A[i][s]
-                    double *pb = b + (s * m) * n + j * m; // блок B[s][j]
+                    double *pa = buf      + (i * m) * n    + s * m; // блок A[i][s]
+                    double *pb = inversed + (s * m) * cols + j * m; // блок B[s][j]
 
                     // Основные циклы с разверткой для блоков 3x3
                     size_t r_end = (v / 3) * 3;
@@ -1897,10 +1897,10 @@ double residual_calculate_mpi(
                 }
                 for (r = 0; r < v; r++) {
                     for (t = 0; t < h; t++) {
-                        if (i == j && r == t) {
-                            norm[t + m * j] += std::abs(1 - pc[r * h + t]);
+                        if (i == pn && r == t) {
+                            residual[t + m * j_loc] += std::abs(1 - pc[r * h + t]);
                         } else {
-                            norm[t + m * j] += std::abs(pc[r * h + t]);
+                            residual[t + m * j_loc] += std::abs(pc[r * h + t]);
                         }
                     }
                 }
@@ -1910,27 +1910,27 @@ double residual_calculate_mpi(
 
     // printf("[+] printed_rows: %d\n", printed_rows);
 
-    int l = n % m;
-    if (l == 0) {
-        return;
-    }
+    // if (l == 0) {
+    //     return;
+    // }
 
-    if (pi == main_pi) {
-        memcpy(buf, a + k * m * cols, cols * l * sizeof(double));
+    // if (pi == main_pi) {
+    //     memcpy(buf, a + k * m * cols, cols * l * sizeof(double));
 
-        int p_shift = cols * l;
-        for (int pk = 1; pk < p; pk++) {
-            int pk_cols = get_loc_cols(n, m, p, pk);
-            MPI_Recv(buf + p_shift, pk_cols * l, MPI_DOUBLE, pk, 0, com, &st);
-            p_shift += pk_cols * l;
-        }
+    //     int p_shift = cols * l;
+    //     for (int pk = 1; pk < p; pk++) {
+    //         int pk_cols = get_loc_cols(n, m, p, pk);
+    //         MPI_Recv(buf + p_shift, pk_cols * l, MPI_DOUBLE, pk, 0, com, &st);
+    //         p_shift += pk_cols * l;
+    //     }
 
-        print_array(buf, n, m, l, max_print, printed_rows, p, l);
-    }
-    else {
-        MPI_Send(a + k * m * cols, cols * l, MPI_DOUBLE, main_pi, 0, com);
-    }
+    //     print_array(buf, n, m, l, max_print, printed_rows, p, l);
+    // }
+    // else {
+    //     MPI_Send(a + k * m * cols, cols * l, MPI_DOUBLE, main_pi, 0, com);
+    // }
     
+    delete[] pc;
     delete[] buf;
     delete[] residual;
 
