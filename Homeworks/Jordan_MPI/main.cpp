@@ -148,7 +148,12 @@ int main(int argc, char *argv[])
     }
     
 
-    // print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
+    printf("---------------- MATRIX ----------------\n");
+    print_matrix_mpi(matrix, n, m, p, rank, buffer, 4, comm);
+    printf("----------------------------------------\n");
+    printf("------------ INVERSED_MATRIX ------------\n");
+    print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
+    printf("-----------------------------------------\n");
     double r1, r2;
 
     r1 = residual_calculate_mpi(matrix, inversed_matrix, n, m, p, rank, comm);
