@@ -1662,14 +1662,15 @@ void matrix_mult_vector(
 	double *b,
 	double *c,
 	int n,
+    int m,
 	int k,
 	int p,
 	MPI_Comm com
 ) {
 	// число строк в процессе
-	int rows = get_(n, m, p, k); // в предыдущей лекции писали
+	int rows = get_loc_cols(n, m, p, k); // в предыдущей лекции писали
 	// макс колво блочных строк в процессах
-	int max_rows = get_max_rows(n, m, p);
+	int max_rows = get_max_cols(n, m, p);
 	// число блочных строк
 	int max_bl = (n + m - 1) / m, bl;
 	int src = (k + 1) % p;
@@ -1680,18 +1681,18 @@ void matrix_mult_vector(
 		// В нач момент l = 0 - это мои данные
 		int lk = (k + l) % p;
 		// Сколько строк в b ?
-		int lk_rows = get_rows(n, m, p, lk);
+		int lk_rows = get_loc_cols(n, m, p, lk);
 		for (int lk_i = 0; lk_i < lk_rows; lk_i ++) {
 			// Здесь должно быть умножение блоков
 			// Делаем для неблочного вида (?)
-			for (i = 0; i < rows; i++) {
+			for (int i = 0; i < rows; i++) {
 				// c_i += A_{i, lk_i} * b_{lk_i}
 				int lk_m = lk_i * m + m <= n ? m : n - lk_i * m; // число строк
 				int i_m = i * m + m <= n ? m : n - i * m;
 				// блок A_{i,lk_i} имеет размер i_m * lk_m
 				for (int ii = 0; ii < i_m; ii++) {
-					doble s = 0; // накопительная сумма
-					for (int jj = 0l j < lk_m; jj++) {
+					double s = 0; // накопительная сумма
+					for (int jj = 0; jj < lk_m; jj++) {
 						s += a[i*n*m + ii*n + lk_i*m + jj] * b[lk_i*m + jj];
 					}
 					c[i*m + ii] += s;
@@ -1710,6 +1711,6 @@ void matrix_mult_vector(
 			0, //tag
 			com,
 			&st	
-		)
+		);
 	}
 }
