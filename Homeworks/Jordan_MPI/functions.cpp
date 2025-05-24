@@ -1724,7 +1724,7 @@ double residual_calculate_mpi(
     int pi,
     MPI_Comm com
 ) {
-    double *buf = new double[n * m];
+    double *pc = new double[n * m];
     double *residual = new double[n * m];
     double norm = 0;
     
@@ -1733,6 +1733,8 @@ double residual_calculate_mpi(
     MPI_Status st;
     int cols = get_loc_cols(n, m, p, pi);
     int k = n / m;
+    int l = n % m;
+    int v, h, r, t, s, q;
     
 
     
@@ -1740,13 +1742,13 @@ double residual_calculate_mpi(
     for (int i = 0; i < k; i++) {
         MPI_Barrier(com);
         if (pi == main_pi) {
-            memcpy(buf, matrix + i * m * cols, cols * m * sizeof(double));
+            memcpy(pc, matrix + i * m * cols, cols * m * sizeof(double));
 
             int p_shift = cols * m;
             for (int pk = 1; pk < p; pk++) {
                 int pk_cols = get_loc_cols(n, m, p, pk);
                 // printf("[+] pk, pk_cols: %d, %d\n", pk, pk_cols);
-                MPI_Recv(buf + p_shift, pk_cols * m, MPI_DOUBLE, pk, 0, com, &st);
+                MPI_Recv(pc + p_shift, pk_cols * m, MPI_DOUBLE, pk, 0, com, &st);
                 p_shift += pk_cols * m;
             }
         }
@@ -1757,8 +1759,150 @@ double residual_calculate_mpi(
         
 
         for (int pn = pi; pn < k; pn += p) {
+            int j_loc = pn / p;
             for (int j = 0; j < k; j++) {
-                
+                // Определяем размер текущего блока C[v x h]
+                v = (i < k ? m : l); // вертикальный размер блока
+                h = (j < k ? m : l); // горизонтальный размер блока
+
+                // Указатель на начало текущего блока C
+                // double *pc = c + (i * m) * n + j * m;
+
+                // Инициализируем блок C нулями
+                for (r = 0; r < v; r++) {
+                    for (t = 0; t < h; t++) {
+                        pc[r * h + t] = 0.0;
+                    }
+                }
+
+                // Перемножаем соответствующие блоки A и B и добавляем к C
+                for (s = 0; s < k /*bl*/; s++) { // Тут неточно
+                    // Определяем размер внутреннего блока
+                    ah = (s < k ? m : l);
+
+                    // Указатели на текущие блоки A и B
+                    double *pa = a + (i * m) * n + s * m; // блок A[i][s]
+                    double *pb = b + (s * m) * n + j * m; // блок B[s][j]
+
+                    // Основные циклы с разверткой для блоков 3x3
+                    size_t r_end = (v / 3) * 3;
+                    size_t t_end = (h / 3) * 3;
+
+                    // Обработка блоков размером 3x3
+                    for (r = 0; r < r_end; r += 3) {
+                        for (t = 0; t < t_end; t += 3) {
+                            double s00 = 0.0, s01 = 0.0, s02 = 0.0;
+                            double s10 = 0.0, s11 = 0.0, s12 = 0.0;
+                            double s20 = 0.0, s21 = 0.0, s22 = 0.0;
+
+                            for (q = 0; q < ah; q++) {
+                                double a0q = pa[(r + 0) * n + q];
+                                double a1q = pa[(r + 1) * n + q];
+                                double a2q = pa[(r + 2) * n + q];
+                                double bq0 = pb[q * n + (t + 0)];
+                                double bq1 = pb[q * n + (t + 1)];
+                                double bq2 = pb[q * n + (t + 2)];
+
+                                s00 += a0q * bq0;
+                                s01 += a0q * bq1;
+                                s02 += a0q * bq2;
+
+                                s10 += a1q * bq0;
+                                s11 += a1q * bq1;
+                                s12 += a1q * bq2;
+
+                                s20 += a2q * bq0;
+                                s21 += a2q * bq1;
+                                s22 += a2q * bq2;
+                            }
+
+                            pc[(r + 0) * h + (t + 0)] += s00;
+                            pc[(r + 0) * h + (t + 1)] += s01;
+                            pc[(r + 0) * h + (t + 2)] += s02;
+
+                            pc[(r + 1) * h + (t + 0)] += s10;
+                            pc[(r + 1) * h + (t + 1)] += s11;
+                            pc[(r + 1) * h + (t + 2)] += s12;
+
+                            pc[(r + 2) * h + (t + 0)] += s20;
+                            pc[(r + 2) * h + (t + 1)] += s21;
+                            pc[(r + 2) * h + (t + 2)] += s22;
+                        }
+
+                        // Обработка оставшихся столбцов в блоке
+                        for (t = t_end; t < h; t++) {
+                            double s0 = 0.0, s1 = 0.0, s2 = 0.0;
+
+                            for (q = 0; q < ah; q++) {
+                                double a0q = pa[(r + 0) * n + q];
+                                double a1q = pa[(r + 1) * n + q];
+                                double a2q = pa[(r + 2) * n + q];
+                                double bqt = pb[q * n + t];
+
+                                s0 += a0q * bqt;
+                                s1 += a1q * bqt;
+                                s2 += a2q * bqt;
+                            }
+
+                            pc[(r + 0) * h + t] += s0;
+                            pc[(r + 1) * h + t] += s1;
+                            pc[(r + 2) * h + t] += s2;
+                            // max_norm = MAX(std::abs(s0), max_norm);
+                            // max_norm = MAX(std::abs(s1), max_norm);
+                            // max_norm = MAX(std::abs(s2), max_norm);
+                            
+                        }
+                    }
+
+                    // Обработка оставшихся строк в блоке
+                    for (r = r_end; r < v; r++) {
+                        for (t = 0; t < t_end; t += 3) {
+                            double s0 = 0.0, s1 = 0.0, s2 = 0.0;
+
+                            for (q = 0; q < ah; q++) {
+                                double a0q = pa[r * n + q];
+                                double bq0 = pb[q * n + (t + 0)];
+                                double bq1 = pb[q * n + (t + 1)];
+                                double bq2 = pb[q * n + (t + 2)];
+
+                                s0 += a0q * bq0;
+                                s1 += a0q * bq1;
+                                s2 += a0q * bq2;
+                            }
+
+                            pc[r * h + (t + 0)] += s0;
+                            pc[r * h + (t + 1)] += s1;
+                            pc[r * h + (t + 2)] += s2;
+
+                            // max_norm = MAX(std::abs(s0), max_norm);
+                            // max_norm = MAX(std::abs(s1), max_norm);
+                            // max_norm = MAX(std::abs(s2), max_norm);
+
+                        }
+
+                        // Обработка оставшихся элементов
+                        for (t = t_end; t < h; t++) {
+                            double sum = 0.0;
+
+                            for (q = 0; q < ah; q++) {
+                                sum += pa[r * n + q] * pb[q * n + t];
+                            }
+
+                            pc[r * h + t] += sum;
+                            // if (r == t && i == j) max_norm = MAX(std::abs(1 - sum), max_norm);
+                            // else max_norm = MAX(std::abs(sum), max_norm);
+                        }
+                    }
+                }
+                for (r = 0; r < v; r++) {
+                    for (t = 0; t < h; t++) {
+                        if (i == j && r == t) {
+                            norm[t + m * j] += std::abs(1 - pc[r * h + t]);
+                        } else {
+                            norm[t + m * j] += std::abs(pc[r * h + t]);
+                        }
+                    }
+                }
             }
         }
     }
