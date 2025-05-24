@@ -1755,7 +1755,6 @@ double residual_calculate_mpi(
 ) {
     double norm = 0;
     int main_pi = 0; // только 0 в большинстве систем
-	int printed_rows = 0;
     MPI_Status st;
     int cols = get_loc_cols(n, m, p, pi);
     int k = n / m;
@@ -1763,7 +1762,7 @@ double residual_calculate_mpi(
     int v, h, r, t, s, q, ah;
     
     double *buf = new double[n * m];
-    double *pc = new double[m * m];
+    double *pc = new double[n * m];
     double *residual = new double[cols];
     
     
@@ -1771,20 +1770,22 @@ double residual_calculate_mpi(
     for (int i = 0; i < k; i++) {
         MPI_Barrier(com);
         if (pi == main_pi) {
-            memcpy(buf, matrix + i * m * cols, cols * m * sizeof(double));
+            memcpy(pc, matrix + i * m * cols, cols * m * sizeof(double));
 
             int p_shift = cols * m;
             for (int pk = 1; pk < p; pk++) {
                 int pk_cols = get_loc_cols(n, m, p, pk);
                 // printf("[+] pk, pk_cols: %d, %d\n", pk, pk_cols);
-                MPI_Recv(buf + p_shift, pk_cols * m, MPI_DOUBLE, pk, 0, com, &st);
+                MPI_Recv(pc + p_shift, pk_cols * m, MPI_DOUBLE, pk, 0, com, &st);
                 p_shift += pk_cols * m;
             }
         }
         else {
             MPI_Send(matrix + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
         }
-        MPI_Bcast(&printed_rows, 1, MPI_INT, main_pi, com);
+        MPI_Barrier(com);
+        
+        buffer_permutation(pc, buf, n, m, p, m);
         
 
         for (int pn = pi; pn < k; pn += p) {
