@@ -1907,6 +1907,25 @@ double residual_calculate_mpi(
             }
         }
     }
+    for (int i = 0; i < p; i++) {
+        if (pi == i) {
+            printf("pi: %d, residual:", pi);
+            print_matrix_l_x_n(residual, 1, cols);
+        }
+        MPI_Barrier(com);
+    }
+
+    MPI_Allgather(residual, cols, MPI_DOUBLE, buf, n, MPI_DOUBLE, com);
+
+    if (pi == 0) printf("---------------- RESIDUAL ----------------\n");
+    if (pi == 0) print_matrix_l_x_n(buf, 1, n);
+    if (pi == 0) printf("------------------------------------------\n");
+
+    int m_ind = -1;
+    norm = -1;
+    for (int i = 0; i < n; i++) {
+        if (norm < buf[i]) norm = buf[i];
+    }
 
     // printf("[+] printed_rows: %d\n", printed_rows);
 

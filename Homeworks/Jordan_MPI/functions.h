@@ -73,3 +73,13 @@ int mpi_calculate(
     int p,
     int pi,
     MPI_Comm com);
+
+double residual_calculate_mpi(
+    double *matrix,
+    double *inversed,
+    int n,
+    int m,
+    int p,
+    int pi,
+    MPI_Comm com
+);
