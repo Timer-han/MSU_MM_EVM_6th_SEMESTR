@@ -1672,7 +1672,7 @@ void matrix_mult_vector(
 	// макс колво блочных строк в процессах
 	int max_rows = get_max_cols(n, m, p);
 	// число блочных строк
-	int max_bl = (n + m - 1) / m, bl;
+	// int max_bl = (n + m - 1) / m;
 	int src = (k + 1) % p;
 	int dst = (k - 1 + p) % p;
 	memset(c, 0, rows * sizeof(double));
@@ -1785,8 +1785,8 @@ double residual_calculate_mpi(
                     double *pb = inversed + (s * m) * cols + j * m; // блок B[s][j]
 
                     // Основные циклы с разверткой для блоков 3x3
-                    size_t r_end = (v / 3) * 3;
-                    size_t t_end = (h / 3) * 3;
+                    int r_end = (v / 3) * 3;
+                    int t_end = (h / 3) * 3;
 
                     // Обработка блоков размером 3x3
                     for (r = 0; r < r_end; r += 3) {
