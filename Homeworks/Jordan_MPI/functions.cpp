@@ -10,6 +10,7 @@
 #include <time.h>
 
 static double EPS = 1e-16;
+static int PRINT_SIZE = 4;
 
 void get_block(double *a, double *block, int n, int cols, int m, int k, int l,
                int i, int j, int p, int pi, int use_local_j, int bl_rows, int bl_cols)
@@ -1319,11 +1320,11 @@ int mpi_calculate(
             for (int row = diag + pi; row < k; row += p) {
                 get_block(buffer, block_A, n, m, m, k, l, diag, row, 1, 0, 0);
                 // printf("--------------- Block A ----------------\n");
-                // print_matrix(block_A, m, 5);
+                // print_matrix(block_A, m, PRINT_SIZE);
                 // printf("-----------------------------------------\n");
                 if (get_inverse_matrix(block_A, block_B, m) == 0) {
                     // printf("--------------- Block B ----------------\n");
-                    // print_matrix(block_B, m, 5);
+                    // print_matrix(block_B, m, PRINT_SIZE);
                     // printf("-----------------------------------------\n");
                     norm = get_norm(block_B, m);
                     // printf("norm is %8.3e\n", norm);
@@ -1383,7 +1384,7 @@ int mpi_calculate(
 
         // MPI_Barrier(com);
         // if (pi == 0) printf("------------------------ MATRIX: ------------------------\n");
-        // print_matrix_mpi(matrix, n, m, p, pi, print_buf, 5, com);
+        // print_matrix_mpi(matrix, n, m, p, pi, print_buf, PRINT_SIZE, com);
         // if (pi == 0) printf("---------------------------------------------------------\n");
         // MPI_Barrier(com);
 
@@ -1412,7 +1413,7 @@ int mpi_calculate(
 
         // MPI_Barrier(com);
         // if (pi == 0) printf("----------------- MATRIX, permutation: -----------------\n");
-        // print_matrix_mpi(matrix, n, m, p, pi, print_buf, 5, com);
+        // print_matrix_mpi(matrix, n, m, p, pi, print_buf, PRINT_SIZE, com);
         // if (pi == 0) printf("--------------------------------------------------------\n");
         // MPI_Barrier(com);
         
@@ -1480,7 +1481,7 @@ int mpi_calculate(
             get_block(matrix, block_A, n, cols, m, k, l, diag, i, p, pi);
 
             // printf("--------------- Block A ----------------\n");
-            // print_matrix(block_A, m, 5);
+            // print_matrix(block_A, m, PRINT_SIZE);
             // printf("----------------------------------------\n");
 
             x = (diag == k ? l : m);
@@ -1495,7 +1496,7 @@ int mpi_calculate(
 
 
             // printf("--------------- Block C ----------------\n");
-            // print_matrix(block_C, m, 5);
+            // print_matrix(block_C, m, PRINT_SIZE);
             // printf("----------------------------------------\n");
 
 
@@ -1518,11 +1519,11 @@ int mpi_calculate(
         
         // MPI_Barrier(com);
         // if (pi == 0) printf("---------------- MATRIX, srting multiply: ----------------\n");
-        // print_matrix_mpi(matrix, n, m, p, pi, print_buf, 5, com);
+        // print_matrix_mpi(matrix, n, m, p, pi, print_buf, PRINT_SIZE, com);
         // if (pi == 0) printf("----------------------------------------------------------\n");
         // MPI_Barrier(com);
         // if (pi == 0) printf("------------ INVERSED_MATRIX, srting multiply: ------------\n");
-        // print_matrix_mpi(inversed_matrix, n, m, p, pi, print_buf, 5, com);
+        // print_matrix_mpi(inversed_matrix, n, m, p, pi, print_buf, PRINT_SIZE, com);
         // if (pi == 0) printf("-----------------------------------------------------------\n");
         // MPI_Barrier(com);
 
@@ -1611,10 +1612,10 @@ int mpi_calculate(
         // MPI_Barrier(com);
         MPI_Barrier(com);
         // if (pi == 0) printf("--------------- MATRIX, после обнуления: ---------------\n");
-        // print_matrix_mpi(matrix, n, m, p, pi, print_buf, 5, com);
+        // print_matrix_mpi(matrix, n, m, p, pi, print_buf, PRINT_SIZE, com);
         // if (pi == 0) printf("--------------------------------------------------------\n");
         // if (pi == 0) printf("----------- INVERSED_MATRIX, после обнуления: -----------\n");
-        // print_matrix_mpi(inversed_matrix, n, m, p, pi, print_buf, 5, com);
+        // print_matrix_mpi(inversed_matrix, n, m, p, pi, print_buf, PRINT_SIZE, com);
         // if (pi == 0) printf("---------------------------------------------------------\n");
         // MPI_Barrier(com);
     }
@@ -1627,7 +1628,7 @@ int mpi_calculate(
 
     if (pi == 0) printf("\n[+] Inversed matrix:\n");
     print_matrix_mpi(
-        inversed_matrix, n, m, p, pi, print_buf, 5, com
+        inversed_matrix, n, m, p, pi, print_buf, PRINT_SIZE, com
     );
 
 
