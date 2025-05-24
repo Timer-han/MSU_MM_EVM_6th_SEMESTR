@@ -1718,18 +1718,15 @@ void matrix_mult_vector(
 
 void buffer_permutation(
 	double *a,
+    double *buf,
 	int n,
     int m,
-    int ,
-	int max_print,
-    int & printed_rows,
     int p,
     int rows
 ) {
     int bl_cols = get_bl_cols(n, m, p, 0);
-    max_print = std::min(max_print, n);
 
-    for (int row = 0; row < rows && printed_rows < max_print; row++) {
+    for (int row = 0; row < rows; row++) {
         int printed = 0;
         for (int bl_col = 0; bl_col < bl_cols; bl_col++) {
             int skip = 0;
@@ -1737,24 +1734,15 @@ void buffer_permutation(
                 int cols = get_loc_cols(n, m, p, pi);
                 // printf(" |pi: %d, cols: %d|", pi, cols);
                 for (int i = 0; i < std::min(m, cols - bl_col * m); i++) {
-                    printf(" %10.3e", a[skip + bl_col * m + i + row * cols]);
+                    buf[printed] = a[skip + bl_col * m + i + row * cols];
                     printed++;
-                    if (printed >= max_print) {
-                        printed_rows++;
-                        printf("\n");
-                        break;
-                    }
                 }
                 skip += cols * rows;
-                if (printed >= max_print) break;
             }
-            if (printed >= max_print) break;
         }
-        if (printed < max_print) printf("\n");
     }
-    // printf("\n");
 }
-}
+
 
 double residual_calculate_mpi(
     double *matrix,
