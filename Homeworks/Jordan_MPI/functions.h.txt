@@ -6,8 +6,7 @@
 
 // work with blocks
 void get_block(double *a, double *block, int n, int cols, int m, int k, int l,
-               int i, int j, int p, int pi, int use_local_j = 1,
-               int bl_rows = -1, int bl_cols = -1);
+               int i, int j, int p, int pi, int use_local_j = 1);
 void put_block(double *a, double *block, int n, int cols, int m, int k, int l,
                int i, int j, int p, int pi);
 void rows_permutation_p(double *A, double *block1, double *block2, int n, int cols,
