@@ -1729,7 +1729,6 @@ double residual_calculate_mpi(
 	int printed_rows = 0;
     MPI_Status st;
     int cols = get_loc_cols(n, m, p, pi);
-    int bl_cols = get_bl_cols(n, m, p, pi);
     int k = n / m;
     int l = n % m;
     int v, h, r, t, s, q, ah;
@@ -1921,7 +1920,6 @@ double residual_calculate_mpi(
     if (pi == 0) print_matrix_l_x_n(buf, 1, n);
     if (pi == 0) printf("------------------------------------------\n");
 
-    int m_ind = -1;
     norm = -1;
     for (int i = 0; i < n; i++) {
         if (norm < buf[i]) norm = buf[i];
