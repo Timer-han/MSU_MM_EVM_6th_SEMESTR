@@ -154,10 +154,10 @@ int main(int argc, char *argv[])
     printf("------------ INVERSED_MATRIX ------------\n");
     print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
     printf("-----------------------------------------\n");
-    double r1, r2;
+    double r1, r2 = 0;
 
     r1 = residual_calculate_mpi(matrix, inversed_matrix, n, m, p, rank, comm);
-    r2 = residual_calculate_mpi(inversed_matrix, matrix, n, m, p, rank, comm);
+    // r2 = residual_calculate_mpi(inversed_matrix, matrix, n, m, p, rank, comm);
     
 
     printf("%s : Task = %d Res1 = %e Res2 = %e T1 = %.2f T2 = %.2f S = %d N = "
