@@ -1724,6 +1724,7 @@ double residual_calculate_mpi(
     int pi,
     MPI_Comm com
 ) {
+    double *buf = new double[n * m];
     double *pc = new double[n * m];
     double *residual = new double[n * m];
     double norm = 0;
@@ -1734,7 +1735,7 @@ double residual_calculate_mpi(
     int cols = get_loc_cols(n, m, p, pi);
     int k = n / m;
     int l = n % m;
-    int v, h, r, t, s, q;
+    int v, h, r, t, s, q, ah;
     
 
     
@@ -1742,13 +1743,13 @@ double residual_calculate_mpi(
     for (int i = 0; i < k; i++) {
         MPI_Barrier(com);
         if (pi == main_pi) {
-            memcpy(pc, matrix + i * m * cols, cols * m * sizeof(double));
+            memcpy(buf, matrix + i * m * cols, cols * m * sizeof(double));
 
             int p_shift = cols * m;
             for (int pk = 1; pk < p; pk++) {
                 int pk_cols = get_loc_cols(n, m, p, pk);
                 // printf("[+] pk, pk_cols: %d, %d\n", pk, pk_cols);
-                MPI_Recv(pc + p_shift, pk_cols * m, MPI_DOUBLE, pk, 0, com, &st);
+                MPI_Recv(buf + p_shift, pk_cols * m, MPI_DOUBLE, pk, 0, com, &st);
                 p_shift += pk_cols * m;
             }
         }
