@@ -10,7 +10,7 @@
 #include <time.h>
 
 static double EPS = 1e-16;
-static int PRINT_SIZE = 4;
+// static int PRINT_SIZE = 4;
 
 void get_block(double *a, double *block, int n, int cols, int m, int k, int l,
                int i, int j, int p, int pi, int use_local_j, int bl_rows, int bl_cols)
@@ -1274,7 +1274,7 @@ int mpi_calculate(
     int min_norm_ind;
     double min_norm;
 
-    double *print_buf = new double[n * m];
+    // double *print_buf = new double[n * m];
     double *block_A = new double[m * m];
     double *block_B = new double[m * m];
     double *block_C = new double[m * m];
@@ -1341,7 +1341,7 @@ int mpi_calculate(
             // if (pi == 0) printf("---------------------------------------\n");
 
             MPI_Bcast(buffer, n * m, MPI_DOUBLE, diag % p, com);
-            if (pi == 0) print_matrix_l_x_n(buffer, n, l);
+            // if (pi == 0) print_matrix_l_x_n(buffer, n, l);
 
             if (pi == diag % p) {
                 get_block(buffer, block_A, n, l, m, k, l, k, k, 1, 0, 0);
@@ -1626,10 +1626,10 @@ int mpi_calculate(
 
     // a->t1 -= get_time();
 
-    if (pi == 0) printf("\n[+] Inversed matrix:\n");
-    print_matrix_mpi(
-        inversed_matrix, n, m, p, pi, print_buf, PRINT_SIZE, com
-    );
+    // if (pi == 0) printf("\n[+] Inversed matrix:\n");
+    // print_matrix_mpi(
+    //     inversed_matrix, n, m, p, pi, print_buf, PRINT_SIZE, com
+    // );
 
 
     // a->t2 = get_time();
@@ -1725,9 +1725,9 @@ void buffer_permutation(
     int rows
 ) {
     int bl_cols = get_bl_cols(n, m, p, 0);
+    int printed = 0;
 
     for (int row = 0; row < rows; row++) {
-        int printed = 0;
         for (int bl_col = 0; bl_col < bl_cols; bl_col++) {
             int skip = 0;
             for (int pi = 0; pi < p; pi++) {
@@ -1757,46 +1757,67 @@ double residual_calculate_mpi(
     int main_pi = 0; // только 0 в большинстве систем
     MPI_Status st;
     int cols = get_loc_cols(n, m, p, pi);
+    int bl_cols = get_bl_cols(n, m, p, pi);
     int k = n / m;
     int l = n % m;
     int v, h, r, t, s, q, ah;
+
+    // printf("pi: %d, cols: %d, bl_cols: %d, k: %d, l: %d\n", pi, cols, bl_cols, k, l);
     
     double *buf = new double[n * m];
     double *pc = new double[n * m];
     double *residual = new double[cols];
+
+    memset(residual, 0, cols * sizeof(double));
+
+    // printf("------------- matrix --------------\n");
+    // print_matrix_mpi(matrix, n, m, p, pi, pc, 4, com);
+    // printf("___________________________________\n");
+
+    // printf("------------ inversed -------------\n");
+    // print_matrix_mpi(inversed, n, m, p, pi, pc, 4, com);
+    // printf("___________________________________\n");
     
     
     // Отправка всех строк толщиной m
-    for (int i = 0; i < k; i++) {
+    for (int i = 0; i < (n + m - 1) / m; i++) {
         MPI_Barrier(com);
+        int str_height = i == k ? l : m;
         if (pi == main_pi) {
-            memcpy(pc, matrix + i * m * cols, cols * m * sizeof(double));
+            memcpy(pc, matrix + i * m * cols, cols * str_height * sizeof(double));
 
-            int p_shift = cols * m;
+            int p_shift = cols * str_height;
             for (int pk = 1; pk < p; pk++) {
                 int pk_cols = get_loc_cols(n, m, p, pk);
                 // printf("[+] pk, pk_cols: %d, %d\n", pk, pk_cols);
-                MPI_Recv(pc + p_shift, pk_cols * m, MPI_DOUBLE, pk, 0, com, &st);
-                p_shift += pk_cols * m;
+                MPI_Recv(pc + p_shift, pk_cols * str_height, MPI_DOUBLE, pk, 0, com, &st);
+                p_shift += pk_cols * str_height;
             }
         }
         else {
-            MPI_Send(matrix + i * m * cols, cols * m, MPI_DOUBLE, main_pi, 0, com);
+            MPI_Send(matrix + i * m * cols, cols * str_height, MPI_DOUBLE, main_pi, 0, com);
         }
-        MPI_Barrier(com);
         
-        buffer_permutation(pc, buf, n, m, p, m);
+        MPI_Bcast(pc, n * str_height, MPI_DOUBLE, main_pi, com);
+        
+        // printf("\n---------- buffer 1 ----------\n");
+        // print_matrix_l_x_n(pc, str_height, n);
+        // printf("------------------------------\n");
 
-        printf("\n---------- buffer ----------\n");
-        print_matrix_l_x_n(buf, n, m);
-        printf("----------------------------\n");
+        buffer_permutation(pc, buf, n, m, p, str_height);
+        // memcpy(buf, pc, n * m * sizeof(double));
 
-        for (int pn = pi; pn < k; pn += p) {
-            int j_loc = pn / p;
-            for (int j = 0; j < k; j++) {
+        // printf("\n---------- buffer 2 ----------\n");
+        // print_matrix_l_x_n(buf, str_height, n);
+        // printf("------------------------------\n");
+        // return -1;
+
+        // for (int pn = pi; pn < k; pn += p) {
+            // int j_loc = pn / p;
+            for (int j = 0; j < bl_cols; j++) {
                 // Определяем размер текущего блока C[v x h]
-                v = (i < k ? m : l); // вертикальный размер блока
-                h = (j < k ? m : l); // горизонтальный размер блока
+                v = (         i < k ? m : l); // вертикальный размер блока
+                h = (j * p + pi < k ? m : l); // горизонтальный размер блока
 
                 // Указатель на начало текущего блока C
                 // double *pc = c + (i * m) * n + j * m;
@@ -1809,13 +1830,15 @@ double residual_calculate_mpi(
                 }
 
                 // Перемножаем соответствующие блоки A и B и добавляем к C
-                for (s = 0; s < k /*bl*/; s++) { // Тут неточно
+                for (s = 0; s < (n + m - 1) / m; s++) { // Тут неточно
                     // Определяем размер внутреннего блока
                     ah = (s < k ? m : l);
 
                     // Указатели на текущие блоки A и B
-                    double *pa = buf      + (i * m) * n    + s * m; // блок A[i][s]
+                    double *pa = buf                       + s * m; // блок A[i][s]
                     double *pb = inversed + (s * m) * cols + j * m; // блок B[s][j]
+
+                    // printf("Consider blocks A[%d][%d] and B[%d][%d]\n", i, s, s, j * p + pi);
 
                     // Основные циклы с разверткой для блоков 3x3
                     int r_end = (v / 3) * 3;
@@ -1832,9 +1855,9 @@ double residual_calculate_mpi(
                                 double a0q = pa[(r + 0) * n + q];
                                 double a1q = pa[(r + 1) * n + q];
                                 double a2q = pa[(r + 2) * n + q];
-                                double bq0 = pb[q * n + (t + 0)];
-                                double bq1 = pb[q * n + (t + 1)];
-                                double bq2 = pb[q * n + (t + 2)];
+                                double bq0 = pb[q * cols + (t + 0)];
+                                double bq1 = pb[q * cols + (t + 1)];
+                                double bq2 = pb[q * cols + (t + 2)];
 
                                 s00 += a0q * bq0;
                                 s01 += a0q * bq1;
@@ -1870,7 +1893,7 @@ double residual_calculate_mpi(
                                 double a0q = pa[(r + 0) * n + q];
                                 double a1q = pa[(r + 1) * n + q];
                                 double a2q = pa[(r + 2) * n + q];
-                                double bqt = pb[q * n + t];
+                                double bqt = pb[q * cols + t];
 
                                 s0 += a0q * bqt;
                                 s1 += a1q * bqt;
@@ -1894,9 +1917,9 @@ double residual_calculate_mpi(
 
                             for (q = 0; q < ah; q++) {
                                 double a0q = pa[r * n + q];
-                                double bq0 = pb[q * n + (t + 0)];
-                                double bq1 = pb[q * n + (t + 1)];
-                                double bq2 = pb[q * n + (t + 2)];
+                                double bq0 = pb[q * cols + (t + 0)];
+                                double bq1 = pb[q * cols + (t + 1)];
+                                double bq2 = pb[q * cols + (t + 2)];
 
                                 s0 += a0q * bq0;
                                 s1 += a0q * bq1;
@@ -1918,7 +1941,7 @@ double residual_calculate_mpi(
                             double sum = 0.0;
 
                             for (q = 0; q < ah; q++) {
-                                sum += pa[r * n + q] * pb[q * n + t];
+                                sum += pa[r * n + q] * pb[q * cols + t];
                             }
 
                             pc[r * h + t] += sum;
@@ -1929,15 +1952,19 @@ double residual_calculate_mpi(
                 }
                 for (r = 0; r < v; r++) {
                     for (t = 0; t < h; t++) {
-                        if (i == pn && r == t) {
-                            residual[t + m * j_loc] += std::abs(1 - pc[r * h + t]);
-                        } else {
-                            residual[t + m * j_loc] += std::abs(pc[r * h + t]);
-                        }
+                        residual[t + m * j] += std::abs(pc[r * h + t]);
+                        // printf(" C[%d, %d] = %5.2lf |", r, t, pc[r * h + t]);
+
+                        // if (i == pn && r == t) {
+                        //     residual[t + m * j_loc] += std::abs(1 - pc[r * h + t]);
+                        // } else {
+                        //     residual[t + m * j_loc] += std::abs(pc[r * h + t]);
+                        // }
                     }
+                    // printf("\n");
                 }
             }
-        }
+        // }
     }
     for (int i = 0; i < p; i++) {
         if (pi == i) {
@@ -1948,6 +1975,7 @@ double residual_calculate_mpi(
     }
 
     MPI_Allgather(residual, cols, MPI_DOUBLE, buf, n, MPI_DOUBLE, com);
+    printf("cols: %d, pi: %d\n", cols, pi);
 
     if (pi == 0) printf("---------------- RESIDUAL ----------------\n");
     if (pi == 0) print_matrix_l_x_n(buf, 1, n);
@@ -1958,31 +1986,11 @@ double residual_calculate_mpi(
         if (norm < buf[i]) norm = buf[i];
     }
 
-    // printf("[+] printed_rows: %d\n", printed_rows);
 
-    // if (l == 0) {
-    //     return;
-    // }
-
-    // if (pi == main_pi) {
-    //     memcpy(buf, a + k * m * cols, cols * l * sizeof(double));
-
-    //     int p_shift = cols * l;
-    //     for (int pk = 1; pk < p; pk++) {
-    //         int pk_cols = get_loc_cols(n, m, p, pk);
-    //         MPI_Recv(buf + p_shift, pk_cols * l, MPI_DOUBLE, pk, 0, com, &st);
-    //         p_shift += pk_cols * l;
-    //     }
-
-    //     print_array(buf, n, m, l, max_print, printed_rows, p, l);
-    // }
-    // else {
-    //     MPI_Send(a + k * m * cols, cols * l, MPI_DOUBLE, main_pi, 0, com);
-    // }
     
     delete[] pc;
     delete[] buf;
     delete[] residual;
 
-    return norm;
+    return norm - 1.;
 }
