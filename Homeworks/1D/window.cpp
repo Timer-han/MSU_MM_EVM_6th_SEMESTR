@@ -113,7 +113,7 @@ void fill_newton_coef_calc (
 {
   if (n > 50) return;
   double dx = (b - a) / n;
-  for (int i = 0; i < 2 * (n + 1); i++)
+  for (int i = 0; i < 2 * (n + 2); i++)
     {
       x[i] = a + (i / 2) * dx;
       result[i] = get_f (f, x[i], a, b, n, max_y, min_y, p);
@@ -121,7 +121,7 @@ void fill_newton_coef_calc (
     }
   // printf("\n");
 
-  for (int i = 2 * n; i > 0; i--)
+  for (int i = 2 * n + 2; i > 0; i--)
     {
       if (i % 2 == 0)
         result[i] = (result[i] - result[i - 1]) / (x[i] - x[i - 1]);
@@ -131,9 +131,9 @@ void fill_newton_coef_calc (
     }
   // printf("\n");
 
-  for (int i = 1; i < 2 * n; i++)
+  for (int i = 1; i < 2 * n + 1; i++)
     {
-      for (int j = 2 * n; j >= i; j--)
+      for (int j = 2 * n + 1; j >= i; j--)
         {
           result[j + 1] = (result[j + 1] - result[j]) / (x[j + 1] - x[j - i]);
           // printf("c[%d]=%8.3e | ", j + 1, result[j + 1]);
@@ -637,6 +637,8 @@ void Window::paintEvent (QPaintEvent * /* event */)
     min_y = std::min(min_y, -res2 + min_y);
   if (graph_type == 3)
     min_y = std::min(min_y, -res2);
+  if (graph_type == 3 && n <= 50)
+    min_y = std::min(min_y, -res1);
 
   if (n <= 50 && (graph_type == 0 || graph_type == 2))
     max_y = std::max(max_y, res1 + max_y);
@@ -644,10 +646,8 @@ void Window::paintEvent (QPaintEvent * /* event */)
     max_y = std::max(max_y, res2 + max_y);
   if (graph_type == 3)
     max_y = std::max(max_y, res2);
-
-
-  if (n <= 50 && (graph_type == 0 || graph_type == 2)) max_y = std::max(max_y, res1);
-  max_y = std::max(max_y, res2 + max_y);
+  if (graph_type == 3 && n <= 50)
+    max_y = std::max(max_y, res1);
 
 
   delta_y = 0.01 * (max_y - min_y);
