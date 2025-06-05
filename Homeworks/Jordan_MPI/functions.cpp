@@ -10,7 +10,7 @@
 #include <time.h>
 
 static double EPS = 1e-16;
-// static int PRINT_SIZE = 4;
+// static int PRINT_SIZE = 6;
 
 void get_block(double *a, double *block, int n, int cols, int m, int k, int l,
                int i, int j, int p, int pi, int use_local_j, int bl_rows, int bl_cols)
@@ -958,7 +958,7 @@ int get_pi(
 	return i_glob_m % p;
 }
 
-int function(
+double function(
     int s,
     int n,
     int i,
@@ -969,7 +969,7 @@ int function(
     if (s == 1) return n - MAX(i, j);
     if (s == 2) return MAX(i, j) + 1;
     if (s == 3) return (i > j ? i - j : j - i);
-    if (s == 4) return 1. / (i + j + 1);
+    if (s == 4) return 1. / (i + j + 1.);
     if (s == 5) return i * n + j;
     return -1;
 }
@@ -1010,41 +1010,48 @@ int read_matrix(
 	FILE *fp = nullptr;
 	int err = 0;
 	if (pi == main_pi) {
-		fp = fopen("r", name);
+		fp = fopen(name, "r");
 		if (fp == nullptr) err = 1;
 	}
+    // printf("[+] Process %d, reading file: %s\n", pi, name);
+
 	MPI_Bcast(&err, 1, MPI_INT, main_pi, com);
 	if (err) return err; // во всех процессах
 	
+    // printf("I'm here!\n");
 	memset(buf, 0, n * m * sizeof(double));
 	
-	// число блочных строк
-	int b, max_b = (n + m - 1) / m;
-	for (b = 0; b < max_b; b++) {
-		// владелец строки
-		// int owner = b % p;
-		int rows = b * m + m <= n ? m : n - b * m;
-		// rows = min (m, n - b * m)
-		
-		// лок номер столбца
-		// int b_loc = b / p;
-		if (pi == main_pi) {
-			err += read_array(fp, buf, n * rows);
-		}
-
-        MPI_Bcast(buf, n * rows, MPI_DOUBLE, main_pi, com);
-
-        int cols = get_bl_cols(n, m, p, pi);
-        int cols_loc = get_loc_cols(n, m, p, pi);
-        int pos = 0;
-        for (int i = 0; i < rows; i++) {
-            for (int j = pi; j < cols; j += p) {
-                for (int k = j * m; k < (j + 1) * m && k < n; k++) {
-                    a[(i + b * m) * cols_loc + pos++] = buf[i * n + k];
-                }
+    int readed = 0;
+	for (int i = 0; i < (n + m - 1) / m; i++) {
+        int str_size = std::min(m, n - i * m);
+        // printf("[+] Process %d, reading string %d, size: %d\n", pi, i, str_size);
+        if (pi == main_pi) {
+            if (read_array(fp, buf, str_size * n) != 0) {
+                err = 2; // ошибка чтения
             }
         }
-	}
+
+        MPI_Bcast(&err, 1, MPI_INT, main_pi, com);
+        if (err) return err; // ошибка чтения
+        // print_matrix_l_x_n(buf, str_size, n);
+        MPI_Bcast(buf, n * str_size, MPI_DOUBLE, main_pi, com);
+
+        // записываем в локальную матрицу
+        // int cols = get_loc_cols(n, m, p, pi);
+        int bl_cols = get_bl_cols(n, m, p, pi);
+
+        for (int str = 0; str < str_size; str++) {
+            for (int j = 0; j < bl_cols; j++) {
+                int bl_width = std::min(m, n - j * m * p - pi * m);
+                memcpy(
+                    a + readed,
+                    buf + str * n + j * m * p + pi * m,
+                    sizeof(double) * bl_width
+                );
+                readed += bl_width;
+            }
+        }
+    }
 	
 	if (pi == main_pi) {
 		fclose(fp);
@@ -1052,6 +1059,17 @@ int read_matrix(
 	}
 	MPI_Bcast(&err, 1, MPI_INT, main_pi, com);
 	if (err) return err;
+
+    // for (int pn = 0; pn < p; pn++) {
+    //     MPI_Barrier(com);
+    //     if (pn == pi) {
+    //         int cols = get_loc_cols(n, m, p, pi);
+    //         printf("[+] Process %d, cols: %d\n", pi, cols);
+    //         print_matrix_l_x_n(a, n, cols);
+    //     }
+    // }
+    // printf("I'm here! pi: %d\n", pi);
+
 	return 0;
 }
 
@@ -1302,7 +1320,8 @@ int mpi_calculate(
     
     double norm = get_norm_pi(matrix, n, cols);
     MPI_Allreduce(&norm, buffer, 1, MPI_DOUBLE, MPI_MAX, com);
-    if (pi == 0) EPS *= norm;
+    EPS *= buffer[0];
+    printf("pi: %d, EPS: %8.3e\n", pi, EPS);
     MPI_Barrier(com);
     
     // Пробегаюсь по диагональным элементам
@@ -1371,9 +1390,7 @@ int mpi_calculate(
         min_norm = -1;
         min_norm_ind = -1;
         for (int i = 0; i < p; i++) {
-            if (
-                buf_array[i * 2] >= EPS && (buf_array[i * 2] < min_norm || min_norm < EPS)
-            ) {
+            if (buf_array[i * 2] >= 0 && (min_norm < 0 || buf_array[i * 2] < min_norm)) {
                 // printf("[+] I'm here! %d\n", pi);
                 min_norm = buf_array[i * 2];
                 min_norm_ind = round(buf_array[i * 2 + 1]);
@@ -1388,7 +1405,7 @@ int mpi_calculate(
         // if (pi == 0) printf("---------------------------------------------------------\n");
         // MPI_Barrier(com);
 
-        if (min_norm_ind < 0) {
+        if (min_norm < 0) {
 
             // printf("[-] min_norm_ind: %d\n[-] min_norm: %8.3e\n", min_norm_ind, min_norm);
             if (pi == 0)
@@ -1434,8 +1451,10 @@ int mpi_calculate(
         // if (pi == 0) printf("---------------- Block A, to inverse: ----------------\n");
         // if (pi == 0) print_matrix_l_x_n(block_A, diag == k ? l : m, diag == k ? l : m);
         // if (pi == 0) printf("-----------------------------------------------------\n");
+        // print_matrix_l_x_n(block_A, m, m);
 
         if (diag != k) {
+            // fprintf(stderr, "pi:%d %s:%d!\n", pi, __FILE__, __LINE__);
             if (get_inverse_matrix(block_A, block_B, m) != 0) {
                 if (pi == 0)
                     fprintf(stderr, "[-] Matrix is irreversible, place %s:%d!\n", __FILE__, __LINE__);
@@ -1443,6 +1462,8 @@ int mpi_calculate(
                 delete[] block_B;
                 delete[] block_C;
                 delete[] buf_array;
+                // fprintf(stderr, "pi:%d %s:%d!\n", pi, __FILE__, __LINE__);
+
                 return -2;
             }
         } else {
@@ -1761,12 +1782,21 @@ double residual_calculate_mpi(
     int k = n / m;
     int l = n % m;
     int v, h, r, t, s, q, ah;
+    
+    if (n > 11000) return -1;
 
     // printf("pi: %d, cols: %d, bl_cols: %d, k: %d, l: %d\n", pi, cols, bl_cols, k, l);
     
     double *buf = new double[n * m];
     double *pc = new double[n * m];
     double *residual = new double[cols];
+    
+    if (!buf || !pc || !residual) {
+        if (pc)       delete[] pc;
+        if (buf)      delete[] buf;
+        if (residual) delete[] residual;
+        return -1;
+    }
 
     memset(residual, 0, cols * sizeof(double));
 
@@ -1966,25 +1996,32 @@ double residual_calculate_mpi(
             }
         // }
     }
-    for (int i = 0; i < p; i++) {
-        if (pi == i) {
-            printf("pi: %d, residual:", pi);
-            print_matrix_l_x_n(residual, 1, cols);
-        }
-        MPI_Barrier(com);
-    }
-
-    MPI_Allgather(residual, cols, MPI_DOUBLE, buf, n, MPI_DOUBLE, com);
-    printf("cols: %d, pi: %d\n", cols, pi);
-
-    if (pi == 0) printf("---------------- RESIDUAL ----------------\n");
-    if (pi == 0) print_matrix_l_x_n(buf, 1, n);
-    if (pi == 0) printf("------------------------------------------\n");
+    // for (int i = 0; i < p; i++) {
+    //     if (pi == i) {
+    //         printf("pi: %d, residual:", pi);
+    //         print_matrix_l_x_n(residual, 1, cols);
+    //     }
+    //     MPI_Barrier(com);
+    // }
 
     norm = -1;
-    for (int i = 0; i < n; i++) {
-        if (norm < buf[i]) norm = buf[i];
-    }
+    for (int i = 0; i < cols; i++)
+        norm = std::max(norm, residual[i]);
+
+    MPI_Allreduce(&norm, residual, 1, MPI_DOUBLE, MPI_MAX, com);
+    norm = residual[0];
+
+    // MPI_Allgather(residual, cols, MPI_DOUBLE, buf, cols, MPI_DOUBLE, com);
+    // printf("cols: %d, pi: %d\n", cols, pi);
+
+    // if (pi == 0) printf("---------------- RESIDUAL ----------------\n");
+    // if (pi == 0) print_matrix_l_x_n(buf, 1, n);
+    // if (pi == 0) printf("------------------------------------------\n");
+
+    // norm = -1;
+    // for (int i = 0; i < n; i++) {
+    //     if (norm < buf[i]) norm = buf[i];
+    // }
 
 
     
@@ -1992,5 +2029,5 @@ double residual_calculate_mpi(
     delete[] buf;
     delete[] residual;
 
-    return norm - 1.;
+    return norm - 1;
 }

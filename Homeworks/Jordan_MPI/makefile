@@ -1,6 +1,6 @@
 CXX = mpicxx
 CXXFLAGS = -isystem /usr/local/intel/impi/5.1.3.223/intel64/include \
-           -mfpmath=sse -fstack-protector-all -g \
+           -O3 -mfpmath=sse -fstack-protector-all -g \
            -W -Wall -Wextra -Wunused -Wcast-align \
            -Werror -pedantic -pedantic-errors -Wfloat-equal \
            -Wpointer-arith -Wformat-security -Wmissing-format-attribute \

@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
         }
         filename = argv[5];
         if (read_matrix(matrix, n, m, p, rank, filename, buffer, comm)) {
+            fprintf(stderr, "[-] Error reading matrix from file %s\n", filename);
             delete[] matrix;
             delete[] inversed_matrix;
             delete[] buffer;
@@ -107,21 +108,31 @@ int main(int argc, char *argv[])
     } else {
         init_matrix(matrix, n, m, p, rank, s);
     }
+    if (rank == 0) printf("------------- GIVEN MATRIX -------------\n");
     MPI_Barrier(comm);
-    print_matrix_mpi(matrix, n, m, p, rank, buffer, 4, comm);
+    print_matrix_mpi(matrix, n, m, p, rank, buffer, r, comm);
     MPI_Barrier(comm);
+    if (rank == 0) printf("----------------------------------------\n");
 
+
+    double t1 = MPI_Wtime();
 
     unit_matrix_mpi(inversed_matrix, n, m, p, rank);
-    MPI_Barrier(comm);
-    print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
-    MPI_Barrier(comm);
+    // MPI_Barrier(comm);
+    // print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
+    // MPI_Barrier(comm);
 
-    mpi_calculate(
-        matrix, inversed_matrix, buffer, n, m, p, rank, comm
-    );
+    if (mpi_calculate(matrix, inversed_matrix, buffer, n, m, p, rank, comm))
+    {
+        delete[] matrix;
+        delete[] inversed_matrix;
+        delete[] buffer;
+        delete[] norm;
+        MPI_Finalize();
+        return 1;
+    }
+    t1 = MPI_Wtime() - t1;
     MPI_Barrier(comm);
-
 
     if (s == 0) {
         if (argc < 5) {
@@ -135,6 +146,7 @@ int main(int argc, char *argv[])
         }
         filename = argv[5];
         if (read_matrix(matrix, n, m, p, rank, filename, buffer, comm)) {
+            fprintf(stderr, "[-] Error reading matrix from file %s\n", filename);
             delete[] matrix;
             delete[] inversed_matrix;
             delete[] buffer;
@@ -148,21 +160,25 @@ int main(int argc, char *argv[])
     }
     
 
-    if (rank == 0) printf("---------------- MATRIX ----------------\n");
-    print_matrix_mpi(matrix, n, m, p, rank, buffer, 4, comm);
-    if (rank == 0) printf("----------------------------------------\n");
+    // if (rank == 0) printf("---------------- MATRIX ----------------\n");
+    // print_matrix_mpi(matrix, n, m, p, rank, buffer, 4, comm);
+    // if (rank == 0) printf("----------------------------------------\n");
     if (rank == 0) printf("------------ INVERSED_MATRIX ------------\n");
-    print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, 4, comm);
+    print_matrix_mpi(inversed_matrix, n, m, p, rank, buffer, r, comm);
     if (rank == 0) printf("-----------------------------------------\n");
+    
     double r1, r2 = 0;
+    double t2 = MPI_Wtime();
 
     r1 = residual_calculate_mpi(matrix, inversed_matrix, n, m, p, rank, comm);
-    // r2 = residual_calculate_mpi(inversed_matrix, matrix, n, m, p, rank, comm);
+    r2 = residual_calculate_mpi(inversed_matrix, matrix, n, m, p, rank, comm);
+
+    t2 = MPI_Wtime() - t2;
     
     if (rank == 0) 
         printf("%s : Task = %d Res1 = %e Res2 = %e T1 = %.2f T2 = %.2f S = %d N = "
             "%d M = %d P = %d\n",
-            argv[0], 18, r1, r2, -0., 0., s, n, m, p);
+            argv[0], 18, r1, r2, t1, t2, s, n, m, p);
 
 
     delete[] matrix;
