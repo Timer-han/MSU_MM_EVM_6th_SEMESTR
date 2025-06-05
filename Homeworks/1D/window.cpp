@@ -631,9 +631,9 @@ void Window::paintEvent (QPaintEvent * /* event */)
   paintLagrResidual (painter, pen_green, false);
   paintCubiResidual (painter, pen_blue, false);
 
-  if (n <= 50) min_y = std::min(min_y, -res1);
+  if (n <= 50 && (graph_type == 0 || graph_type == 2)) min_y = std::min(min_y, -res1);
   min_y = std::min(min_y, -res2);
-  if (n <= 50) max_y = std::max(max_y, res1);
+  if (n <= 50 && (graph_type == 0 || graph_type == 2)) max_y = std::max(max_y, res1);
   max_y = std::max(max_y, res2);
 
 
