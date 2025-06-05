@@ -619,7 +619,7 @@ void Window::paintEvent (QPaintEvent * /* event */)
 
   // calculate min and max for current function
   max_y = min_y = 0;
-  if ()
+  if (graph_type < 3)
   for (x1 = a; x1 - b < 1.e-6; x1 += (b - a) / width ())
     {
       y1 = f (x1);
