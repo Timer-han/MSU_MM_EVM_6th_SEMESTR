@@ -627,6 +627,14 @@ void Window::paintEvent (QPaintEvent * /* event */)
       if (y1 > max_y)
         max_y = y1;
     }
+  paintLagrResidual (painter, pen_green, false);
+  paintCubiResidual (painter, pen_blue, false);
+
+  min_y = std::min(min_y, -res1);
+  min_y = std::min(min_y, -res2);
+  max_y = std::max(max_y, res1);
+  max_y = std::max(max_y, res2);
+
 
   delta_y = 0.01 * (max_y - min_y);
   min_y -= delta_y;
