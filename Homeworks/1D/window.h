@@ -27,6 +27,8 @@ private:
   double *cubic_d;
   double min_y = 0;
   double max_y = 0;
+  double max_s = 0;
+  double min_s = 0;
 
 public:
   QPainter painter;
