@@ -121,7 +121,7 @@ void fill_newton_coef_calc (
     }
   // printf("\n");
 
-  for (int i = 2 * n + 2; i > 0; i--)
+  for (int i = 2 * n; i > 0; i--)
     {
       if (i % 2 == 0)
         result[i] = (result[i] - result[i - 1]) / (x[i] - x[i - 1]);
@@ -131,9 +131,9 @@ void fill_newton_coef_calc (
     }
   // printf("\n");
 
-  for (int i = 1; i < 2 * n + 2; i++)
+  for (int i = 1; i < 2 * n; i++)
     {
-      for (int j = 2 * n + 2; j >= i; j--)
+      for (int j = 2 * n; j >= i; j--)
         {
           result[j + 1] = (result[j + 1] - result[j]) / (x[j + 1] - x[j - i]);
           // printf("c[%d]=%8.3e | ", j + 1, result[j + 1]);
