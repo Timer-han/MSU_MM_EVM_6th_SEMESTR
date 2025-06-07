@@ -722,7 +722,6 @@ double r2(
 
     res = reduce_sum_det(p, k, res);
     return res * hx * hy / 2;
-    ;
 }
 
 double r3(
