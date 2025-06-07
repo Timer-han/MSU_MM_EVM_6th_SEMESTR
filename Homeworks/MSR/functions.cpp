@@ -624,6 +624,7 @@ void fill_B(
 {
     int n = (nx + 1) * (ny + 1);
     int i1, i2, i, j, l;
+
     thread_rows(n, p, k, i1, i2);
 
     for (l = i1; l < i2; ++l)
