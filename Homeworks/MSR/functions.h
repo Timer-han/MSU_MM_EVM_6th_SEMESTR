@@ -4,7 +4,7 @@ void thread_rows(int n , int p, int k, int &i1, int &i2);
 double scalar_product(int n, double* x, double* y, int p, int k);
 void mult_sub_vector(int n, double* x, double* y, double t, int p, int k);
 void apply_preconditioner_msr_matrix(int n, double* A, int* /*I*/, double* v, double* r, int p, int k);
-void multiply_msr_matrix_vector(int n, double* A, int* I, double* x, double* y, int p, int k);
+void mult_msr_matrix_vector(int n, double* A, int* I, double* x, double* y, int p, int k);
 void ij2l(int nx, int /*ny*/, int i, int j, int &l);
 void l2ij(int nx, int /*ny*/, int &i, int &j, int l);
 int get_len_msr(int nx, int ny);

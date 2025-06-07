@@ -22,7 +22,7 @@ int minimal_residual_msr_matrix(
     b_norm2 = scalar_product(n, b, b, p, k); // (b, b)
     prec = b_norm2 * eps * eps;
     // r = Ax
-    multiply_msr_matrix_vector(n, A, I, x, r, p, k);
+    mult_msr_matrix_vector(n, A, I, x, r, p, k);
     // 1 точка синхронизации
 	// r = Ax - b, r-=b, r-=1*b
     mult_sub_vector(n, r, b, 1., p, k);
@@ -34,7 +34,7 @@ int minimal_residual_msr_matrix(
             n, A, I, v, r, p, k);
         // 1 точка синхронизациии
 		// u = Av, u = AM^(-1)r
-        multiply_msr_matrix_vector(n, A, I, v, u, p, k); 
+        mult_msr_matrix_vector(n, A, I, v, u, p, k); 
 		// 1 точка синхронизации
 		// c_1 = (u, r)
 		// c_2 = (u, u)
@@ -114,7 +114,7 @@ double scalar_product(
     int i;
     double s = 0;
     thread_rows(n, p, k, i1, i2);
-    for (i = i1; i < i2; ++i)
+    for (i = i1; i < i2; i++)
         s += x[i] * y[i];
 
     s = reduce_sum_det(p, k, s);
@@ -122,50 +122,59 @@ double scalar_product(
     return s;
 }
 
-void mult_sub_vector(int n, double *x, double *y, double t, int p, int k)
+void mult_sub_vector(
+    int n,
+    double *x,
+    double *y,
+    double t,
+    int p,
+    int k)
 {
-    int i;
-    int i1;
-    int i2;
+    int i, i1, i2;
     thread_rows(n, p, k, i1, i2);
-    for (i = i1; i < i2; ++i)
-    {
+    for (i = i1; i < i2; i++)
         x[i] -= t * y[i];
-    }
     synchronize(p);
 }
 
-void apply_preconditioner_msr_matrix(int n, double *A, int * /*I*/, double *v, double *r, int p, int k)
+void apply_preconditioner_msr_matrix(
+    int n,
+    double *A,
+    int * /*I*/,
+    double *v,
+    double *r,
+    int p,
+    int k)
 {
-    int i;
-    int i1;
-    int i2;
+    int i, i1, i2;
     thread_rows(n, p, k, i1, i2);
-    for (i = i1; i < i2; ++i)
-    {
+    for (i = i1; i < i2; i++)
         v[i] = r[i] / A[i];
-    }
     synchronize(p);
 }
 
-void multiply_msr_matrix_vector(int n, double *A, int *I, double *x, double *y, int p, int k)
+void mult_msr_matrix_vector(
+    int n,
+    double *A,
+    int *I,
+    double *x,
+    double *y,
+    int p,
+    int k)
 {
-    int i;
-    int i1;
-    int i2;
-    int l;
-    int J;
-    double s;
+    int i, i1, i2;
+    int l, J, s;
     thread_rows(n, p, k, i1, i2);
-    for (i = i1; i < i2; ++i)
+    for (i = i1; i < i2; i++)
     {
-        s = A[i] * x[i];     // диагональ
-        l = I[i + 1] - I[i]; // число элементов
+		// диагональный элемент
+        s = A[i] * x[i]; // A_ii * x_i
+		// число != 0 вне диагональных элементов
+        l = I[i + 1] - I[i];
+		// начало строки i
         J = I[i];
-        for (int j = 0; j < l; ++j)
-        {
+        for (int j = 0; j < l; j++)
             s += A[J + j] * x[I[J + j]];
-        }
         y[i] = s;
     }
     synchronize(p);
@@ -234,9 +243,9 @@ int get_len_msr_off_diag(int nx, int ny)
     int m = 0;
     int i;
     int j;
-    for (i = 0; i <= nx; ++i)
+    for (i = 0; i <= nx; i++)
     {
-        for (j = 0; j <= ny; ++j)
+        for (j = 0; j <= ny; j++)
         {
             m += get_off_diag(nx, ny, i, j);
         }
