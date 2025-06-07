@@ -651,14 +651,20 @@ double r2(
     ;
 }
 
-double r3(int nx, int ny, double hx, double hy, double x0, double y0, double *x, double (*f)(double, double), int p, int k)
+double r3(
+    int nx,
+    int ny,
+    double hx,
+    double hy,
+    double x0,
+    double y0,
+    double *x,
+    double (*f)(double, double),
+    int p,
+    int k)
 {
     int n = (nx + 1) * (ny + 1);
-    int i1;
-    int i2;
-    int l;
-    int i;
-    int j;
+    int i1, i2, i, j, l;
     double r3_residual = -1;
 
     thread_rows(n, p, k, i1, i2);
@@ -674,14 +680,20 @@ double r3(int nx, int ny, double hx, double hy, double x0, double y0, double *x,
     return r3_residual;
 }
 
-double r4(int nx, int ny, double hx, double hy, double x0, double y0, double *x, double (*f)(double, double), int p, int k)
+double r4(
+    int nx,
+    int ny,
+    double hx,
+    double hy,
+    double x0,
+    double y0,
+    double *x,
+    double (*f)(double, double),
+    int p,
+    int k)
 {
     int n = (nx + 1) * (ny + 1);
-    int i1;
-    int i2;
-    int l;
-    int i;
-    int j;
+    int i1, i2, i, j, l;
     double r4_residual = 0;
 
     thread_rows(n, p, k, i1, i2);
@@ -689,7 +701,6 @@ double r4(int nx, int ny, double hx, double hy, double x0, double y0, double *x,
     for (l = i1; l < i2; ++l)
     {
         l2ij(nx, ny, i, j, l);
-
         r4_residual += std::abs(f(x0 + i * hx, y0 + j * hy) - x[l]);
     }
 
