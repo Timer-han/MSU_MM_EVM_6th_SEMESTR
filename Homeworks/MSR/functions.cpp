@@ -562,15 +562,21 @@ void fill_B(
     synchronize(p);
 }
 
-double r1(int nx, int ny, double hx, double hy, double x0, double y0, double *x, double (*f)(double, double), int p, int k)
+double r1(
+    int nx,
+    int ny,
+    double hx,
+    double hy,
+    double x0,
+    double y0,
+    double *x,
+    double (*f)(double, double),
+    int p,
+    int k)
 {
     int n = (nx + 1) * (ny + 1);
-    int i1;
-    int i2;
-    int l;
-    int i;
-    int j;
-    double r1_residual = -1;
+    int i1, i2, i, j, l;
+    double r1_residual = -1.;
 
     thread_rows(n, p, k, i1, i2);
 
@@ -583,7 +589,9 @@ double r1(int nx, int ny, double hx, double hy, double x0, double y0, double *x,
             continue;
         }
 
-        r1_residual = std::max(r1_residual, std::abs(f(x0 + (i + 2. / 3) * hx, y0 + (j + 1. / 3) * hy) - (x[l] + x[l + 1] + x[l + 1 + nx + 1]) / 3));
+        r1_residual = std::max(
+            r1_residual,
+            std::abs(f(x0 + (i + 2. / 3) * hx, y0 + (j + 1. / 3) * hy) - (x[l] + x[l + 1] + x[l + 1 + nx + 1]) / 3));
         r1_residual = std::max(r1_residual, std::abs(f(x0 + (i + 1. / 3) * hx, y0 + (j + 2. / 3) * hy) - (x[l] + x[l + nx + 1] + x[l + 1 + nx + 1]) / 3));
     }
 
