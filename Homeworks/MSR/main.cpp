@@ -71,11 +71,13 @@ void* thread_func(void* args) {
 	return nullptr;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     double a, b, c, d, eps;
     int nx, ny, pi, maxit, p;
-    
-    if (argc < 11) {
+
+    if (argc < 11)
+    {
         printf("[-] Not enough arguments!\n");
         printf("[+] Usage: %s a b c d nx ny pi eps maxit p\n", argv[0]);
         return 1;
@@ -91,53 +93,64 @@ int main(int argc, char* argv[]) {
         sscanf(argv[7], "%d", &pi) != 1 ||
         sscanf(argv[8], "%lf", &eps) != 1 ||
         sscanf(argv[9], "%d", &maxit) != 1 ||
-        sscanf(argv[10], "%d", &p) != 1
-    ) {
+        sscanf(argv[10], "%d", &p) != 1)
+    {
         printf("[-] Invalid arguments!\n");
         return 2;
     }
-	
-	init_reduce_sum(p);
-	
-	double (*f)(double, double);
-	select_func(pi, f);
-	
-    int n = (nx + 1) * (ny + 1);
-	
-	double* A;
-	int* I;
-	if (allocate_msr_matrix(nx, ny, &A,  &I) != 0) {
-		return -1;
-	}
-    fill_I(nx, ny, I);
-	double* B = new double[n];
-	double* x = new double[n];
-	double* r = new double[n];
-	double* u = new double[n];
-	double* v = new double[n];
 
-    if (!A || !I || !B || !x || !r || !u || !v) {
+    init_reduce_sum(p);
+
+    double (*f)(double, double);
+    select_func(pi, f);
+
+    int n = (nx + 1) * (ny + 1);
+
+    double *A;
+    int *I;
+    if (allocate_msr_matrix(nx, ny, &A, &I) != 0)
+    {
+        printf("[-] Failed to allocate MSR matrix!\n");
+        return -1;
+    }
+    fill_I(nx, ny, I);
+    double *B = new double[n];
+    double *x = new double[n];
+    double *r = new double[n];
+    double *u = new double[n];
+    double *v = new double[n];
+
+    if (!A || !I || !B || !x || !r || !u || !v)
+    {
         printf("[-] Memory allocation failed!\n");
         delete_reduce_sum();
-        if (A) delete[] A;
-        if (I) delete[] I;
-        if (B) delete[] B;
-        if (x) delete[] x;
-        if (r) delete[] r;
-        if (u) delete[] u;
-        if (v) delete[] v;
+        if (A)
+            delete[] A;
+        if (I)
+            delete[] I;
+        if (B)
+            delete[] B;
+        if (x)
+            delete[] x;
+        if (r)
+            delete[] r;
+        if (u)
+            delete[] u;
+        if (v)
+            delete[] v;
         return 3;
     }
-	
-	for (int i = 0; i < n; ++i) {
-		x[i] = 0;
-		r[i] = 0;
-		u[i] = 0;
-		v[i] = 0;
-	}
-    
-    thread_data* data = new thread_data[p];
-    pthread_t* tid = new pthread_t[p];
+
+    for (int i = 0; i < n; ++i)
+    {
+        x[i] = 0;
+        r[i] = 0;
+        u[i] = 0;
+        v[i] = 0;
+    }
+
+    thread_data *data = new thread_data[p];
+    pthread_t *tid = new pthread_t[p];
 
     for (int i = 0; i < p; ++i)
     {
@@ -145,55 +158,58 @@ int main(int argc, char* argv[]) {
         data[i].b = b;
         data[i].c = c;
         data[i].d = d;
-		data[i].nx = nx;
-		data[i].ny = ny;
-		data[i].f = f;
-		data[i].eps = eps;
-		data[i].maxit = maxit;
-		data[i].p = p;
-		data[i].pi = i;
-		
-		data[i].A = A;
-		data[i].I = I;
-		data[i].x = x;
-		data[i].B = B;
-		
-		data[i].r = r;
-		data[i].u = u;
-		data[i].v = v;
+        data[i].nx = nx;
+        data[i].ny = ny;
+        data[i].f = f;
+        data[i].eps = eps;
+        data[i].maxit = maxit;
+        data[i].p = p;
+        data[i].pi = i;
+
+        data[i].A = A;
+        data[i].I = I;
+        data[i].x = x;
+        data[i].B = B;
+
+        data[i].r = r;
+        data[i].u = u;
+        data[i].v = v;
     }
-    
-    for (int i = 1; i < p; ++i) {
+
+    for (int i = 1; i < p; ++i)
+    {
         pthread_create(&tid[i], 0, thread_func, data + i);
     }
     thread_func(data + 0);
-	
-    for (int i = 1; i < p; ++i) {
+
+    for (int i = 1; i < p; ++i)
+    {
         pthread_join(tid[i], 0);
     }
-    
+
     int task = 1;
-	double t1 = 0;
-	double t2 = 0;
-	
-	for (int i = 0; i < p; ++i) {
+    double t1 = 0;
+    double t2 = 0;
+
+    for (int i = 0; i < p; ++i)
+    {
         t1 = std::max(t1, data[i].t1);
         t2 = std::max(t2, data[i].t2);
     }
-    
-    printf ("%s : Task = %d R1 = %e R2 = %e R3 = %e R4 = %e T1 = %.2f T2 = %.2f It = %d E = %e K = %d Nx = %d Ny = %d P = %d\n", 
-			argv[0], task, data->r1, data->r2, data->r3, data->r4, t1, t2, data->it, eps, pi, nx, ny, p);
-    
-	delete_reduce_sum();
-	delete[] A;
-	delete[] I;
-	delete[] B;
-	delete[] x;
-	delete[] r;
-	delete[] u;
-	delete[] v;
-	delete[] data;
+
+    printf("%s : Task = %d R1 = %e R2 = %e R3 = %e R4 = %e T1 = %.2f T2 = %.2f It = %d E = %e K = %d Nx = %d Ny = %d P = %d\n",
+           argv[0], task, data->r1, data->r2, data->r3, data->r4, t1, t2, data->it, eps, pi, nx, ny, p);
+
+    delete_reduce_sum();
+    delete[] A;
+    delete[] I;
+    delete[] B;
+    delete[] x;
+    delete[] r;
+    delete[] u;
+    delete[] v;
+    delete[] data;
     delete[] tid;
-	
+
     return 0;
 }
