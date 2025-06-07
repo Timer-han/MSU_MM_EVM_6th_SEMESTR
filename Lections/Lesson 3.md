@@ -33,16 +33,16 @@ void mult_msr_matrix_vector (
 	double *x,
 	double *y
 ) {
-	int i, j, l, ;
+	int i, j, l, J;
 	double s;
 	for (i = 0; i < n; i++) {
 		// диагональный элемент
 		s = A[i] * x[i]; // A_ii * x_i
 		// число != 0 вне диагональных элементов
-		l = I[i+1] -I[i];
+		l = I[i+1] - I[i];
 		// начало строки i
 		J = I[i];
-		for ( j = 0; j < l; j++) {
+		for (j = 0; j < l; j++) {
 			s += A[J + j] * x[I[J + j]]; // I[J+j] - номер столбца для A[j+j]
 		}
 		y[i] = s;
