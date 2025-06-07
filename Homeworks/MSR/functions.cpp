@@ -257,18 +257,18 @@ int allocate_msr_matrix(
     int diag_len = (nx + 1) * (ny + 1);
     int off_diag = get_len_msr_all_diag(nx, ny);
     int len = diag_len + off_diag + 1;
+
     double *A = nullptr;
     int *I = nullptr;
+
     A = new double[len];
     if (A == nullptr)
-    {
         return 1;
-    }
+
     I = new int[len];
     if (I == nullptr)
-    {
         return 2;
-    }
+
     *p_A = A;
     *p_I = I;
     return 0;
@@ -277,11 +277,8 @@ int allocate_msr_matrix(
 void fill_I(int nx, int ny, int *I)
 {
     int n = (nx + 1) * (ny + 1);
-    int l;
-    int i;
-    int j;
-    int m;
-    int r = n + 1;
+    int l, i, j;
+    int m, r = n + 1;
     for (l = 0; l < n; ++l)
     {
         l2ij(nx, ny, i, j, l);
@@ -292,7 +289,15 @@ void fill_I(int nx, int ny, int *I)
     I[l] = r;
 }
 
-void fill_A_ij(int nx, int ny, double hx, double hy, int i, int j, double *A_diag, double *A_off_diag)
+void fill_A_ij(
+    int nx,
+    int ny,
+    double hx,
+    double hy,
+    int i,
+    int j,
+    double *A_diag,
+    double *A_off_diag)
 {
     double s = hx * hy;
     int l;
