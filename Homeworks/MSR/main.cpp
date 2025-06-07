@@ -31,9 +31,9 @@ void* thread_func(void* arg) {
 	int k = data->k;
 	
 	double* A = data->A;
-	int* I = data->I;
-	double* x = data->x;
 	double* B = data->B;
+	double* x = data->x;
+	int* I = data->I;
 	
 	double* r = data->r;
 	double* u = data->u;
