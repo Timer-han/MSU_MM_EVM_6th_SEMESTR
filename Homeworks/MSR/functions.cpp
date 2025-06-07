@@ -393,57 +393,164 @@ void fill_A(int nx, int ny, double hx, double hy, int *I, double *A, int p, int 
 
 #define FF(I, J) (f(x0 + (I) * hx, y0 + (J) * hy))
 
-double F_IJ(int nx, int ny, double hx, double hy, double x0, double y0, int i, int j, double (*f)(double, double))
+double F_IJ(
+    int nx,
+    int ny,
+    double hx,
+    double hy,
+    double x0,
+    double y0,
+    int i,
+    int j,
+    double (*f)(double, double))
 {
-    double w = hx * hy / 192;
+    double w = hx * hy / 192; // ввели вес
 
-    if (i > 0 && i < nx && j > 0 && j < ny)
+    if (i > 0 && i < nx && j > 0 && j < ny) // внутренние
     {
-        return w * (36 * FF(i, j) + 20 * (FF(i + 0.5, j) + FF(i, j - 0.5) + FF(i - 0.5, j - 0.5) + FF(i - 0.5, j) + FF(i, j + 0.5) + FF(i + 0.5, j + 0.5)) + 4 * (FF(i + 0.5, j - 0.5) + FF(i - 0.5, j - 1) + FF(i - 1, j - 0.5) + FF(i - 0.5, j + 0.5) + FF(i + 0.5, j + 1) + FF(i + 1, j + 0.5)) + 2 * (FF(i + 1, j) + FF(i, j - 1) + FF(i - 1, j - 1) + FF(i - 1, j) + FF(i, j + 1) + FF(i + 1, j + 1)));
+        return w * (
+            36 * FF(i, j)
+            + 20 * (
+                FF(i + 0.5, j)
+                + FF(i, j - 0.5)
+                + FF(i - 0.5, j - 0.5)
+                + FF(i - 0.5, j)
+                + FF(i, j + 0.5)
+                + FF(i + 0.5, j + 0.5)
+            ) + 4 * (
+                FF(i + 0.5, j - 0.5)
+                + FF(i - 0.5, j - 1)
+                + FF(i - 1, j - 0.5)
+                + FF(i - 0.5, j + 0.5)
+                + FF(i + 0.5, j + 1)
+                + FF(i + 1, j + 0.5)
+            ) + 2 * (
+                FF(i + 1, j)
+                + FF(i, j - 1)
+                + FF(i - 1, j - 1)
+                + FF(i - 1, j)
+                + FF(i, j + 1)
+                + FF(i + 1, j + 1)
+            )
+        );
     }
-    if (i > 0 && i < nx && j == 0)
+    if (i > 0 && i < nx && j == 0) // нижняя сторона
     {
-        return w * (18 * FF(i, j) + 10 * (FF(i + 0.5, j) + FF(i - 0.5, j)) + 20 * (FF(i, j + 0.5) + FF(i + 0.5, j + 0.5)) + 4 * (FF(i - 0.5, j + 0.5) + FF(i + 0.5, j + 1) + FF(i + 1, j + 0.5)) + 1 * (FF(i - 1, j) + FF(i + 1, j)) + 2 * (FF(i, j + 1) + FF(i + 1, j + 1)));
+        return w * (
+            18 * FF(i, j)
+            + 10 * (FF(i + 0.5, j) + FF(i - 0.5, j))
+            + 20 * (FF(i, j + 0.5) + FF(i + 0.5, j + 0.5))
+            + 4 * (
+                FF(i - 0.5, j + 0.5)
+                + FF(i + 0.5, j + 1)
+                + FF(i + 1, j + 0.5)
+            )
+            + 1 * (FF(i - 1, j) + FF(i + 1, j))
+            + 2 * (FF(i, j + 1) + FF(i + 1, j + 1))
+        );
     }
-    if (i > 0 && i < nx && j == ny)
+    if (i > 0 && i < nx && j == ny)  // верхняя сторона
     {
-        return w * (18 * FF(i, j) + 10 * (FF(i - 0.5, j) + FF(i + 0.5, j)) + 20 * (FF(i, j - 0.5) + FF(i - 0.5, j - 0.5)) + 4 * (FF(i + 0.5, j - 0.5) + FF(i - 0.5, j - 1) + FF(i - 1, j - 0.5)) + 1 * (FF(i - 1, j) + FF(i + 1, j)) + 2 * (FF(i, j - 1) + FF(i - 1, j - 1)));
+        return w * (
+            18 * FF(i, j)
+            + 10 * (FF(i - 0.5, j) + FF(i + 0.5, j))
+            + 20 * (FF(i, j - 0.5) + FF(i - 0.5, j - 0.5))
+            + 4 * (
+                FF(i + 0.5, j - 0.5)
+                + FF(i - 0.5, j - 1)
+                + FF(i - 1, j - 0.5)
+            ) 
+            + 1 * (FF(i - 1, j) + FF(i + 1, j))
+            + 2 * (FF(i, j - 1) + FF(i - 1, j - 1))
+        );
     }
-    if (i == 0 && j > 0 && j < ny)
+    if (i == 0 && j > 0 && j < ny) // левая сторона без углов
     {
-        return w * (18 * FF(i, j) + 10 * (FF(i, j - 0.5) + FF(i, j + 0.5)) + 20 * (FF(i + 0.5, j) + FF(i + 0.5, j + 0.5)) + 4 * (FF(i + 0.5, j - 0.5) + FF(i + 0.5, j + 1) + FF(i + 1, j + 0.5)) + 1 * (FF(i, j - 1) + FF(i, j + 1)) + 2 * (FF(i + 1, j) + FF(i + 1, j + 1)));
+        return w * (
+            18 * FF(i, j)
+            + 10 * (FF(i, j - 0.5) + FF(i, j + 0.5))
+            + 20 * (FF(i + 0.5, j) + FF(i + 0.5, j + 0.5))
+            + 4 * (
+                FF(i + 0.5, j - 0.5)
+                + FF(i + 0.5, j + 1)
+                + FF(i + 1, j + 0.5)
+            )
+            + 1 * (FF(i, j - 1) + FF(i, j + 1))
+            + 2 * (FF(i + 1, j) + FF(i + 1, j + 1))
+        );
     }
-    if (i == nx && j > 0 && j < ny)
+    if (i == nx && j > 0 && j < ny) // правая сторона без углов
     {
-        return w * (18 * FF(i, j) + 10 * (FF(i, j - 0.5) + FF(i, j + 0.5)) + 20 * (FF(i - 0.5, j) + FF(i - 0.5, j - 0.5)) + 4 * (FF(i - 0.5, j - 1) + FF(i - 1, j - 0.5) + FF(i - 0.5, j + 0.5)) + 1 * (FF(i, j - 1) + FF(i, j + 1)) + 2 * (FF(i - 1, j) + FF(i - 1, j - 1)));
+        return w * (
+            18 * FF(i, j)
+            + 10 * (FF(i, j - 0.5) + FF(i, j + 0.5))
+            + 20 * (FF(i - 0.5, j) + FF(i - 0.5, j - 0.5))
+            + 4 * (
+                FF(i - 0.5, j - 1)
+                + FF(i - 1, j - 0.5)
+                + FF(i - 0.5, j + 0.5)
+            )
+            + 1 * (FF(i, j - 1) + FF(i, j + 1))
+            + 2 * (FF(i - 1, j) + FF(i - 1, j - 1))
+        );
     }
-    if (i == 0 && j == 0)
+    if (i == 0 && j == 0) // левый нижний угол
     {
-        return w * (12 * FF(i, j) + 10 * (FF(i + 0.5, j) + FF(i, j + 0.5)) + 20 * (FF(i + 0.5, j + 0.5)) + 4 * (FF(i + 1, j + 0.5) + FF(i + 0.5, j + 1)) + 1 * (FF(i + 1, j) + FF(i, j + 1)) + 2 * (FF(i + 1, j + 1)));
+        return w * (
+            12 * FF(i, j)
+            + 10 * (FF(i + 0.5, j) + FF(i, j + 0.5))
+            + 20 * (FF(i + 0.5, j + 0.5))
+            + 4 * (FF(i + 1, j + 0.5) + FF(i + 0.5, j + 1))
+            + 1 * (FF(i + 1, j) + FF(i, j + 1))
+            + 2 * (FF(i + 1, j + 1))
+        );
     }
-    if (i == nx && j == ny)
+    if (i == nx && j == ny) // парвый верхний угол
     {
-        return w * (12 * FF(i, j) + 10 * (FF(i - 0.5, j) + FF(i, j - 0.5)) + 20 * (FF(i - 0.5, j - 0.5)) + 4 * (FF(i - 0.5, j - 1) + FF(i - 1, j - 0.5)) + 1 * (FF(i, j - 1) + FF(i - 1, j)) + 2 * (FF(i - 1, j - 1)));
+        return w * (
+            12 * FF(i, j)
+            + 10 * (FF(i - 0.5, j)+ FF(i, j - 0.5))
+            + 20 * (FF(i - 0.5, j - 0.5))
+            + 4 * (FF(i - 0.5, j - 1) + FF(i - 1, j - 0.5))
+            + 1 * (FF(i, j - 1) + FF(i - 1, j))
+            + 2 * (FF(i - 1, j - 1))
+        );
     }
-    if (i == 0 && j == ny)
+    if (i == 0 && j == ny) // левый верхний угол
     {
-        return w * (6 * FF(i, j) + 10 * (FF(i + 0.5, j) + FF(i, j - 0.5)) + 4 * (FF(i + 0.5, j - 0.5)) + 1 * (FF(i + 1, j) + FF(i, j - 1)));
+        return w * (
+            6 * FF(i, j)
+            + 10 * (FF(i + 0.5, j) + FF(i, j - 0.5))
+            + 4 * (FF(i + 0.5, j - 0.5))
+            + 1 * (FF(i + 1, j) + FF(i, j - 1))
+        );
     }
-    if (i == nx && j == 0)
+    if (i == nx && j == 0) // правый нижний угол
     {
-        return w * (6 * FF(i, j) + 10 * (FF(i - 0.5, j) + FF(i, j + 0.5)) + 4 * (FF(i - 0.5, j + 0.5)) + 1 * (FF(i - 1, j) + FF(i, j + 1)));
+        return w * (
+            6 * FF(i, j)
+            + 10 * (FF(i - 0.5, j) + FF(i, j + 0.5))
+            + 4 * (FF(i - 0.5, j + 0.5))
+            + 1 * (FF(i - 1, j) + FF(i, j + 1))
+        );
     }
-    return 1e308;
+    return 1e308; // типа ошибка. Сюда не должно быть попаданий
 }
 
-void fill_B(int nx, int ny, double hx, double hy, double x0, double y0, double *b, double (*f)(double, double), int p, int k)
+void fill_B(
+    int nx,
+    int ny,
+    double hx,
+    double hy,
+    double x0,
+    double y0,
+    double *b,
+    double (*f)(double, double),
+    int p,
+    int k)
 {
     int n = (nx + 1) * (ny + 1);
-    int i1;
-    int i2;
-    int l;
-    int i;
-    int j;
+    int i1, i2, i, j, l;
     thread_rows(n, p, k, i1, i2);
 
     for (l = i1; l < i2; ++l)
