@@ -232,7 +232,8 @@ void mult_msr_matrix_vector(
     int k)
 {
     int i, i1, i2;
-    int l, J, s;
+    int l, J;
+    double s;
     thread_rows(n, p, k, i1, i2);
     for (i = i1; i < i2; i++)
     {
@@ -242,9 +243,8 @@ void mult_msr_matrix_vector(
         l = I[i + 1] - I[i];
 		// начало строки i
         J = I[i];
-        for (int j = 0; j < l; j++) {
+        for (int j = 0; j < l; j++)
             s += A[J + j] * x[I[J + j]];
-        }
         y[i] = s;
     }
     synchronize(p);
