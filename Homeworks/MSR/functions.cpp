@@ -239,20 +239,20 @@ int get_all_diag(int nx, int ny, int i, int j, int *I_ij)
 
 int get_len_msr_all_diag(int nx, int ny)
 {
-    int m = 0;
-    int i;
-    int j;
+    int i, j, m = 0;
+
     for (i = 0; i <= nx; i++)
-    {
         for (j = 0; j <= ny; j++)
-        {
             m += get_all_diag(nx, ny, i, j);
-        }
-    }
+
     return m;
 }
 
-int allocate_msr_matrix(int nx, int ny, double **p_A, int **p_I)
+int allocate_msr_matrix(
+    int nx,
+    int ny,
+    double **p_A,
+    int **p_I)
 {
     int diag_len = (nx + 1) * (ny + 1);
     int off_diag = get_len_msr_all_diag(nx, ny);
