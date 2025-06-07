@@ -73,16 +73,30 @@ void* thread_func(void* args) {
 
 int main(int argc, char* argv[]) {
     argc = argc;
-    double a = std::stod(argv[1]);
-    double b = std::stod(argv[2]);
-    double c = std::stod(argv[3]);
-    double d = std::stod(argv[4]);
-    int nx = std::stoi(argv[5]);
-    int ny = std::stoi(argv[6]);
-	int pi = std::stoi(argv[7]);
-	double eps = std::stod(argv[8]);
-	int maxit = std::stoi(argv[9]);
-	int p = std::stoi(argv[10]);
+    double a, b, c, d, eps;
+    int nx, ny, pi, maxit, p;
+    
+    if (argc < 11) {
+        printf("[-] Not enough arguments!\n");
+        printf("[+] Usage: %s a b c d nx ny pi eps maxit p\n", argv[0]);
+        return 1;
+    }
+    
+    if (
+        sscanf(argv[1], "%lf", &a) != 1 ||
+        sscanf(argv[2], "%lf", &b) != 1 ||
+        sscanf(argv[3], "%lf", &c) != 1 ||
+        sscanf(argv[4], "%lf", &d) != 1 ||
+        sscanf(argv[5], "%d", &nx) != 1 ||
+        sscanf(argv[6], "%d", &ny) != 1 ||
+        sscanf(argv[7], "%d", &pi) != 1 ||
+        sscanf(argv[8], "%lf", &eps) != 1 ||
+        sscanf(argv[9], "%d", &maxit) != 1 ||
+        sscanf(argv[10], "%d", &p) != 1
+    ) {
+        printf("[-] Invalid arguments!\n");
+        return 2;
+    }
 	
 	init_reduce_sum(p);
 	
