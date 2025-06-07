@@ -242,8 +242,9 @@ void mult_msr_matrix_vector(
         l = I[i + 1] - I[i];
 		// начало строки i
         J = I[i];
-        for (int j = 0; j < l; j++)
+        for (int j = 0; j < l; j++) {
             s += A[J + j] * x[I[J + j]];
+        }
         y[i] = s;
     }
     synchronize(p);
