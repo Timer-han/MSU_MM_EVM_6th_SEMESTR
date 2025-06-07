@@ -1,5 +1,5 @@
 #include <cmath>
-#include "algorithm.h"
+#include "functions.h"
 #include "reduce.h"
 
 int minimal_residual_msr_matrix(int n, double* A, int* I, double* b, double* x, double* r, double* u, double* v, double eps, int maxit, int p, int k) {
