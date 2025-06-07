@@ -576,7 +576,7 @@ double r1(
 {
     int n = (nx + 1) * (ny + 1);
     int i1, i2, i, j, l;
-    double r1_residual = -1.;
+    double res = -1.;
 
     thread_rows(n, p, k, i1, i2);
 
@@ -589,15 +589,15 @@ double r1(
             continue;
         }
 
-        r1_residual = std::max(
-            r1_residual,
+        res = std::max(
+            res,
             std::abs(
                 f(x0 + (i + 2. / 3) * hx, y0 + (j + 1. / 3) * hy)
                 - (x[l] + x[l + 1] + x[l + 1 + nx + 1]) / 3
             )
         );
-        r1_residual = std::max(
-            r1_residual,
+        res = std::max(
+            res,
             std::abs(
                 f(x0 + (i + 1. / 3) * hx, y0 + (j + 2. / 3) * hy)
                 - (x[l] + x[l + nx + 1] + x[l + 1 + nx + 1]) / 3
@@ -605,8 +605,8 @@ double r1(
         );
     }
 
-    ReduceMax(p, &r1_residual, 1);
-    return r1_residual;
+    sync_max(p, &res, 1);
+    return res;
 }
 
 double r2(
@@ -623,7 +623,7 @@ double r2(
 {
     int n = (nx + 1) * (ny + 1);
     int i1, i2, i, j, l;
-    double r2_residual = 0;
+    double res = 0;
 
     thread_rows(n, p, k, i1, i2);
 
@@ -636,18 +636,18 @@ double r2(
             continue;
         }
 
-        r2_residual += std::abs(
+        res += std::abs(
             f(x0 + (i + 2. / 3) * hx, y0 + (j + 1. / 3) * hy)
             - (x[l] + x[l + 1] + x[l + 1 + nx + 1]) / 3
         );
-        r2_residual += std::abs(
+        res += std::abs(
             f(x0 + (i + 1. / 3) * hx, y0 + (j + 2. / 3) * hy)
             - (x[l] + x[l + nx + 1] + x[l + 1 + nx + 1]) / 3
         );
     }
 
-    r2_residual = reduce_sum_det(p, k, r2_residual);
-    return r2_residual * hx * hy / 2;
+    res = reduce_sum_det(p, k, res);
+    return res * hx * hy / 2;
     ;
 }
 
@@ -665,7 +665,7 @@ double r3(
 {
     int n = (nx + 1) * (ny + 1);
     int i1, i2, i, j, l;
-    double r3_residual = -1;
+    double res = -1;
 
     thread_rows(n, p, k, i1, i2);
 
@@ -673,11 +673,11 @@ double r3(
     {
         l2ij(nx, ny, i, j, l);
 
-        r3_residual = std::max(r3_residual, std::abs(f(x0 + i * hx, y0 + j * hy) - x[l]));
+        res = std::max(res, std::abs(f(x0 + i * hx, y0 + j * hy) - x[l]));
     }
 
-    ReduceMax(p, &r3_residual, 1);
-    return r3_residual;
+    sync_max(p, &res, 1);
+    return res;
 }
 
 double r4(
@@ -694,16 +694,16 @@ double r4(
 {
     int n = (nx + 1) * (ny + 1);
     int i1, i2, i, j, l;
-    double r4_residual = 0;
+    double res = 0;
 
     thread_rows(n, p, k, i1, i2);
 
     for (l = i1; l < i2; ++l)
     {
         l2ij(nx, ny, i, j, l);
-        r4_residual += std::abs(f(x0 + i * hx, y0 + j * hy) - x[l]);
+        res += std::abs(f(x0 + i * hx, y0 + j * hy) - x[l]);
     }
 
-    r4_residual = reduce_sum_det(p, k, r4_residual);
-    return r4_residual * hx * hy;
+    res = reduce_sum_det(p, k, res);
+    return res * hx * hy;
 }

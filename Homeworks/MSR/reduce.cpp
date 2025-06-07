@@ -66,7 +66,7 @@ double reduce_sum_det(int p, int k, double s) {
 	return sum;
 }
 
-void ReduceMax(int p, double* a, int n) {
+void sync_max(int p, double* a, int n) {
     static pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
     static pthread_cond_t c_in = PTHREAD_COND_INITIALIZER;
     static pthread_cond_t c_out = PTHREAD_COND_INITIALIZER;
