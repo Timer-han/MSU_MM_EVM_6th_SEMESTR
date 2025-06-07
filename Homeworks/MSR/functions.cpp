@@ -324,19 +324,20 @@ int allocate_msr_matrix(
     int **p_I)
 {
     int diag_len = (nx + 1) * (ny + 1);
-    int off_diag = get_len_msr_all_diag(nx, ny);
-    int len = diag_len + off_diag + 1;
+    int all_diag = get_len_msr_all_diag(nx, ny);
+    int len = diag_len + all_diag + 1;
 
     double *A = nullptr;
     int *I = nullptr;
 
     A = new double[len];
-    if (A == nullptr)
-        return 1;
-
     I = new int[len];
-    if (I == nullptr)
-        return 2;
+    if (!A || !I)
+    {
+        if (A) delete[] A;
+        if (I) delete[] I;
+        return 1;
+    }
 
     *p_A = A;
     *p_I = I;
@@ -366,7 +367,7 @@ void fill_A_ij(
     int i,
     int j,
     double *A_diag,
-    double *A_off_diag)
+    double *A_all_diag)
 {
     double s = hx * hy;
     int l;
@@ -375,86 +376,89 @@ void fill_A_ij(
     {
         *A_diag = 6 * s / 12;
         for (l = 0; l < 6; ++l)
-        {
-            A_off_diag[l] = s / 12;
-        }
+            A_all_diag[l] = s / 12;
     }
     else if (j == 0 && i > 0 && i < nx)
     {
         *A_diag = 3 * s / 12;
-        A_off_diag[0] = 1 * s / 24;
-        A_off_diag[1] = 1 * s / 24;
-        A_off_diag[2] = 2 * s / 24;
-        A_off_diag[3] = 2 * s / 24;
+        A_all_diag[0] = 1 * s / 24;
+        A_all_diag[1] = 1 * s / 24;
+        A_all_diag[2] = 2 * s / 24;
+        A_all_diag[3] = 2 * s / 24;
     }
     else if (j == ny && i > 0 && i < nx)
     {
         *A_diag = 3 * s / 12;
-        A_off_diag[0] = 1 * s / 24;
-        A_off_diag[1] = 2 * s / 24;
-        A_off_diag[2] = 2 * s / 24;
-        A_off_diag[3] = 1 * s / 24;
+        A_all_diag[0] = 1 * s / 24;
+        A_all_diag[1] = 2 * s / 24;
+        A_all_diag[2] = 2 * s / 24;
+        A_all_diag[3] = 1 * s / 24;
     }
     else if (i == 0 && j > 0 && j < ny)
     {
         *A_diag = 3 * s / 12;
-        A_off_diag[0] = 2 * s / 24;
-        A_off_diag[1] = 1 * s / 24;
-        A_off_diag[2] = 1 * s / 24;
-        A_off_diag[3] = 2 * s / 24;
+        A_all_diag[0] = 2 * s / 24;
+        A_all_diag[1] = 1 * s / 24;
+        A_all_diag[2] = 1 * s / 24;
+        A_all_diag[3] = 2 * s / 24;
     }
     else if (i == nx && j > 0 && j < ny)
     {
         *A_diag = 3 * s / 12;
-        A_off_diag[0] = 1 * s / 24;
-        A_off_diag[1] = 2 * s / 24;
-        A_off_diag[2] = 2 * s / 24;
-        A_off_diag[3] = 1 * s / 24;
+        A_all_diag[0] = 1 * s / 24;
+        A_all_diag[1] = 2 * s / 24;
+        A_all_diag[2] = 2 * s / 24;
+        A_all_diag[3] = 1 * s / 24;
     }
     else if (i == 0 && j == 0)
     {
         *A_diag = 2 * s / 12;
-        A_off_diag[0] = 1 * s / 24;
-        A_off_diag[1] = 1 * s / 24;
-        A_off_diag[2] = 2 * s / 24;
+        A_all_diag[0] = 1 * s / 24;
+        A_all_diag[1] = 1 * s / 24;
+        A_all_diag[2] = 2 * s / 24;
     }
     else if (i == nx && j == ny)
     {
         *A_diag = 2 * s / 12;
-        A_off_diag[0] = 1 * s / 24;
-        A_off_diag[1] = 2 * s / 24;
-        A_off_diag[2] = 1 * s / 24;
+        A_all_diag[0] = 1 * s / 24;
+        A_all_diag[1] = 2 * s / 24;
+        A_all_diag[2] = 1 * s / 24;
     }
     else if (i == 0 && j == ny)
     {
         *A_diag = 1 * s / 12;
-        A_off_diag[0] = 1 * s / 24;
-        A_off_diag[1] = 1 * s / 24;
+        A_all_diag[0] = 1 * s / 24;
+        A_all_diag[1] = 1 * s / 24;
     }
     else if (i == nx && j == 0)
     {
         *A_diag = 1 * s / 12;
-        A_off_diag[0] = 1 * s / 24;
-        A_off_diag[1] = 1 * s / 24;
+        A_all_diag[0] = 1 * s / 24;
+        A_all_diag[1] = 1 * s / 24;
     }
 }
 
-void fill_A(int nx, int ny, double hx, double hy, int *I, double *A, int p, int k)
+void fill_A(
+    int nx,
+    int ny,
+    double hx,
+    double hy,
+    int *I,
+    double *A,
+    int p,
+    int k)
 {
-    int i;
-    int j;
-    int l;
-    int i1;
-    int i2;
+    int i, j, l, i1, i2;
     int n = (nx + 1) * (ny + 1);
+
     thread_rows(n, p, k, i1, i2);
 
     for (l = i1; l < i2; ++l)
     {
         l2ij(nx, ny, i, j, l);
         double *A_diag = A + l;
-        double *A_off_diag = A + I[l];
-        fill_A_ij(nx, ny, hx, hy, i, j, A_diag, A_off_diag);
+        double *A_all_diag = A + I[l];
+        fill_A_ij(nx, ny, hx, hy, i, j, A_diag, A_all_diag);
     }
 
     synchronize(p);
