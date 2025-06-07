@@ -8,7 +8,7 @@ void mult_msr_matrix_vector(int n, double* A, int* I, double* x, double* y, int 
 void ij2l(int nx, int /*ny*/, int i, int j, int &l);
 void l2ij(int nx, int /*ny*/, int &i, int &j, int l);
 int get_len_msr(int nx, int ny);
-int get_off_diag(int nx, int ny, int i, int j, int* I_ij = nullptr); 
+int get_all_diag(int nx, int ny, int i, int j, int* I_ij = nullptr); 
 int get_len_msr_off_diag(int nx, int ny);
 int allocate_msr_matrix(int nx, int ny, double** p_A, int** p_I);
 void fill_I(int nx, int ny, int* I);

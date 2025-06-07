@@ -204,13 +204,12 @@ int get_len_msr(int nx, int ny)
         {                      \
             I_ij[m] = k;       \
         }                      \
-        ++m;                   \
+        m++;                   \
     } while (0)
 
-int get_off_diag(int nx, int ny, int i, int j, int *I_ij)
+int get_all_diag(int nx, int ny, int i, int j, int *I_ij)
 {
-    int m = 0;
-    int k;
+    int k, m = 0;
     if (i < nx)
     {
         F(i + 1, j);
@@ -247,7 +246,7 @@ int get_len_msr_off_diag(int nx, int ny)
     {
         for (j = 0; j <= ny; j++)
         {
-            m += get_off_diag(nx, ny, i, j);
+            m += get_all_diag(nx, ny, i, j);
         }
     }
     return m;
@@ -287,7 +286,7 @@ void fill_I(int nx, int ny, int *I)
     {
         l2ij(nx, ny, i, j, l);
         I[l] = r;
-        m = get_off_diag(nx, ny, i, j, I + r);
+        m = get_all_diag(nx, ny, i, j, I + r);
         r += m;
     }
     I[l] = r;
