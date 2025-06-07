@@ -1,3 +1,36 @@
+class thread_data {
+public:
+    double a;
+    double b;
+    double c;
+    double d;
+    int nx;
+    int ny;
+	double (*f)(double, double);
+	double eps;
+	int maxit;
+	int p;
+	int k;
+	
+	double* A;
+	int* I;
+	double* x;
+	double* B;
+	
+	double* r;
+	double* u;
+	double* v;
+	
+	double r1;
+	double r2;
+	double r3;
+	double r4;
+	
+	double t1;
+	double t2;
+	
+	int it;
+};
 
 
 double f_0(double /* x */, double /* y */);
