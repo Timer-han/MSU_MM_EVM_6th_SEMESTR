@@ -10,7 +10,7 @@ public:
 	double eps;
 	int maxit;
 	int p;
-	int k;
+	int pi;
 	
 	double* A;
 	int* I;
@@ -56,7 +56,7 @@ int minimal_residual_msr_matrix(
     double eps,
     int maxit,
     int p,
-    int k
+    int pi
 );
 int minimal_residual_msr_matrix_full(
     int n,
@@ -71,12 +71,12 @@ int minimal_residual_msr_matrix_full(
     int maxit,
     int maxsteps,
     int p,
-    int k
+    int pi
 );
-void thread_rows(int n, int p, int k, int &i1, int &i2);
+void thread_rows(int n, int p, int pi, int &i1, int &i2);
 
-double scalar_product(int n, double *x, double *y, int p, int k);
-void mult_sub_vector(int n, double *x, double *y, double t, int p, int k);
+double scalar_product(int n, double *x, double *y, int p, int pi);
+void mult_sub_vector(int n, double *x, double *y, double t, int p, int pi);
 
 void apply_preconditioner_msr_matrix(
     int n,
@@ -85,7 +85,7 @@ void apply_preconditioner_msr_matrix(
     double *v,
     double *r,
     int p,
-    int k
+    int pi
 );
 void mult_msr_matrix_vector(
     int n,
@@ -94,7 +94,7 @@ void mult_msr_matrix_vector(
     double *x,
     double *y,
     int p,
-    int k
+    int pi
 );
 
 void ij2l(int nx, int /*ny*/, int i, int j, int &l);
@@ -125,7 +125,7 @@ void fill_A(
     int *I,
     double *A,
     int p,
-    int k
+    int pi
 );
 
 
@@ -150,7 +150,7 @@ void fill_B(
     double *b,
     double (*f)(double, double),
     int p,
-    int k
+    int pi
 );
 
 
@@ -164,7 +164,7 @@ double r1(
     double *x,
     double (*f)(double, double),
     int p,
-    int k
+    int pi
 );
 double r2(
     int nx,
@@ -176,7 +176,7 @@ double r2(
     double *x,
     double (*f)(double, double),
     int p,
-    int k
+    int pi
 );
 double r3(
     int nx,
@@ -188,7 +188,7 @@ double r3(
     double *x,
     double (*f)(double, double),
     int p,
-    int k
+    int pi
 );
 double r4(
     int nx,
@@ -200,5 +200,5 @@ double r4(
     double *x,
     double (*f)(double, double),
     int p,
-    int k
+    int pi
 );

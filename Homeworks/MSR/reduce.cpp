@@ -54,10 +54,10 @@ void delete_reduce_sum() {
 	delete[] result;
 }
 
-double reduce_sum_det(int p, int k, double s) {
+double reduce_sum_det(int p, int pi, double s) {
 	double sum = 0;
 	int l;
-	result[k] = s;
+	result[pi] = s;
 	synchronize(p);
 	for(l = 0; l < p; ++l) {
 		sum += result[l];

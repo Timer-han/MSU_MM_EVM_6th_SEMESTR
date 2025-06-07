@@ -28,7 +28,7 @@ void* thread_func(void* arg) {
 	double eps = data->eps;
 	int maxit = data->maxit;
 	int p = data->p;
-	int k = data->k;
+	int pi = data->pi;
 	
 	double* A = data->A;
 	double* B = data->B;
@@ -42,7 +42,7 @@ void* thread_func(void* arg) {
     cpu_set_t cpu;
     CPU_ZERO(&cpu);
     int n_cpus = get_nprocs();
-    int cpu_id = n_cpus - 1 - (k % n_cpus);
+    int cpu_id = n_cpus - 1 - (pi % n_cpus);
     CPU_SET(cpu_id, &cpu);
     pthread_t tid = pthread_self();
 
@@ -53,18 +53,18 @@ void* thread_func(void* arg) {
     double hy = (d - c) / ny;
 	int maxsteps = 300;
 	
-	fill_A(nx, ny, hx, hy, I, A, p, k);
-    fill_B(nx, ny, hx, hy, a, c, B, f, p, k); 
+	fill_A(nx, ny, hx, hy, I, A, p, pi);
+    fill_B(nx, ny, hx, hy, a, c, B, f, p, pi); 
 	
 	data->t1 = GetCpuTime();
-	data->it = minimal_residual_msr_matrix_full(n, A, I, B, x, r, u, v, eps, maxit, maxsteps, p, k);
+	data->it = minimal_residual_msr_matrix_full(n, A, I, B, x, r, u, v, eps, maxit, maxsteps, p, pi);
 	data->t1 = GetCpuTime() - data->t1;
 	
 	data->t2 = GetCpuTime();
-	data->r1 = r1(nx, ny, hx, hy, a, c, x, f, p, k);
-	data->r2 = r2(nx, ny, hx, hy, a, c, x, f, p, k);
-	data->r3 = r3(nx, ny, hx, hy, a, c, x, f, p, k);
-	data->r4 = r4(nx, ny, hx, hy, a, c, x, f, p, k);
+	data->r1 = r1(nx, ny, hx, hy, a, c, x, f, p, pi);
+	data->r2 = r2(nx, ny, hx, hy, a, c, x, f, p, pi);
+	data->r3 = r3(nx, ny, hx, hy, a, c, x, f, p, pi);
+	data->r4 = r4(nx, ny, hx, hy, a, c, x, f, p, pi);
 	data->t2 = GetCpuTime() - data->t2;
 
 	return nullptr;
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
     double d = std::stod(argv[4]);
     int nx = std::stoi(argv[5]);
     int ny = std::stoi(argv[6]);
-	int k = std::stoi(argv[7]);
+	int pi = std::stoi(argv[7]);
 	double eps = std::stod(argv[8]);
 	int maxit = std::stoi(argv[9]);
 	int p = std::stoi(argv[10]);
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 	init_reduce_sum(p);
 	
 	double (*f)(double, double);
-	select_func(k, f);
+	select_func(pi, f);
 	
     int n = (nx + 1) * (ny + 1);
 	
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
 		data_arr[i].eps = eps;
 		data_arr[i].maxit = maxit;
 		data_arr[i].p = p;
-		data_arr[i].k = i;
+		data_arr[i].pi = i;
 		
 		data_arr[i].A = A;
 		data_arr[i].I = I;
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
     }
     
     printf ("%s : Task = %d R1 = %e R2 = %e R3 = %e R4 = %e T1 = %.2f T2 = %.2f It = %d E = %e K = %d Nx = %d Ny = %d P = %d\n", 
-			argv[0], task, data_arr->r1, data_arr->r2, data_arr->r3, data_arr->r4, t1, t2, data_arr->it, eps, k, nx, ny, p);
+			argv[0], task, data_arr->r1, data_arr->r2, data_arr->r3, data_arr->r4, t1, t2, data_arr->it, eps, pi, nx, ny, p);
     
 	delete_reduce_sum();
 	delete[] A;

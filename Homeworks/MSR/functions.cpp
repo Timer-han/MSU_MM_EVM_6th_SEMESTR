@@ -83,41 +83,41 @@ int minimal_residual_msr_matrix(
     double eps,
     int max_it,
     int p,
-    int k)
+    int pi)
 {
     double prec, b_norm2, tau;
     double c1, c2;
     int it = 0;
-    b_norm2 = scalar_product(n, b, b, p, k); // (b, b)
+    b_norm2 = scalar_product(n, b, b, p, pi); // (b, b)
     prec = b_norm2 * eps * eps;
     // r = Ax
-    mult_msr_matrix_vector(n, A, I, x, r, p, k);
+    mult_msr_matrix_vector(n, A, I, x, r, p, pi);
     // 1 точка синхронизации
 	// r = Ax - b, r-=b, r-=1*b
-    mult_sub_vector(n, r, b, 1., p, k);
+    mult_sub_vector(n, r, b, 1., p, pi);
 	// r -= 1.*b, 1 точка синхронизации
     for (; it < max_it; ++it)
     {
 		// Mr = r - решить систему
         apply_preconditioner_msr_matrix(
-            n, A, I, v, r, p, k);
+            n, A, I, v, r, p, pi);
         // 1 точка синхронизациии
 		// u = Av, u = AM^(-1)r
-        mult_msr_matrix_vector(n, A, I, v, u, p, k); 
+        mult_msr_matrix_vector(n, A, I, v, u, p, pi); 
 		// 1 точка синхронизации
 		// c_1 = (u, r)
 		// c_2 = (u, u)
-        c1 = scalar_product(n, u, r, p, k);
-        c2 = scalar_product(n, u, u, p, k);
+        c1 = scalar_product(n, u, r, p, pi);
+        c2 = scalar_product(n, u, u, p, pi);
 
         if (c1 < prec || c2 < prec)
             break;
 
         tau = c1 / c2;
-        mult_sub_vector(n, x, v, tau, p, k); 
+        mult_sub_vector(n, x, v, tau, p, pi); 
 		// 1 точка синхронизации
 		// r -= tau * u
-        mult_sub_vector(n, r, u, tau, p, k);
+        mult_sub_vector(n, r, u, tau, p, pi);
 		// 1 точка синхронизации
     }
     if (it > max_it)
@@ -140,12 +140,12 @@ int minimal_residual_msr_matrix_full(
     int max_it,
     int max_step,
     int p,
-    int k)
+    int pi)
 {
     int step, ret, its = 0;
     for (step = 0; step < max_step; ++step) {
         ret = minimal_residual_msr_matrix(
-            n, A, I, b, x, r, u, v, eps, max_it, p, k
+            n, A, I, b, x, r, u, v, eps, max_it, p, pi
         );
         if (ret >= 0) {
             its += ret;
@@ -161,13 +161,13 @@ int minimal_residual_msr_matrix_full(
 void thread_rows(
     int n,
     int p,
-    int k,
+    int pi,
     int &i1,
     int &i2)
 {
-    i1 = n * k,
+    i1 = n * pi,
     i1 /= p;
-    i2 = n * (k + 1);
+    i2 = n * (pi + 1);
     i2 /= p;
 }
 
@@ -176,17 +176,17 @@ double scalar_product(
     double *x,
     double *y,
     int p,
-    int k)
+    int pi)
 {
     int i1;
     int i2;
     int i;
     double s = 0;
-    thread_rows(n, p, k, i1, i2);
+    thread_rows(n, p, pi, i1, i2);
     for (i = i1; i < i2; i++)
         s += x[i] * y[i];
 
-    s = reduce_sum_det(p, k, s);
+    s = reduce_sum_det(p, pi, s);
     // ответ в каждом потоке
     return s;
 }
@@ -197,10 +197,10 @@ void mult_sub_vector(
     double *y,
     double t,
     int p,
-    int k)
+    int pi)
 {
     int i, i1, i2;
-    thread_rows(n, p, k, i1, i2);
+    thread_rows(n, p, pi, i1, i2);
     for (i = i1; i < i2; i++)
         x[i] -= t * y[i];
     synchronize(p);
@@ -213,10 +213,10 @@ void apply_preconditioner_msr_matrix(
     double *v,
     double *r,
     int p,
-    int k)
+    int pi)
 {
     int i, i1, i2;
-    thread_rows(n, p, k, i1, i2);
+    thread_rows(n, p, pi, i1, i2);
     for (i = i1; i < i2; i++)
         v[i] = r[i] / A[i];
     synchronize(p);
@@ -229,12 +229,12 @@ void mult_msr_matrix_vector(
     double *x,
     double *y,
     int p,
-    int k)
+    int pi)
 {
     int i, i1, i2;
     int l, J;
     double s;
-    thread_rows(n, p, k, i1, i2);
+    thread_rows(n, p, pi, i1, i2);
     for (i = i1; i < i2; i++)
     {
 		// диагональный элемент
@@ -447,12 +447,12 @@ void fill_A(
     int *I,
     double *A,
     int p,
-    int k)
+    int pi)
 {
     int i, j, l, i1, i2;
     int n = (nx + 1) * (ny + 1);
 
-    thread_rows(n, p, k, i1, i2);
+    thread_rows(n, p, pi, i1, i2);
 
     for (l = i1; l < i2; ++l)
     {
@@ -621,12 +621,12 @@ void fill_B(
     double *b,
     double (*f)(double, double),
     int p,
-    int k)
+    int pi)
 {
     int n = (nx + 1) * (ny + 1);
     int i1, i2, i, j, l;
 
-    thread_rows(n, p, k, i1, i2);
+    thread_rows(n, p, pi, i1, i2);
 
     for (l = i1; l < i2; ++l)
     {
@@ -647,13 +647,13 @@ double r1(
     double *x,
     double (*f)(double, double),
     int p,
-    int k)
+    int pi)
 {
     int n = (nx + 1) * (ny + 1);
     int i1, i2, i, j, l;
     double res = -1.;
 
-    thread_rows(n, p, k, i1, i2);
+    thread_rows(n, p, pi, i1, i2);
 
     for (l = i1; l < i2; ++l)
     {
@@ -694,13 +694,13 @@ double r2(
     double *x,
     double (*f)(double, double),
     int p,
-    int k)
+    int pi)
 {
     int n = (nx + 1) * (ny + 1);
     int i1, i2, i, j, l;
     double res = 0;
 
-    thread_rows(n, p, k, i1, i2);
+    thread_rows(n, p, pi, i1, i2);
 
     for (l = i1; l < i2; ++l)
     {
@@ -721,7 +721,7 @@ double r2(
         );
     }
 
-    res = reduce_sum_det(p, k, res);
+    res = reduce_sum_det(p, pi, res);
     return res * hx * hy / 2;
 }
 
@@ -735,13 +735,13 @@ double r3(
     double *x,
     double (*f)(double, double),
     int p,
-    int k)
+    int pi)
 {
     int n = (nx + 1) * (ny + 1);
     int i1, i2, i, j, l;
     double res = -1;
 
-    thread_rows(n, p, k, i1, i2);
+    thread_rows(n, p, pi, i1, i2);
 
     for (l = i1; l < i2; ++l)
     {
@@ -764,13 +764,13 @@ double r4(
     double *x,
     double (*f)(double, double),
     int p,
-    int k)
+    int pi)
 {
     int n = (nx + 1) * (ny + 1);
     int i1, i2, i, j, l;
     double res = 0;
 
-    thread_rows(n, p, k, i1, i2);
+    thread_rows(n, p, pi, i1, i2);
 
     for (l = i1; l < i2; ++l)
     {
@@ -778,6 +778,6 @@ double r4(
         res += std::abs(f(x0 + i * hx, y0 + j * hy) - x[l]);
     }
 
-    res = reduce_sum_det(p, k, res);
+    res = reduce_sum_det(p, pi, res);
     return res * hx * hy;
 }
