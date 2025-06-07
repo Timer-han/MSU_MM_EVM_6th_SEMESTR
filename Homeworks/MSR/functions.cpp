@@ -237,7 +237,7 @@ int get_all_diag(int nx, int ny, int i, int j, int *I_ij)
     return m;
 }
 
-int get_len_msr_off_diag(int nx, int ny)
+int get_len_msr_all_diag(int nx, int ny)
 {
     int m = 0;
     int i;
@@ -255,7 +255,7 @@ int get_len_msr_off_diag(int nx, int ny)
 int allocate_msr_matrix(int nx, int ny, double **p_A, int **p_I)
 {
     int diag_len = (nx + 1) * (ny + 1);
-    int off_diag = get_len_msr_off_diag(nx, ny);
+    int off_diag = get_len_msr_all_diag(nx, ny);
     int len = diag_len + off_diag + 1;
     double *A = nullptr;
     int *I = nullptr;
