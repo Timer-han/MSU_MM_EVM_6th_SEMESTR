@@ -650,7 +650,7 @@ void Window::paintEvent (QPaintEvent * /* event */)
     max_y = std::max(max_y, res1);
 
 
-  delta_y = 0.01 * (max_y - min_y);
+  delta_y = std::max(0.01 * (max_y - min_y), 1e-17);
   min_y -= delta_y;
   max_y += delta_y;
 
