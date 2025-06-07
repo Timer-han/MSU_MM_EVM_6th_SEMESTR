@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
 	int maxit = std::stoi(argv[9]);
 	int p = std::stoi(argv[10]);
 	
-	InitReduceSum(p);
+	init_reduce_sum(p);
 	
 	double (*f)(double, double);
 	select_func(k, f);
@@ -252,7 +252,7 @@ int main(int argc, char* argv[]) {
     printf ("%s : Task = %d R1 = %e R2 = %e R3 = %e R4 = %e T1 = %.2f T2 = %.2f It = %d E = %e K = %d Nx = %d Ny = %d P = %d\n", 
 			argv[0], task, data_arr->r1, data_arr->r2, data_arr->r3, data_arr->r4, t1, t2, data_arr->it, eps, k, nx, ny, p);
     
-	FreeReduceSum();
+	delete_reduce_sum();
 	delete[] A;
 	delete[] I;
 	delete[] B;
