@@ -72,7 +72,6 @@ void* thread_func(void* args) {
 }
 
 int main(int argc, char* argv[]) {
-    argc = argc;
     double a, b, c, d, eps;
     int nx, ny, pi, maxit, p;
     
@@ -81,7 +80,7 @@ int main(int argc, char* argv[]) {
         printf("[+] Usage: %s a b c d nx ny pi eps maxit p\n", argv[0]);
         return 1;
     }
-    
+
     if (
         sscanf(argv[1], "%lf", &a) != 1 ||
         sscanf(argv[2], "%lf", &b) != 1 ||
@@ -116,6 +115,19 @@ int main(int argc, char* argv[]) {
 	double* r = new double[n];
 	double* u = new double[n];
 	double* v = new double[n];
+
+    if (!A || !I || !B || !x || !r || !u || !v) {
+        printf("[-] Memory allocation failed!\n");
+        delete_reduce_sum();
+        if (A) delete[] A;
+        if (I) delete[] I;
+        if (B) delete[] B;
+        if (x) delete[] x;
+        if (r) delete[] r;
+        if (u) delete[] u;
+        if (v) delete[] v;
+        return 3;
+    }
 	
 	for (int i = 0; i < n; ++i) {
 		x[i] = 0;
@@ -124,37 +136,37 @@ int main(int argc, char* argv[]) {
 		v[i] = 0;
 	}
     
-    thread_data* data_arr = new thread_data[p];
+    thread_data* data = new thread_data[p];
     pthread_t* tid = new pthread_t[p];
-    for (int i = 0; i < p; ++i) {
-        data_arr[i].a = a;
-        data_arr[i].b = b;
-        data_arr[i].c = c;
-        data_arr[i].d = d;
+
+    for (int i = 0; i < p; ++i)
+    {
+        data[i].a = a;
+        data[i].b = b;
+        data[i].c = c;
+        data[i].d = d;
+		data[i].nx = nx;
+		data[i].ny = ny;
+		data[i].f = f;
+		data[i].eps = eps;
+		data[i].maxit = maxit;
+		data[i].p = p;
+		data[i].pi = i;
 		
-		data_arr[i].nx = nx;
-		data_arr[i].ny = ny;
+		data[i].A = A;
+		data[i].I = I;
+		data[i].x = x;
+		data[i].B = B;
 		
-		data_arr[i].f = f;
-		data_arr[i].eps = eps;
-		data_arr[i].maxit = maxit;
-		data_arr[i].p = p;
-		data_arr[i].pi = i;
-		
-		data_arr[i].A = A;
-		data_arr[i].I = I;
-		data_arr[i].x = x;
-		data_arr[i].B = B;
-		
-		data_arr[i].r = r;
-		data_arr[i].u = u;
-		data_arr[i].v = v;
+		data[i].r = r;
+		data[i].u = u;
+		data[i].v = v;
     }
     
     for (int i = 1; i < p; ++i) {
-        pthread_create(&tid[i], 0, thread_func, data_arr + i);
+        pthread_create(&tid[i], 0, thread_func, data + i);
     }
-    thread_func(data_arr + 0);
+    thread_func(data + 0);
 	
     for (int i = 1; i < p; ++i) {
         pthread_join(tid[i], 0);
@@ -165,12 +177,12 @@ int main(int argc, char* argv[]) {
 	double t2 = 0;
 	
 	for (int i = 0; i < p; ++i) {
-        t1 = std::max(t1, data_arr[i].t1);
-        t2 = std::max(t2, data_arr[i].t2);
+        t1 = std::max(t1, data[i].t1);
+        t2 = std::max(t2, data[i].t2);
     }
     
     printf ("%s : Task = %d R1 = %e R2 = %e R3 = %e R4 = %e T1 = %.2f T2 = %.2f It = %d E = %e K = %d Nx = %d Ny = %d P = %d\n", 
-			argv[0], task, data_arr->r1, data_arr->r2, data_arr->r3, data_arr->r4, t1, t2, data_arr->it, eps, pi, nx, ny, p);
+			argv[0], task, data->r1, data->r2, data->r3, data->r4, t1, t2, data->it, eps, pi, nx, ny, p);
     
 	delete_reduce_sum();
 	delete[] A;
@@ -180,7 +192,7 @@ int main(int argc, char* argv[]) {
 	delete[] r;
 	delete[] u;
 	delete[] v;
-	delete[] data_arr;
+	delete[] data;
     delete[] tid;
 	
     return 0;
