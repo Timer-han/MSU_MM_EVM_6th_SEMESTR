@@ -18,7 +18,7 @@ int minimal_residual_msr_matrix(
 {
     double prec, b_norm2, tau;
     double c1, c2;
-    int it;
+    int it = 0;
     b_norm2 = scalar_product(n, b, b, p, k); // (b, b)
     prec = b_norm2 * eps * eps;
     // r = Ax
@@ -27,7 +27,7 @@ int minimal_residual_msr_matrix(
 	// r = Ax - b, r-=b, r-=1*b
     mult_sub_vector(n, r, b, 1., p, k);
 	// r -= 1.*b, 1 точка синхронизации
-    for (it = 0; it < max_it; ++it)
+    for (; it < max_it; ++it)
     {
 		// Mr = r - решить систему
         apply_preconditioner_msr_matrix(
