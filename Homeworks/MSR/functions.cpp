@@ -1,4 +1,9 @@
 #include <cmath>
+#include <sys/resource.h>
+#include <sys/sysinfo.h>
+#include <sys/time.h>
+#include <pthread.h>  
+
 #include "functions.h"
 #include "reduce.h"
 

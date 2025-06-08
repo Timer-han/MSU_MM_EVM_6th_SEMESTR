@@ -202,3 +202,6 @@ double r4(
     int p,
     int pi
 );
+
+double GetCpuTime ();
+void* thread_func (void* args);
