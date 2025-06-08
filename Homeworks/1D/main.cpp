@@ -55,9 +55,11 @@ int main (int argc, char *argv[])
   window->setMenuBar (tool_bar);
   window->setCentralWidget (graph_area);
   window->setWindowTitle ("Graph");
-
   window->show ();
   app.exec ();
+
+  delete graph_area;
+  delete tool_bar;
   delete window;
   return 0;
 }
