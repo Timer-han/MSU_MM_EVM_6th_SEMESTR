@@ -34,8 +34,8 @@ public:
 	
 	int it;
 
-    pthread_mutex_t *mutex_gui_kernel;
-    pthread_cond_t *cond_gui_kernel;
+    pthread_mutex_t *mutex;
+    pthread_cond_t *cond;
   
     int is_running = 1;
 };
