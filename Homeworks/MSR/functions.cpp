@@ -796,7 +796,7 @@ double GetCpuTime() {
 
 void* thread_func(void* args) {
     thread_data* arg = (thread_data*) args;
-    
+    // Unpack args
     double a = arg->a;
     double b = arg->b;
     double c = arg->c;
@@ -817,6 +817,12 @@ void* thread_func(void* args) {
 	double* r = arg->r;
 	double* u = arg->u;
 	double* v = arg->v;
+    
+    // solver indexes
+    int p_solv = p - 1;
+    int pi_solv = pi - 1;
+    int pi_main_solv = 0;
+
     
     cpu_set_t cpu;
     CPU_ZERO(&cpu);

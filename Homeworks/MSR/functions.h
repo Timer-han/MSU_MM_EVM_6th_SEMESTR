@@ -1,5 +1,8 @@
 class thread_data {
 public:
+    pthread_t tid;
+    thread_data *pthread_args;
+
     double a;
     double b;
     double c;
@@ -30,6 +33,11 @@ public:
 	double t2;
 	
 	int it;
+
+    pthread_mutex_t *mutex_gui_kernel;
+    pthread_cond_t *cond_gui_kernel;
+  
+    int is_running = 1;
 };
 
 
