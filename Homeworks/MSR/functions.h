@@ -34,15 +34,15 @@ public:
 	
 	int it;
 
-    bool is_closing = false;
-    bool is_running = false;
-    bool is_calculated = false;
-    
+    bool *is_closing;
+    bool *is_running;
+    bool *is_calculated;
+
 
     pthread_mutex_t *mutex;
     pthread_cond_t *cond;
   
-    int is_running = 1;
+    // int is_running = 1;
 };
 
 

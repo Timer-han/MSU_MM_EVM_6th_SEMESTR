@@ -829,7 +829,7 @@ void* thread_func(void* args) {
     cpu_set_t cpu;
     CPU_ZERO(&cpu);
     int n_cpus = get_nprocs();
-    int cpu_id = n_cpus - 1 - (pi % n_cpus);
+    int cpu_id = n_cpus - 1 - (pi_solv % n_cpus);
     CPU_SET(cpu_id, &cpu);
     pthread_t tid = pthread_self();
 
