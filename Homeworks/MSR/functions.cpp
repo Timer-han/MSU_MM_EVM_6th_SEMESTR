@@ -834,7 +834,7 @@ void* thread_func(void* args) {
     pthread_t tid = pthread_self();
     pthread_setaffinity_np(tid, sizeof(cpu), &cpu);
 
-    int &need_to_calculation = *arg->need_to_calculation;
+    // int &need_to_calculation = *arg->need_to_calculation;
     int &calculation_is_ready = *arg->calculation_is_ready;
     int &is_closing = *arg->is_closing;
 
