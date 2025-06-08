@@ -823,7 +823,9 @@ void* thread_func(void* args) {
     int pi_solv = pi - 1;
     int pi_main_solv = 0;
 
-    
+    // init mutex and cpu set
+    pthread_mutex_t &mutex = *arg->mutex;
+    pthread_cond_t &cond = *arg->cond;
     cpu_set_t cpu;
     CPU_ZERO(&cpu);
     int n_cpus = get_nprocs();
