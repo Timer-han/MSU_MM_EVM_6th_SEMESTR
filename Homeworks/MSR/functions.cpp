@@ -781,3 +781,66 @@ double r4(
     res = reduce_sum_det(p, pi, res);
     return res * hx * hy;
 }
+
+
+double GetCpuTime() {
+	struct rusage buf;
+	getrusage(RUSAGE_THREAD, &buf);
+	return buf.ru_utime.tv_sec + buf.ru_utime.tv_usec / 1.e6;
+}
+
+void* thread_func(void* args) {
+    thread_data* arg = (thread_data*) args;
+    
+    double a = arg->a;
+    double b = arg->b;
+    double c = arg->c;
+    double d = arg->d;
+    int nx = arg->nx;
+    int ny = arg->ny;
+	double (*f)(double, double) = arg->f;
+	double eps = arg->eps;
+	int maxit = arg->maxit;
+	int p = arg->p;
+	int pi = arg->pi;
+	
+	double* A = arg->A;
+	double* B = arg->B;
+	double* x = arg->x;
+	int* I = arg->I;
+	
+	double* r = arg->r;
+	double* u = arg->u;
+	double* v = arg->v;
+    
+    cpu_set_t cpu;
+    CPU_ZERO(&cpu);
+    int n_cpus = get_nprocs();
+    int cpu_id = n_cpus - 1 - (pi % n_cpus);
+    CPU_SET(cpu_id, &cpu);
+    pthread_t tid = pthread_self();
+
+    pthread_setaffinity_np(tid, sizeof(cpu), &cpu);
+    
+    int n = (nx + 1) * (ny + 1);
+	double hx = (b - a) / nx;
+    double hy = (d - c) / ny;
+	
+	fill_A(nx, ny, hx, hy, I, A, p, pi);
+    fill_B(nx, ny, hx, hy, a, c, B, f, p, pi); 
+	
+	int maxsteps = 300;
+
+	arg->t1 = GetCpuTime();
+	arg->it = minimal_residual_msr_matrix_full(n, A, I, B, x, r, u, v, eps, maxit, maxsteps, p, pi);
+	arg->t1 = GetCpuTime() - arg->t1;
+	
+	arg->t2 = GetCpuTime();
+	arg->r1 = r1(nx, ny, hx, hy, a, c, x, f, p, pi);
+	arg->r2 = r2(nx, ny, hx, hy, a, c, x, f, p, pi);
+	arg->r3 = r3(nx, ny, hx, hy, a, c, x, f, p, pi);
+	arg->r4 = r4(nx, ny, hx, hy, a, c, x, f, p, pi);
+	arg->t2 = GetCpuTime() - arg->t2;
+
+	return nullptr;
+}
