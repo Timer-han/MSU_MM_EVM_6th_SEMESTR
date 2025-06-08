@@ -34,6 +34,11 @@ public:
 	
 	int it;
 
+    bool is_closing = false;
+    bool is_running = false;
+    bool is_calculated = false;
+    
+
     pthread_mutex_t *mutex;
     pthread_cond_t *cond;
   
