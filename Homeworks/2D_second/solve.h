@@ -1,6 +1,19 @@
 #include <stdio.h>
 #include <math.h>
 
+enum class io_status
+{
+  undefine,
+  error_open,
+  error_read,
+  error_buf,
+  error_mem,
+  degenerate_data,
+  error_incorrect_parametres,
+  non_applicable,
+  success,
+};
+
 void matrix_mult_vector_msr (int n, double *A, int *I, double *x, double *y, int p, int k);
   
 int minimal_errors_msr_matrix (int n, double *A, int *I, double *b,
@@ -48,3 +61,50 @@ void solve_02 (int n, double x[], double f_x[], double mas_4n[], double dd0, dou
 
 int bin_search_to_add (double x, double * a, int n);
 double Pf_02 (double x, double a, double b, int n, double x_mas[], double mas_4n[]);
+
+// ###############################################################
+// ###############################################################
+// ###############################################################
+
+int get_len_msr (int n_x, int n_y);
+
+int IA_ij (int n_x, int n_y, double h_x, double h_y, int i, int j, int is, int js, int s, int *I, double *A);
+
+// ###############################################################
+// ###############################################################
+// ###############################################################
+
+int get_len_msr (int n_x, int n_y);
+void ij2l (int n_x, int /*n_y*/, int i, int j, int &l);
+void l2ij (int n_x, int /*n_y*/, int &i, int &j, int l);
+
+int get_off_diag (int nx, int ny, double hx, double hy, int i, int j, int *I = nullptr, double *A = nullptr);
+
+//возвращает количество внедиагональных точек (i, j)
+int get_len_nss_off_diag (int nx, int ny);
+
+void get_diag (int nx, int ny, double hx, double hy, int i, int j, int /*I*/, double *A);
+
+void fill_I (int nx, int ny, double hx, double hy, int *I);
+
+int fill_IA (int nx, int ny, double hx, double hy, int *I, double *A, int p, int k);
+
+void print_MSR_mat (int nx, int ny, int *I, double *A);
+void print_MSR (int nx, int ny, int *I, double *A, int pr);
+
+void print_mas (int n, double *x, int pr);
+//void IA_ij (int n_x, int n_y, double h_x, double h_y, int i, int j, int is, int js, int s, int *I = nullptr, double *A = nullptr);
+
+// ###############################################################
+// ###############################################################
+// ###############################################################
+
+double p_f (int nx, int ny, double a, double b, double c, double d, double *x_mas, double x, double y);
+
+double residual_C_norm_error (int nx, int ny, double a, double b, double c, double d, double *x_mas, double (*f) (double x, double y), int p, int k);
+
+double residual_L1_norm_error (int nx, int ny, double a, double b, double c, double d, double *x_mas, double (*f) (double x, double y), int p, int k);
+
+double residual_C_norm_diff (int nx, int ny, double a, double b, double c, double d, double *x_mas, double (*f) (double x, double y), int p, int k);
+
+double residual_L1_norm_diff (int nx, int ny, double a, double b, double c, double d, double *x_mas, double (*f) (double x, double y), int p, int k);

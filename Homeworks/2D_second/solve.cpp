@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "msr_matrix.h"
+#include "matrix_Gram.h"
 #include "for_pthread.h"
 #include "solve.h"
 
@@ -349,3 +349,414 @@ double reduce_sum_det (int p, int k, double s)
   return sum;
 }
 
+
+
+// ###############################################################
+// ###############################################################
+// ###############################################################
+
+
+int IA_ij (int n_x, int n_y, double hx, double hy, int i, int j, int is, int js, int s, int *I, double *A)
+{
+  (void) I;
+  double Sq = hx * hy;
+  int l, ls;
+  ij2l (n_x, n_y, i, j, l);
+  ij2l (n_x, n_y, is, js, ls);
+  
+  if (I != nullptr)
+    I[s] = ls;
+  if (i > 0 && i < n_x && j > 0 && j < n_y) // #
+    {
+      if (l == ls)
+        A[s] = 6 * 1 / 12. * Sq;
+      else
+        A[s] = 2 * 1 / 24. * Sq;
+    }
+  if (i > 0 && i < n_x && j == 0) // _
+    {
+      if (l == ls)
+        A[s] = 3 * 1 / 12. * Sq;
+      else
+      if (s == 0 || s == 1)
+        A[s] = 1 * 1 / 24. * Sq;
+      else
+      if (s == 2 || s == 3)
+        A[s] = 2 * 1 / 24. * Sq;
+      else
+        return -1;
+    }
+  if (i > 0 && i < n_x && j == n_y) // ^
+    {
+      if (l == ls)
+        A[s] = 3 * 1 / 12. * Sq;
+      else
+      if (s == 0 || s == 3)
+        A[s] = 1 * 1 / 24. * Sq;
+      else
+      if (s == 1 || s == 2)
+        A[s] = 2 * 1 / 24. * Sq;
+      else
+        return -1;
+    }
+  if (i == 0 && j > 0 && j < n_y) // <
+    {
+      if (l == ls)
+        A[s] = 3 * 1 / 12. * Sq;
+      else
+      if (s == 0 || s == 3)
+        A[s] = 2 * 1 / 24. * Sq;
+      else
+      if (s == 1 || s == 2)
+        A[s] = 1 * 1 / 24. * Sq;
+      else
+        return -1;
+    }
+  if (i == n_x && j > 0 && j < n_y) // >
+    {
+      if (l == ls)
+        A[s] = 3 * 1 / 12. * Sq;
+      else
+      if (s == 0 || s == 3)
+        A[s] = 1 * 1 / 24. * Sq;
+      else
+      if (s == 1 || s == 2)
+        A[s] = 2 * 1 / 24. * Sq;
+      else
+        return -1;
+    }
+  if (i == 0 && j == 0) // <_
+    {
+      if (l == ls)
+        A[s] = 2 * 1 / 12. * Sq;
+      else
+      if (s == 0 || s == 1)
+        A[s] = 1 * 1 / 24. * Sq;
+      else
+      if (s == 2)
+        A[s] = 2 * 1 / 24. * Sq;
+      else
+        return -1;
+    }
+  if (i == n_x && j == n_y) // >^
+    {
+      if (l == ls)
+        A[s] = 2 * 1 / 12. * Sq;
+      else
+      if (s == 0 || s == 2)
+        A[s] = 1 * 1 / 24. * Sq;
+      else
+      if (s == 1)
+        A[s] = 2 * 1 / 24. * Sq;
+      else
+        return -1;
+    }
+  if ((i == n_x && j == 0) || (i == 0 && j == n_y)) // <^ or >_
+    {
+      if (l == ls)
+        A[s] = 1 * 1 / 12. * Sq;
+      else
+      if (s == 0 || s == 1)
+        A[s] = 1 * 1 / 24. * Sq;
+      else
+        return -1;
+    }
+  return 0;
+}
+
+
+
+// ###############################################################
+// ###############################################################
+// ###############################################################
+
+
+int get_len_msr (int n_x, int n_y)
+{
+  return 6 * (n_x - 1) * (n_y - 1) + 4 * (2 * (n_x - 1) 
+                                        + 2 * (n_y - 1)) + 3 * 2 + 2 * 2;
+}
+
+void ij2l (int n_x, int /*n_y*/, int i, int j, int &l)
+{
+  l = i + j * (n_x + 1);
+}
+
+void l2ij (int n_x, int /*n_y*/, int &i, int &j, int l)
+{
+  j = l / (n_x + 1);
+  i = l - j * (n_x + 1);
+}
+
+#define F(IS, JS, S) \
+        IA_ij (nx, ny, hx, hy, i, j, (IS), (JS), (S), I, A)
+
+int get_off_diag (int nx, int ny, double hx, double hy, int i, int j,
+                  int *I, double *A)
+{
+  int s = 0;
+  if (i < nx)           { if (A != nullptr) F (i + 1, j,     s); s++; }
+  if           (j > 0)  { if (A != nullptr) F (i,     j - 1, s); s++; }
+  if (i > 0  && j > 0)  { if (A != nullptr) F (i - 1, j - 1, s); s++; }
+  if (i > 0)            { if (A != nullptr) F (i - 1, j,     s); s++; }
+  if           (j < ny) { if (A != nullptr) F (i,     j + 1, s); s++; }
+  if (i < nx && j < ny) { if (A != nullptr) F (i + 1, j + 1, s); s++; }
+  return s; // количество диагональных элементов
+}
+
+//возвращает количество внедиагональных точек (i, j)
+int get_len_msr_off_diag (int nx, int ny)
+{
+  double hx = 0, hy = 0; int i, j, res = 0;
+  for (i = 0; i <= nx; i++)
+    for (j = 0; j <= ny; j++)
+      res += get_off_diag (nx, ny, hx, hy, i, j);
+  return res;
+}
+
+void get_diag (int nx, int ny, double hx, double hy, int i, int j, int* /*I*/, double *A)
+{
+  IA_ij (nx, ny, hx, hy, i, j, i, j, 0, nullptr, A);
+}
+
+void fill_I (int nx, int ny, double hx, double hy, int *I)
+{
+  int i, j, l, N = (nx + 1) * (ny + 1);
+  int r = N + 1;
+  for (l = 0; l < N; l++)
+    {
+      l2ij (nx, ny, i, j, l);
+      int s = get_off_diag (nx, ny, hx, hy, i, j);
+      I[l] = r;
+      r += s;
+    }
+  I[l] = r;
+}
+
+int fill_IA (int nx, int ny, double hx, double hy, int *I, double *A, int p, int k)
+{
+  int i, j, l, l1, l2, N = (nx + 1) * (ny + 1), r, s, t;
+  int err = 0, len = 0;
+  thread_rows (N, p, k, l1, l2);
+  for (l = l1; l < l2; l++)
+    {
+      r = I[l];
+      s = I[l+1] - I[l];
+      l2ij (nx, ny, i, j, l);
+      get_diag (nx, ny, hx, hy, i, j, I,  A + l);
+      t = get_off_diag (nx, ny, hx, hy, i, j, I + r, A + r);
+      if (t != s)
+        {
+          err = 1; break;
+        }
+      len += s;
+    }
+  reduce_sum (p, &err, 1);
+  if (err != 0)
+    return -1;
+  reduce_sum (p, &len, 1);
+  if (I[N] != (N + 1) + len)
+    return -2;
+  return 0;
+}
+
+void print_MSR (int nx, int ny, int *I, double *A, int pr)
+{
+  int m = get_len_msr(nx, ny) + 1 + (nx + 1) * (ny + 1);
+  m = (m < pr ? m : pr);
+  for (int i = 0; i < m; i++)
+    printf (" %4d", I[i]);
+  printf ("\n");
+  for (int i = 0; i < m; i++)
+    printf (" %4.1lf", A[i] * 24);
+  printf ("\n");
+}
+
+void print_MSR_mat (int nx, int ny, int *I, double *A)
+{
+  int r, s;
+  for (int l = 0; l < (nx + 1) * (ny + 1); l++)
+    {
+      r = I[l];
+      s = I[l+1] - r;
+      printf (" {%2d - %4.1lf}", l, A[l]*24);
+      for (int i_s = 0; i_s < s; i_s++)
+        {
+          printf (" {%2d - %4.1lf}", I[r + i_s], A[r + i_s]*24);
+        }
+      printf ("\n");
+    }
+}
+
+void print_mas (int n, double *x, int pr)
+{
+  int m = (n < pr ? n : pr);
+  for (int i = 0; i < m; i++)
+    printf (" %10.3e", x[i]);
+  printf ("\n");
+}
+
+
+
+// ###############################################################
+// ###############################################################
+// ###############################################################
+
+
+double p_f (int nx, int ny, double a, double b, double c, double d, double *x_mas, double x, double y)
+{
+  double hx = (b - a) / nx;
+  double hy = (d - c) / ny;
+  
+  //int i = fmod(x - a, hx);
+  //int j = fmod(y - c, hy);
+  int i = floor((x - a)/hx);
+  int j = floor((y - c)/hy);
+  if (i < 0) i = 0;
+  if (i >= nx) i = nx - 1;
+  if (j < 0) j = 0;
+  if (j >= ny) j = ny - 1;
+  //printf ("\n%10.3e %10.3e %d %d\n", x, y, i, j);
+  //printf ("%10.3e %10.3e %10.3e %10.3e\n", x, y, x - i * hx - a, y - j * hy - c);
+  if (x - i * hx - a > y - j * hy - c) // _> triangle
+    {
+      int l1, l2, l3;
+      ij2l (nx, ny, i, j, l1);
+      ij2l (nx, ny, i+1, j+1, l2);
+      ij2l (nx, ny, i+1, j, l3);
+      return x_mas[l1] * ((i+1) * hx + a - x)/hx + x_mas[l2] * (y - j * hy - c)/hy + x_mas[l3] * ((x - i * hx - a)/hx - (y - j * hy - c)/hy);
+    }
+  else // <^ triangle
+    {
+      int l1, l2, l3;
+      ij2l (nx, ny, i, j, l1);
+      ij2l (nx, ny, i+1, j+1, l2);
+      ij2l (nx, ny, i, j+1, l3);
+      //printf ("### %10.3e %10.3e\n", x_mas[l3], x_mas[l2]);
+      //printf ("### %10.3e\n", x_mas[l1]);
+      //printf ("@@@ %10.3e %10.3e\n", ((y - j * hy - c)/hy - (x - i * hx - a)/hx), (x - i * hx - a)/hx);
+      //printf ("@@@ %10.3e\n", (c + (j+1) * hy - y)/hy);
+      return x_mas[l1] * (c + (j+1) * hy - y)/hy + x_mas[l2] * (x - i * hx - a)/hx + x_mas[l3] * ((y - j * hy - c)/hy - (x - i * hx - a)/hx);
+    }
+}
+
+#define P_F(X, Y) \
+        p_f (nx, ny, a, b, c, d, x_mas, (X), (Y))
+
+double residual_C_norm_error (int nx, int ny, double a, double b, double c, double d, double *x_mas, double (*f) (double x, double y), int p, int k)
+{
+  int l1, l2;
+  double x, y;
+  double hx = (b - a) / nx;
+  double hy = (d - c) / ny;
+  thread_rows (2 * nx * ny, p, k, l1, l2);
+  int i, i2, j;
+  double diff = -1;
+  
+  double max = -1;
+  for (int l = l1; l < l2; l++)
+    {
+      j = l / (2 * nx);
+      i2 = l - j * (2 * nx);
+      i = i2 / 2;
+      if (i2 - i * 2 == 0) // _> triangle
+        {
+          x = a + (3 * i + 1) * hx / 3;
+          y = c + (3 * j + 2) * hy / 3;
+        }
+      else
+        {
+          x = a + (3 * i + 2) * hx / 3;
+          y = c + (3 * j + 1) * hy / 3;
+        }
+      diff = fabs (f(x, y) - P_F(x, y));
+      if (max < diff)
+        max = diff;
+    }
+  reduce_max (p, &max, 1);
+  return max;
+}
+
+double residual_L1_norm_error (int nx, int ny, double a, double b, double c, double d, double *x_mas, double (*f) (double x, double y), int p, int k)
+{
+  int l1, l2;
+  double x, y;
+  double hx = (b - a) / nx;
+  double hy = (d - c) / ny;
+  thread_rows (2 * nx * ny, p, k, l1, l2);
+  int i, i2, j;
+  double diff = -1;
+  
+  double sum = 0;
+  for (int l = l1; l < l2; l++)
+    {
+      j = l / (2 * nx);
+      i2 = l - j * (2 * nx);
+      i = i2 / 2;
+      if (i2 - i * 2 == 0) // _> triangle
+        {
+          x = a + (3 * i + 1) * hx / 3;
+          y = c + (3 * j + 2) * hy / 3;
+        }
+      else
+        {
+          x = a + (3 * i + 2) * hx / 3;
+          y = c + (3 * j + 1) * hy / 3;
+        }
+      diff = fabs (f(x, y) - P_F(x, y));
+      sum += diff * hx * hy / 2.;
+    }
+  reduce_sum (p, &sum, 1);
+  return sum;
+}
+
+double residual_C_norm_diff (int nx, int ny, double a, double b, double c, double d, double *x_mas, double (*f) (double x, double y), int p, int k)
+{
+  double hx = (b - a) / nx;
+  double hy = (d - c) / ny;
+  double x, y;
+  int j1, j2;
+  double diff = -1;
+  thread_rows (ny + 1, p, k, j1, j2);
+
+  double max = -1;
+  for (int j = j1; j < j2; j++)
+    {
+      for (int i = 0; i <= nx; i++)
+        {
+          x = a + i * hx;
+          y = c + j * hy;
+          diff = fabs (f(x, y) - P_F(x, y));
+        }
+      if (max < diff)
+        max = diff;
+    }
+  reduce_max (p, &max, 1);
+  return max;
+}
+
+double residual_L1_norm_diff (int nx, int ny, double a, double b, double c, double d, double *x_mas, double (*f) (double x, double y), int p, int k)
+{
+  double hx = (b - a) / nx;
+  double hy = (d - c) / ny;
+  double x, y;
+  int j1, j2;
+  thread_rows (ny + 1, p, k, j1, j2);
+  double diff = -1;
+  
+  double sum = 0;
+  for (int j = j1; j < j2; j++)
+    {
+      for (int i = 0; i <= nx; i++)
+        {
+          x = a + i * hx;
+          y = c + j * hy;
+          diff = fabs (f(x, y) - P_F(x, y));
+          sum += diff * hx * hy;
+        }
+    }
+  reduce_sum (p, &sum, 1);
+  return sum;
+}
+  
+     
