@@ -20,7 +20,7 @@ int minimal_errors_msr_matrix (int n, double *A, int *I, double *b,
 int minimal_errors_msr_matrix_full (int n, double *A, int *I, double *b,
                                    double *x, /* in-out */
                                    double *r, double *u, double *v, double eps, 
-                                   int max_it, int max_step, double omega, 
+                                   int max_it, int max_step,
                                    int p, int k);
 
 void thread_rows (int n, int p, int k, int &i1, int &i2);

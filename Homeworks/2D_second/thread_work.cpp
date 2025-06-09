@@ -324,7 +324,7 @@ void *thread_func (void* ptr)
           t = get_time ();
         }
       it = minimal_errors_msr_matrix_full ((nx+1)*(ny+1), A, I, B, x // in-out 
-                                          , r, u, v, eps, max_it, max_step, omega, p_calc, k_calc);
+                                          , r, u, v, eps, max_it, max_step, p_calc, k_calc);
       if (k_calc == k_main_calc)
         {
           pthread_arg->t1 = get_time () - t;
@@ -529,7 +529,7 @@ void *single_func (void* ptr)
       t = get_time ();
     }
   it = minimal_errors_msr_matrix_full ((nx+1)*(ny+1), A, I, B, x // in-out 
-                                       , r, u, v, eps, max_it, max_step, omega, p_calc, k_calc);
+                                       , r, u, v, eps, max_it, max_step, p_calc, k_calc);
   if (k_calc == k_main_calc)
     {
       pthread_arg->t1 = get_time () - t;

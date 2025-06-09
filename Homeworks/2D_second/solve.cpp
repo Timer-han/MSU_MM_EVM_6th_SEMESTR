@@ -156,7 +156,7 @@ void matrix_mult_vector_msr (int n, double *A, int *I, double *x, double *y, int
 int minimal_errors_msr_matrix (int n, double *A, int *I, double *b,
                                double *x, /* in-out */
                                double *r, double *u, double *v,
-                               double eps, int max_it, double omega, int p, int k)
+                               double eps, int max_it, int p, int k)
 {
   double prec, b_norm2, tau, c1, c2;
   int it;
@@ -196,7 +196,7 @@ int minimal_errors_msr_matrix (int n, double *A, int *I, double *b,
           print_mas (n, r, 9); // <- ####
         }*/
       // v: Mv = r
-      apply_preconditional_msr_matrix (n, A, I, v, r, omega, p, k); // 1 т. синх.
+      apply_preconditional_msr_matrix (n, A, I, v, r, p, k); // 1 т. синх.
       /*if (k == 0)
         {
           printf ("Vector v:\n");
@@ -250,14 +250,14 @@ int minimal_errors_msr_matrix (int n, double *A, int *I, double *b,
 int minimal_errors_msr_matrix_full (int n, double *A, int *I, double *b,
                                    double *x, /* in-out */
                                    double *r, double *u, double *v, double eps, 
-                                   int max_it, int max_step, double omega, 
+                                   int max_it, int max_step,
                                    int p, int k)
 {
   int step, ret, its = 0;
   for (step = 0; step < max_step; step++)
     {
       // много точек итераций
-      ret = minimal_errors_msr_matrix (n, A, I, b, x, r, u, v, eps, max_it, omega, p, k);
+      ret = minimal_errors_msr_matrix (n, A, I, b, x, r, u, v, eps, max_it, p, k);
       if (ret >= 0)
         {
           its += ret;
@@ -284,7 +284,7 @@ int minimal_errors_msr_matrix_full (int n, double *A, int *I, double *b,
 }*/
 
 void apply_preconditional_msr_matrix (int n, double *A, int *I, double *v,
-                                      double *r, double omega, int p, int k)
+                                      double *r, int p, int k)
 {
   (void)I;
   int i, i1, i2;
@@ -307,7 +307,7 @@ void apply_preconditional_msr_matrix (int n, double *A, int *I, double *v,
           if (i1 <= j && j < i)
             {
               //printf ("   A[%d, %d] = %.1lf/24, x[%d] = %.1lf\n", i, j, A[J + s]*24, j, v[j]);
-              res -= omega * A[J + s] * v[j];
+              res -= A[J + s] * v[j];
             }
         }
       //printf ("   res = %.1lf/24 / A[i] = %.1lf/24 = %.3lf\n", res*24, A[i]*24, res / A[i]);
@@ -317,7 +317,7 @@ void apply_preconditional_msr_matrix (int n, double *A, int *I, double *v,
   for (i = i1; i < i2; i++)
     { 
       //v[i]=r[i];
-      v[i] *= omega * (2 - omega) * A[i];
+      v[i] *=  A[i];
     }
   //if(k ==0){printf ("2: "); print_mas (n, v, 9);}
   for (i = i2 - 1; i >= i1; i--)
@@ -330,7 +330,7 @@ void apply_preconditional_msr_matrix (int n, double *A, int *I, double *v,
           j = I[J + s];
           if (i <= j && j < i2)
             {
-              res -= omega * A[J + s] * v[j];
+              res -= A[J + s] * v[j];
             }
         }
       v[i] = res / A[i];
