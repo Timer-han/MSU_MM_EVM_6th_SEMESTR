@@ -338,20 +338,6 @@ void *thread_func (void* ptr)
         }
       
       
-      /*if (debug && k_calc == k_main_calc)
-        {
-          //printf ("Result vector x:\n");
-          //print_B (nx, ny, x, (nx+1)*(ny+1)); // <- ####
-          int n = 6;
-          double dx = (b-a)/n, dy = (d-c)/n;
-          for (int j = n; j >= 0; j--)
-            {
-              for (int i = 0; i <= n; i++)
-                printf(" [%9.2e]", p_f (nx, ny, a, b, c, d, x, a + i*dx, c + j*dy));
-              printf("\n");
-            }
-        }*/
-      
       if (k_calc == k_main_calc)
         {
           t = get_time ();
@@ -377,10 +363,7 @@ void *thread_func (void* ptr)
           //if (!is_closing)
           need_to_calculation = 0;
         }
-      //if (k_calc == k_main_calc) printf("[k = %d]: calc_is_ready = %d, need_to_calc = %d\n", k, calculation_is_ready, need_to_calculation);
-      
-      //pthread_cond_broadcast(&cond_gui_kernel);
-      //pthread_mutex_unlock(&mutex_gui_kernel);
+
       /* Mutex sending */
       
       /* Mutex waiting */
@@ -402,21 +385,15 @@ void *thread_func (void* ptr)
       pthread_arg->is_running = main_arg->is_running;
       printf("[k = %d]: pthread_arg->is_running = %d\n", k, pthread_arg->is_running);
       
-      /*pthread_mutex_lock (&mutex_gui_kernel);
-      if (k_calc == k_main_calc)
-        {
-          //else
-          need_to_calculation = 0;
-          calculation_is_ready = 1;
-        }
-      if (k_calc == k_main_calc)
-      pthread_mutex_unlock(&mutex_gui_kernel);*/
+
       /* Mutex waiting */
     }
   
   pthread_arg->error_type = io_status::success;
   return nullptr;
 }
+
+
 
 void *single_func (void* ptr)
 {
