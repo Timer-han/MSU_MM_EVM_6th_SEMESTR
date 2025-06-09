@@ -26,10 +26,10 @@ int main(int argc, char *argv[]) {
     action = tool_bar->addAction("Change Type Of Graph", graph_area, SLOT(ChangeTypeOfGraph()));
     action->setShortcut(QString("1"));
     
-    action = tool_bar->addAction("Extend area", graph_area, SLOT(ExtendArea()));
+    action = tool_bar->addAction("Compress area", graph_area, SLOT(CompressArea()));
     action->setShortcut(QString("2"));
     
-    action = tool_bar->addAction("Compress area", graph_area, SLOT(CompressArea()));
+    action = tool_bar->addAction("Expand area", graph_area, SLOT(ExtendArea()));
     action->setShortcut(QString("3"));
     
     action = tool_bar->addAction("Increase N", graph_area, SLOT(IncreaseN()));
@@ -58,9 +58,11 @@ int main(int argc, char *argv[]) {
     window->setMenuBar(tool_bar);
     window->setCentralWidget(graph_area);
     window->setWindowTitle("Graph");
-
     window->show();
     app.exec();
+    
+    delete graph_area;
+    delete tool_bar;
     delete window;
     return 0;
 }
