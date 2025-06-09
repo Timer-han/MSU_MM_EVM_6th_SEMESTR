@@ -4,7 +4,7 @@
 #include <QtWidgets/QtWidgets>
 #include <pthread.h>
 #include <sys/sysinfo.h>
-#include "for_pthread.h"
+#include "thread_work.h"
 
 class Window : public QWidget
 {

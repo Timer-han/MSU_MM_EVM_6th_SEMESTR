@@ -4,12 +4,8 @@
 #include <math.h>
 
 #include "window.h"
-#include "for_pthread.h"
-#include "msr_matrix.h"
-#include "f.h"
+#include "thread_work.h"
 #include "solve.h"
-#include "init_b.h"
-#include "residual.h"
 
 #define OMEGA 1
 

@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "matrix_Gram.h"
-#include "for_pthread.h"
+#include "thread_work.h"
 #include "solve.h"
+
+#define EPS (1e-4)
 
 static double *results = nullptr;
 
@@ -349,6 +350,136 @@ double reduce_sum_det (int p, int k, double s)
   return sum;
 }
 
+
+
+// ###############################################################
+// ###############################################################
+// ###############################################################
+
+void init_b (int nx, int ny, double a, double b, double c, double d, double (*f) (double, double), double *B, int p, int k, int disturbance, double max_abs_f)
+{
+  int l1, l2, N = (nx + 1) * (ny + 1);
+  int i, j;
+  
+  thread_rows (N, p, k, l1, l2);
+  for (int l = l1; l < l2; l++)
+    {
+      l2ij (nx, ny, i, j, l);
+      B[l] = F_ij (nx, ny, a, b, c, d, i, j, f, disturbance, max_abs_f);
+    }
+}
+
+#define F(I, J)  (f_dist (nx, ny, a, b, c, d, (I), (J), f, disturbance, max_abs_f))
+
+double f_dist (int nx, int ny, double a, double b, double c, double d, double i, double j, double (*f) (double x, double y), int disturbance, double max_abs_f)
+{
+  double hx = (b - a) / nx;
+  double hy = (d - c) / ny;
+  if (fabs (i - nx/2) < EPS && fabs (j - ny/2) < EPS)
+    {
+      //printf("max_abs_f = %lf, disturbance = %d\n", max_abs_f, disturbance);
+      return f(a + (i) * hx, c + (j) * hy) + 0.1 * max_abs_f * disturbance;
+    }
+  else
+    {
+      return f(a + (i) * hx, c + (j) * hy);
+    }
+}
+
+double F_ij (int nx, int ny, double a, double b, double c, double d, int i, int j, double (*f) (double x, double y), int disturbance, double max_abs_f)
+{
+  double hx = (b - a) / nx;
+  double hy = (d - c) / ny;
+  double w = hx * hy / 192;
+  if (i > 0 && i < nx && j > 0 && j < ny) // #
+    return w * (36 * F(i, j)
+              + 20 * (F(i + 0.5, j) + F(i, j - 0.5) + F(i - 0.5, j - 0.5)
+                    + F(i - 0.5, j) + F(i, j + 0.5) + F(i + 0.5, j + 0.5))
+              +  4 * (F(i + 0.5, j - 0.5) + F(i - 0.5, j - 1) + F(i - 1, j - 0.5)
+                    + F(i - 0.5, j + 0.5) + F(i + 0.5, j + 1) + F(i + 1, j + 0.5))
+              +  2 * (F(i + 1, j) + F(i, j - 1) + F(i - 1, j - 1)
+                    + F(i - 1, j) + F(i, j + 1) + F(i + 1, j + 1))
+               );
+               
+  if (i > 0 && i < nx && j == 0) //  нижняя сторона
+    return w * (18 * F(i, j)
+              + 10 * (F(i + 0.5, j) + F(i - 0.5, j))
+              + 20 * (F(i, j + 0.5) + F(i + 0.5, j + 0.5))
+              +  4 * (F(i - 0.5, j + 0.5) + F(i + 0.5, j + 1) + F(i + 1, j + 0.5))
+              +  1 * (F(i - 1, j) + F(i + 1, j))
+              +  2 * (F(i, j + 1) + F(i + 1, j + 1))
+               );
+
+  if (i > 0 && i < nx && j == ny) // верхняя сторона
+    return w * (18 * F(i, j)
+              + 10 * (F(i - 0.5, j) + F(i + 0.5, j))
+              + 20 * (F(i, j - 0.5) + F(i - 0.5, j - 0.5))
+              +  4 * (F(i - 1, j - 0.5) + F(i - 0.5, j - 1) + F(i + 0.5, j - 0.5))
+              +  1 * (F(i - 1, j) + F(i + 1, j)) +
+              +  2 * (F(i - 1, j - 1) + F(i, j - 1))
+               );
+
+  if (i == 0 && j > 0 && j < ny) // левая сторона без углов
+    return w * (18 * F(i, j)
+              + 10 * (F(i, j - 0.5) + F(i, j + 0.5))
+              + 20 * (F(i + 0.5, j) + F(i + 0.5, j + 0.5))
+              +  4 * (F(i + 0.5, j - 0.5) + F(i + 0.5, j + 1) + F(i + 1, j + 0.5))
+              +  1 * (F(i, j - 1) + F(i, j + 1))
+              +  2 * (F(i + 1, j) + F(i + 1, j + 1))
+               );
+
+  if (i == nx && j > 0 && j < ny) // правая сторона без углов
+    return w * (18 * F(i, j) +
+              + 10 * (F(i, j + 0.5) + F(i, j - 0.5))
+              + 20 * (F(i - 0.5, j - 0.5) + F(i - 0.5, j))
+              +  4 * (F(i - 0.5, j - 1) + F(i - 1, j - 0.5) + F(i - 0.5, j + 0.5))
+              +  1 * (F(i, j - 1) + F(i, j + 1))
+              +  2 * (F(i - 1, j - 1) + F(i - 1, j))
+               );
+
+  if (i == 0 && j == 0) // левый нижний угол
+    return w * (12 * F(i, j)
+              + 10 * (F(i + 0.5, j) + F(i, j + 0.5))
+              + 20 * F(i + 0.5, j + 0.5)
+              +  4 * (F(i + 0.5, j + 1) + F(i + 1, j + 0.5))
+              +  1 * (F(i + 1, j) + F(i, j + 1))
+              +  2 * F(i + 1, j + 1)
+               );
+
+  if (i == nx && j == ny) // правый верхний угол
+    return w * (12 * F(i, j) +
+              + 10 * (F(i - 0.5, j) + F(i, j - 0.5))
+              + 20 * F(i - 0.5, j - 0.5)
+              +  4 * (F(i - 0.5, j - 1) + F(i - 1, j - 0.5))
+              +  1 * (F(i - 1, j) + F(i, j - 1))
+              +  2 * F(i - 1, j - 1)
+               );
+
+  if (i == 0 && j == ny) // левый верхний угол
+    return w * ( 6 * F(i, j)
+              + 10 * (F(i + 0.5, j) + F(i, j - 0.5))
+              +  4 * F(i + 0.5, j - 0.5)
+              +  1 * (F(i + 1, j) + F(i, j - 1))
+               );
+
+  if (i == nx && j == 0) // правый нижний угол
+    return w * ( 6 * F(i, j)
+              + 10 * (F(i - 0.5, j) + F(i, j + 0.5))
+              +  4 * F(i - 0.5, j + 0.5)
+              +  1 * (F(i - 1, j) + F(i, j + 1))
+               );
+
+  return 1e308; // Сюда не должно быть попаданий
+}
+
+void print_B (int nx, int ny, double *B, int pr)
+{
+  int m = (nx + 1) * (ny + 1);
+  m = (m < pr ? m : pr);
+  for (int i = 0; i < m; i++)
+    printf (" %10.3e", B[i]*24);
+  printf ("[24]\n");
+}
 
 
 // ###############################################################

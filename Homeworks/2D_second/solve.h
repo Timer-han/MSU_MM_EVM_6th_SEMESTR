@@ -1,18 +1,14 @@
 #include <stdio.h>
 #include <math.h>
 
-enum class io_status
-{
-  undefine,
-  error_open,
-  error_read,
-  error_buf,
-  error_mem,
-  degenerate_data,
-  error_incorrect_parametres,
-  non_applicable,
-  success,
-};
+double f_0 (double /*x*/, double /*y*/);
+double f_1 (double x, double /*y*/);
+double f_2 (double /*x*/, double y);
+double f_3 (double x, double y);
+double f_4 (double x, double y);
+double f_5 (double x, double y);
+double f_6 (double x, double y);
+double f_7 (double x, double y);
 
 void matrix_mult_vector_msr (int n, double *A, int *I, double *x, double *y, int p, int k);
   
@@ -61,6 +57,21 @@ void solve_02 (int n, double x[], double f_x[], double mas_4n[], double dd0, dou
 
 int bin_search_to_add (double x, double * a, int n);
 double Pf_02 (double x, double a, double b, int n, double x_mas[], double mas_4n[]);
+
+
+// ###############################################################
+// ###############################################################
+// ###############################################################
+
+void init_b (int n_x, int n_y, double a, double b, double c, double d, double (*f) (double, double), double *B, int p, int k, int disturbance, double max_abs_f);
+
+double f_dist (int nx, int ny, double a, double b, double c, double d, double i, double j, double (*f) (double x, double y), int disturbance, double max_abs_f);
+
+double F_ij (int nx, int ny, double a, double b, double c, double d, int i, int j, double (*f) (double x, double y), int disturbance, double max_abs_f);
+
+double F_ij_fast (int nx, int ny, double a, double b, double c, double d, int i, int j, double (*f) (double x, double y));
+
+void print_B (int nx, int ny, double *B, int pr);
 
 // ###############################################################
 // ###############################################################
