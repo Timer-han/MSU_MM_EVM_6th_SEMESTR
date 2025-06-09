@@ -102,4 +102,13 @@ protected:
     void paintEvent(QPaintEvent *event);
 };
 
+double f_0(double /* x */, double /* y */);
+double f_1(double x, double /* y */);
+double f_2(double /* x */, double y);
+double f_3(double x, double y);
+double f_4(double x, double y);
+double f_5(double x, double y);
+double f_6(double x, double y);
+double f_7(double x, double y);
+
 #endif
