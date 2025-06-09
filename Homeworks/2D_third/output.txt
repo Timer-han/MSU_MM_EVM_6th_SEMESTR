@@ -1,28 +1,3 @@
-In file included from main.cpp:8:
-window.h:106:8: warning: ‘double f_0(double, double)’ declared ‘static’ but never defined [-Wunused-function]
-  106 | double f_0(double /* x */, double /* y */);
-      |        ^~~
-window.h:108:8: warning: ‘double f_1(double, double)’ declared ‘static’ but never defined [-Wunused-function]
-  108 | double f_1(double x, double /* y */);
-      |        ^~~
-window.h:110:8: warning: ‘double f_2(double, double)’ declared ‘static’ but never defined [-Wunused-function]
-  110 | double f_2(double /* x */, double y);
-      |        ^~~
-window.h:112:8: warning: ‘double f_3(double, double)’ declared ‘static’ but never defined [-Wunused-function]
-  112 | double f_3(double x, double y);
-      |        ^~~
-window.h:114:8: warning: ‘double f_4(double, double)’ declared ‘static’ but never defined [-Wunused-function]
-  114 | double f_4(double x, double y);
-      |        ^~~
-window.h:116:8: warning: ‘double f_5(double, double)’ declared ‘static’ but never defined [-Wunused-function]
-  116 | double f_5(double x, double y);
-      |        ^~~
-window.h:118:8: warning: ‘double f_6(double, double)’ declared ‘static’ but never defined [-Wunused-function]
-  118 | double f_6(double x, double y);
-      |        ^~~
-window.h:120:8: warning: ‘double f_7(double, double)’ declared ‘static’ but never defined [-Wunused-function]
-  120 | double f_7(double x, double y);
-      |        ^~~
 functions.cpp: In function ‘void mult_sub_vector(int, double*, double*, double, int, int)’:
 functions.cpp:87:9: error: ‘ReduceSum’ was not declared in this scope; did you mean ‘ReduceSumDet’?
    87 |         ReduceSum(p);
