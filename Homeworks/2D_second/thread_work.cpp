@@ -15,7 +15,7 @@ double get_time()
   return time.tv_sec + time.tv_usec*1.e-6;
 }
 
-int process_args (Args *a)
+int process_args (thread_data *a)
 {
   if (a->error_flag != 0)
     {
@@ -29,7 +29,7 @@ int process_args (Args *a)
   return 0;
 }
 
-void Args::set_func ()
+void thread_data::set_func ()
 {
   switch (func_id)
     {
@@ -176,14 +176,13 @@ void reduce_max (int p, double *a, int n)
 
 void *thread_func (void* ptr)
 {
-  Args *pthread_arg = (Args *) ptr;
+  thread_data *pthread_arg = (thread_data *) ptr;
   
-  /* Reading data from Args */
-  int k = pthread_arg->k;
+  /* Reading data from thread_data */
+  int k = pthread_arg->pi;
   int p = pthread_arg->p;
   double eps = pthread_arg->eps;
   int max_it = pthread_arg->max_it;
-  double omega = pthread_arg->omega;
   
   int *I = pthread_arg->I;
   double *A, *B, *x, *r, *u, *v;
@@ -199,7 +198,7 @@ void *thread_func (void* ptr)
   double c = pthread_arg->c;
   double d = pthread_arg->d;
   
-  /* Reading data from Args */
+  /* Reading data from thread_data */
   
   int p_calc = p - 1;
   int k_calc = k - 1;
@@ -213,7 +212,7 @@ void *thread_func (void* ptr)
   int &calculation_is_ready = *pthread_arg->calculation_is_ready;
   int &is_closing = *pthread_arg->is_closing;
   
-  Args *main_arg = pthread_arg->pthread_args;
+  thread_data *main_arg = pthread_arg->pthread_args;
   pthread_t tid = pthread_arg->tid;
   
   cpu_set_t cpu;
@@ -257,7 +256,7 @@ void *thread_func (void* ptr)
     {
       if (k_calc == k_main_calc) printf("[k = %d]: start calculation\n", k);
         
-      /* Reading mutable data from Args */
+      /* Reading mutable data from thread_data */
       I = pthread_arg->I = main_arg->I;
       A = pthread_arg->A = main_arg->A;
       B = pthread_arg->B = main_arg->B;
@@ -273,7 +272,7 @@ void *thread_func (void* ptr)
       nx = pthread_arg->nx = main_arg->nx;
       ny = pthread_arg->ny = main_arg->ny;
       disturbance = pthread_arg->disturbance = main_arg->disturbance;
-      /* Reading mutable data from Args */
+      /* Reading mutable data from thread_data */
       
       //if (k_calc == k_main_calc) printf("[k = %d]: begin: func_id = %d\n", k, pthread_arg->func_id);
       
@@ -421,12 +420,11 @@ void *thread_func (void* ptr)
 
 void *single_func (void* ptr)
 {
-  Args *pthread_arg = (Args *) ptr;
+  thread_data *pthread_arg = (thread_data *) ptr;
   
-  /* Reading data from Args */
+  /* Reading data from thread_data */
   double eps = pthread_arg->eps;
   int max_it = pthread_arg->max_it;
-  double omega = pthread_arg->omega;
   
   int *I = pthread_arg->I;
   double *A, *B, *x, *r, *u, *v;
@@ -434,14 +432,14 @@ void *single_func (void* ptr)
   int nx, ny;
   double (*f) (double, double);
   
-  /* Reading data from Args */
+  /* Reading data from thread_data */
   
   /* INIT MUTEX, CPU */
   
   int &need_to_calculation = *pthread_arg->need_to_calculation;
   int &calculation_is_ready = *pthread_arg->calculation_is_ready;
   
-  Args *main_arg = pthread_arg->pthread_args;
+  thread_data *main_arg = pthread_arg->pthread_args;
   
   
   int p_calc = 1;
@@ -460,7 +458,7 @@ void *single_func (void* ptr)
   d = pthread_arg->d;
   
     
-  /* Reading mutable data from Args */
+  /* Reading mutable data from thread_data */
   I = pthread_arg->I = main_arg->I;
   A = pthread_arg->A = main_arg->A;
   B = pthread_arg->B = main_arg->B;
@@ -477,7 +475,7 @@ void *single_func (void* ptr)
   f = pthread_arg->f;
   max_abs_f = max_f_ab (a, b, c, d, func_id, f);
   disturbance = pthread_arg->disturbance = main_arg->disturbance;
-  /* Reading mutable data from Args */
+  /* Reading mutable data from thread_data */
   
   //printf("[k = 0]: begin: func_id = %d\n", k, pthread_arg->func_id);
   

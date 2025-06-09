@@ -22,7 +22,7 @@ enum class io_status
   success,
 };
 
-class Args
+class thread_data
 {
 public:
   pthread_t tid;
@@ -34,13 +34,10 @@ public:
   int nx = 0;
   int ny = 0;
   int func_id = 0;
-  int k = 0;
+  int pi = 0;
   int p = 1;
   double eps = 1e-14;
   int max_it = 100000;
-  double omega = 1;
-  /*int r = 0;
-  int m = 0;*/
   
   int *I = 0;
   double *A = 0;
@@ -63,7 +60,7 @@ public:
   
   int disturbance = 0;
   
-  Args *pthread_args;
+  thread_data *pthread_args;
   void set_func ();
   int *need_to_calculation;
   int *calculation_is_ready;
@@ -77,7 +74,7 @@ public:
 
 double get_time();
 
-int process_args (Args *a);
+int process_args (thread_data *a);
 
 void reduce_sum (int p, int *a = nullptr, int n = 0);
 void reduce_sum (int p, double *a, int n);
