@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <math.h>
+
+void matrix_mult_vector_msr (int n, double *A, int *I, double *x, double *y, int p, int k);
+  
+int minimal_errors_msr_matrix (int n, double *A, int *I, double *b,
+                               double *x, /* in-out */
+                               double *r, double *u, double *v,
+                               double eps, int max_it, double omega, int p, int k);
+
+int minimal_errors_msr_matrix_full (int n, double *A, int *I, double *b,
+                                   double *x, /* in-out */
+                                   double *r, double *u, double *v, double eps, 
+                                   int max_it, int max_step, double omega, 
+                                   int p, int k);
+
+void thread_rows (int n, int p, int k, int &i1, int &i2);
+
+void apply_preconditional_msr_matrix (int n, double *A, int *I, double *v,
+                                      double *r, double omega, int p, int k);
+
+double scalar_product (int n, double *x, double *y, int p, int k);
+void mult_sub_vector (int n, double *x, double *y, double alpha, int p, int k);
+
+//static double *results = nullptr;
+double max_f_ab (double a, double b, double c, double d, int func_id, double (*f) (double, double));
+
+int init_reduce_sum (int p);
+int delete_reduce_sum ();
+
+double reduce_sum_det (int p, int k, double s);
+
+
+void init_b_fast (int n_x, int n_y, double a, double b, double c, double d, double (*f) (double, double y), double *B);
+
+
+double F_ij (int nx, int ny, double hx, double hy, double b, double c, int i, int j, double (*f) (double x, double y));
+
+// ###############################################################
+// ###############################################################
+// ###############################################################
+
+void solve_01 (int n, double x[], double f_x[], double alpha[], double z[]);
+
+double Pf_01 (double x, double a, double b, int n, double x_mas[], double alpha[]);
+
+void solve_02 (int n, double x[], double f_x[], double mas_4n[], double dd0, double ddn);
+
+int bin_search_to_add (double x, double * a, int n);
+double Pf_02 (double x, double a, double b, int n, double x_mas[], double mas_4n[]);
