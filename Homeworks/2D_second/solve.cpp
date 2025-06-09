@@ -619,19 +619,19 @@ void l2ij (int n_x, int /*n_y*/, int &i, int &j, int l)
   i = l - j * (n_x + 1);
 }
 
-#define F(IS, JS, S) \
+#define FF(IS, JS, S) \
         IA_ij (nx, ny, hx, hy, i, j, (IS), (JS), (S), I, A)
 
 int get_off_diag (int nx, int ny, double hx, double hy, int i, int j,
                   int *I, double *A)
 {
   int s = 0;
-  if (i < nx)           { if (A != nullptr) F (i + 1, j,     s); s++; }
-  if           (j > 0)  { if (A != nullptr) F (i,     j - 1, s); s++; }
-  if (i > 0  && j > 0)  { if (A != nullptr) F (i - 1, j - 1, s); s++; }
-  if (i > 0)            { if (A != nullptr) F (i - 1, j,     s); s++; }
-  if           (j < ny) { if (A != nullptr) F (i,     j + 1, s); s++; }
-  if (i < nx && j < ny) { if (A != nullptr) F (i + 1, j + 1, s); s++; }
+  if (i < nx)           { if (A != nullptr) FF (i + 1, j,     s); s++; }
+  if           (j > 0)  { if (A != nullptr) FF (i,     j - 1, s); s++; }
+  if (i > 0  && j > 0)  { if (A != nullptr) FF (i - 1, j - 1, s); s++; }
+  if (i > 0)            { if (A != nullptr) FF (i - 1, j,     s); s++; }
+  if           (j < ny) { if (A != nullptr) FF (i,     j + 1, s); s++; }
+  if (i < nx && j < ny) { if (A != nullptr) FF (i + 1, j + 1, s); s++; }
   return s; // количество диагональных элементов
 }
 
