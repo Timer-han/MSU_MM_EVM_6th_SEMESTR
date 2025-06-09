@@ -226,6 +226,7 @@ void *thread_func (void* ptr)
   
   int it = 0;
   double t;
+  
   int max_step = 100;
   
   /* Mutex waiting */
