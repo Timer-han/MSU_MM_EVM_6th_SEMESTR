@@ -6,6 +6,7 @@
 #include "functions.h"
 #include "reduce.h"
 
+static
 int minimal_residual_msr_matrix(int n, double* A, int* I, double* b, double* x, double* r, double* u, double* v, double eps, int maxit, int p, int k) {
     double prec;
     double b_norm2;
@@ -37,6 +38,7 @@ int minimal_residual_msr_matrix(int n, double* A, int* I, double* b, double* x, 
     return it;
 }
 
+static
 int minimal_residual_msr_matrix_full(int n, double* A, int* I, double* b, double* x, double* r, double* u, double* v, double eps, int maxit, int maxsteps, int p, int k) {
     int step;
     int ret;
@@ -56,6 +58,7 @@ int minimal_residual_msr_matrix_full(int n, double* A, int* I, double* b, double
     return its;
 }
 
+static
 void thread_rows(int n , int p, int k, int &i1, int &i2) {
     i1 = n * k, 
     i1 /= p;
@@ -63,6 +66,7 @@ void thread_rows(int n , int p, int k, int &i1, int &i2) {
     i2 /= p;
 }
 
+static
 double scalar_product(int n, double* x, double* y, int p, int k) {
 	int i1;
 	int i2;
@@ -76,6 +80,7 @@ double scalar_product(int n, double* x, double* y, int p, int k) {
 	return s;
 }
 
+static
 void mult_sub_vector(int n, double* x, double* y, double t, int p, int k) {
 	int i;
 	int i1;
@@ -87,6 +92,7 @@ void mult_sub_vector(int n, double* x, double* y, double t, int p, int k) {
 	ReduceSum(p);
 }
 
+static
 void apply_preconditioner_msr_matrix(int n, double* A, int* /*I*/, double* v, double* r, int p, int k) {
 	int i;
 	int i1;
@@ -98,6 +104,7 @@ void apply_preconditioner_msr_matrix(int n, double* A, int* /*I*/, double* v, do
 	ReduceSum(p);
 }
 
+static
 void multiply_msr_matrix_vector(int n, double* A, int* I, double* x, double* y, int p, int k) {
     int i;
 	int i1;
