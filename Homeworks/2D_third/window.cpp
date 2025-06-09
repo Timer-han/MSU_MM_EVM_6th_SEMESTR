@@ -6,59 +6,43 @@
 
 #define L2G(X, Y) (l2g((X), (Y), y_min, y_max))
 
-double f_0([[maybe_unused]] double x, [[maybe_unused]] double y) {
-	// if (i == nx / 2 && j == ny / 2) {
-	// 	return 1 + p * 0.1 * f_abs;
-	// }
+double f_0(double /* x */, double /* y */)
+{
 	return 1;
 }
 
-double f_1(double x, [[maybe_unused]] double y) {
-	// if (i == nx / 2 && j == ny / 2) {
-	// 	return x + p * 0.1 * f_abs;
-	// }
+double f_1(double x, double /* y */)
+{
 	return x;
 }
 
-double f_2([[maybe_unused]] double x, double y) {
-	// if (i == nx / 2 && j == ny / 2) {
-	// 	return y + p * 0.1 * f_abs;
-	// }
+double f_2(double /* x */, double y)
+{
 	return y;
 }
 
-double f_3(double x, double y) {
-	// if (i == nx / 2 && j == ny / 2) {
-	// 	return x + y + p * 0.1 * f_abs;
-	// }
+double f_3(double x, double y)
+{
 	return x + y;
 }
 
-double f_4(double x, double y) {
-	// if (i == nx / 2 && j == ny / 2) {
-	// 	return sqrt(x * x + y * y) + p * 0.1 * f_abs;
-	// }
+double f_4(double x, double y)
+{
 	return sqrt(x * x + y * y);
 }
 
-double f_5(double x, double y) {
-	// if (i == nx / 2 && j == ny / 2) {
-	// 	return x * x + y * y + p * 0.1 * f_abs;
-	// }
+double f_5(double x, double y)
+{
 	return x * x + y * y;
 }
 
-double f_6(double x, double y) {
-	// if (i == nx / 2 && j == ny / 2) {
-	// 	return exp(x * x - y * y) + p * 0.1 * f_abs;
-	// }
+double f_6(double x, double y)
+{
 	return exp(x * x - y * y);
 }
 
-double f_7(double x, double y) {
-	// if (i == nx / 2 && j == ny / 2) {
-	// 	return 1. / (25 *(x * x + y * y) + 1) + p * 0.1 * f_abs;
-	// }
+double f_7(double x, double y)
+{
 	return 1. / (25 *(x * x + y * y) + 1);
 }
 
