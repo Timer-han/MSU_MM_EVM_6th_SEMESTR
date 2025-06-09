@@ -9,9 +9,10 @@ public:
     double d;
     int nx;
     int ny;
+    int func_id;
 	double (*f)(double, double);
 	double eps;
-	int maxit;
+	int max_it;
 	int p;
 	int pi;
 	
@@ -67,7 +68,7 @@ int minimal_residual_msr_matrix(
     double *u,
     double *v,
     double eps,
-    int maxit,
+    int max_it,
     int p,
     int pi
 );
@@ -81,7 +82,7 @@ int minimal_residual_msr_matrix_full(
     double *u,
     double *v,
     double eps,
-    int maxit,
+    int max_it,
     int maxsteps,
     int p,
     int pi
