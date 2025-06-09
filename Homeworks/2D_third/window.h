@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QtWidgets>
 
-#include "algorithm.h"
+#include "functions.h"
 
 class Window : public QWidget {
     Q_OBJECT
