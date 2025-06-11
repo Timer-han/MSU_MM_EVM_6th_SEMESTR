@@ -6,7 +6,7 @@
 
 static double* result = nullptr;
 
-void ReduceSum(int p, double* a, int n) {
+void synchronize(int p, double* a, int n) {
     static pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
     static pthread_cond_t c_in = PTHREAD_COND_INITIALIZER;
     static pthread_cond_t c_out = PTHREAD_COND_INITIALIZER;
@@ -43,31 +43,30 @@ void ReduceSum(int p, double* a, int n) {
     pthread_mutex_unlock(&m);
 }
 
-int InitReduceSum(int p) {
+int init_reduce_sum(int p) {
 	result = new double[p];
-	if (result == nullptr) {
+	if (result == nullptr)
 		return -1;
-	}
 	return 0;
 }
 
-void FreeReduceSum() {
+void delete_reduce_sum() {
 	delete[] result;
 }
 
-double ReduceSumDet(int p, int k, double s) {
+double reduce_sum_det(int p, int pi, double s) {
 	double sum = 0;
 	int l;
-	result[k] = s;
-	ReduceSum(p);
+	result[pi] = s;
+	synchronize(p);
 	for(l = 0; l < p; ++l) {
 		sum += result[l];
 	}
-	ReduceSum(p);
+	synchronize(p);
 	return sum;
 }
 
-void ReduceMax(int p, double* a, int n) {
+void sync_max(int p, double* a, int n) {
     static pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
     static pthread_cond_t c_in = PTHREAD_COND_INITIALIZER;
     static pthread_cond_t c_out = PTHREAD_COND_INITIALIZER;

@@ -20,37 +20,37 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    action = tool_bar->addAction("Change function", graph_area, SLOT(ChangeFunc()));
+    action = tool_bar->addAction("Change &Function", graph_area, SLOT(change_f()));
     action->setShortcut(QString("0"));
     
-    action = tool_bar->addAction("Change Type Of Graph", graph_area, SLOT(ChangeTypeOfGraph()));
+    action = tool_bar->addAction("Change Show &Mode", graph_area, SLOT(change_show_mode()));
     action->setShortcut(QString("1"));
     
-    action = tool_bar->addAction("Compress area", graph_area, SLOT(CompressArea()));
+    action = tool_bar->addAction("&Compress Area", graph_area, SLOT(decrease_visible_area()));
     action->setShortcut(QString("2"));
     
-    action = tool_bar->addAction("Expand area", graph_area, SLOT(ExtendArea()));
+    action = tool_bar->addAction("&Expand Area", graph_area, SLOT(increase_visible_area()));
     action->setShortcut(QString("3"));
     
-    action = tool_bar->addAction("Increase N", graph_area, SLOT(IncreaseN()));
+    action = tool_bar->addAction("n+", graph_area, SLOT(increase_triangulation()));
     action->setShortcut(QString("4"));
     
-    action = tool_bar->addAction("Decrease N", graph_area, SLOT(DecreaseN()));
+    action = tool_bar->addAction("n-", graph_area, SLOT(decrease_triangulation()));
     action->setShortcut(QString("5"));
     
-    action = tool_bar->addAction("Increase Func Middle", graph_area, SLOT(IncreaseFuncMiddle()));
+    action = tool_bar->addAction("Increase Protrusion", graph_area, SLOT(increase_protrusion()));
     action->setShortcut(QString("6"));
     
-    action = tool_bar->addAction("Decrease Func Middle", graph_area, SLOT(DecreaseFuncMiddle()));
+    action = tool_bar->addAction("Decrease Protrusion", graph_area, SLOT(decrease_protrusion()));
     action->setShortcut(QString("7"));
 	
-	action = tool_bar->addAction("Increase M", graph_area, SLOT(IncreaseM()));
+	action = tool_bar->addAction("m+", graph_area, SLOT(increase_m()));
     action->setShortcut(QString("8"));
     
-    action = tool_bar->addAction("Decrease M", graph_area, SLOT(DecreaseM()));
+    action = tool_bar->addAction("m-", graph_area, SLOT(decrease_m()));
     action->setShortcut(QString("9"));
 
-    action = tool_bar->addAction("Exit", graph_area, SLOT(Finish()));
+    action = tool_bar->addAction("Exit", graph_area, SLOT(close()));
     action->setShortcut(QString("Ctrl+X"));
 
     tool_bar->setMaximumHeight(30);

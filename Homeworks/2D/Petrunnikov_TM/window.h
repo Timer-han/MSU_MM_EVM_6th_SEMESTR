@@ -37,6 +37,20 @@ private:
 	int* I;
 	double* x;
 	double* B;
+
+	int nx_print = -1;
+	int ny_print = -1;
+	double a_print;
+	double b_print;
+	double c_print;
+	double d_print;
+	// double* A_print = nullptr;
+	// int* I_print = nullptr;
+	double* x_print = nullptr;
+	// double* B_print = nullptr;
+	// double* r_print = nullptr;
+	// double* u_print = nullptr;
+	// double* v_print = nullptr;
 	
 	double* r;
 	double* u;
@@ -53,7 +67,7 @@ private:
 	int it;
 	
     double (*f)(double, double);
-	thread_data* data_arr;
+	thread_data* thrd_data;
 	pthread_t* tid;
 	
 	pthread_cond_t cond;
@@ -70,35 +84,37 @@ public:
     QPointF l2g(double x_loc, double y_loc, double y_min, double y_max);
     
 public slots:
-	void update_f_min_max_abs();
+	void update_image_bounds();
 	void select_func(int func_id);
-	int ReadData(char* argv[]);
-	bool threads_are_ready();
+	int read_args(char* argv[]);
+	bool is_threads_ready();
 	void waiting_threads();
-	int update_memory();
+	int memory_realloc();
 	void update_thread_data();
-	
-    void ChangeFunc(); // 0
-    void ChangeTypeOfGraph(); // 1
-    void ExtendArea(); // 2
-    void CompressArea(); // 3
-    void IncreaseN(); // 4
-    void DecreaseN(); // 5
-    void IncreaseFuncMiddle(); // 6
-    void DecreaseFuncMiddle(); // 7
-	void IncreaseM(); // 8
-	void DecreaseM(); // 9
-	void Finish();
+	void save_prev_results();
+
+
+    void change_f(); // 0
+    void change_show_mode(); // 1
+    void increase_visible_area(); // 2
+    void decrease_visible_area(); // 3
+    void increase_triangulation(); // 4
+    void decrease_triangulation(); // 5
+    void increase_protrusion(); // 6
+    void decrease_protrusion(); // 7
+	void increase_m(); // 8
+	void decrease_m(); // 9
+	void close();
     
 protected:
 	
 	QPointF l2g(double x_loc, double y_loc);
-	void DrawTriangle(QPointF p_1, QPointF p_2, QPointF p_3, QPainter* painter, QColor color);
-	QColor GetColor(double value, double max_value, double min_value);
-	void DrawFunc(QPainter* painter);
-	double ApproximationPointValue(double x, double y);
-	void DrawApproximation(QPainter* painter);
-	void DrawResidual(QPainter* painter);
+	void draw_triangle(QPointF p_1, QPointF p_2, QPointF p_3, QPainter* painter, QColor color);
+	QColor get_graph_color(double value, double max_value, double min_value);
+	void draw_f(QPainter* painter);
+	double get_aprx_value(double x, double y);
+	void draw_aprx(QPainter* painter);
+	void draw_res(QPainter* painter);
     void paintEvent(QPaintEvent *event);
 };
 

@@ -2,116 +2,132 @@
 #define WINDOW_H
 
 #include <QtWidgets/QtWidgets>
-#include <pthread.h>
-#include <sys/sysinfo.h>
-#include "for_pthread.h"
 
-class Window : public QWidget
-{
-  Q_OBJECT
+#include "functions.h"
+
+class qtMainWindow : public
+
+class Window : public QWidget {
+    Q_OBJECT
 
 private:
-  char *prog_name = nullptr;
+	QWidget *widget;
+    const char* f_name;
+	char* file_name;
+    int type_of_graph;
+	
+	double f_max;
+	double f_min;
+	double f_abs;
+	
+    double a;
+    double b;
+	double c;
+    double d;
+    int nx;
+	int ny;
+	int mx;
+	int my;
+	int func_id;
+	double eps;
+	int maxit;
+	int p_thread;
+	int s;
+    int p;
+	
+	double* A;
+	int* I;
+	double* x;
+	double* B;
 
-  double a, b, c, d;
-  double eps = 1e-15;
-  double omega;
-  
-  size_t nx = 1, ny = 1;
-  size_t mx = 1, my = 1;
-  int p = 2;
-  int max_it = 1, err = 0;
-  int it = 0;
-  double t1 = 0, t2 = 0;
-  double r1 = 0, r2 = 0, r3 = 0, r4 = 0;
-  
-  int func_id = 0;
-  int zoom = 0;
-  int disturbance = 0;
-  double (*f) (double, double);
-  int view_id = 0;
-  int print_graph_func = 1;
-  int print_graph_aprox = 0;
-  int print_graph_diff = 0;
-  
-  int func_id_print = 0;
-  size_t nx_print = 1;
-  size_t ny_print = 1;
-  int disturbance_print = 0;
-  double (*f_print) (double, double);
-  
-  pthread_mutex_t mutex_gui_kernel = PTHREAD_MUTEX_INITIALIZER;
-  pthread_cond_t cond_gui_kernel = PTHREAD_COND_INITIALIZER;
-  
-  Args *pthread_args = nullptr;
-  int *I_calc = nullptr;
-  double *A_calc = nullptr, *B_calc = nullptr, *x_calc = nullptr;
-  double *r_calc = nullptr, *u_calc = nullptr, *v_calc = nullptr;
-  
-  int *I_print = nullptr;
-  double *A_print = nullptr, *B_print = nullptr, *x_print = nullptr;
-  double *r_print = nullptr, *u_print = nullptr, *v_print = nullptr;
-  
-  int need_to_calculate = 0;
-  int calculation_is_ready = 1;
-  int is_closing = 0;
-  
-  
-  const char *f_name;
-  //size_t n;
-  //size_t n_max;
-  size_t m_max = 10'000;
-  //size_t n_mas = 40'000'000;
-  
-  double *x_mas = nullptr;
-  
-  
-  int is_painting = 0;
-  QTimer *timer;
-  
-  int status = 0;
+	int nx_print = -1;
+	int ny_print = -1;
+	double a_print;
+	double b_print;
+	double c_print;
+	double d_print;
+	// double* A_print = nullptr;
+	// int* I_print = nullptr;
+	double* x_print = nullptr;
+	// double* B_print = nullptr;
+	// double* r_print = nullptr;
+	// double* u_print = nullptr;
+	// double* v_print = nullptr;
+	
+	double* r;
+	double* u;
+	double* v;
+	
+	double r1;
+	double r2;
+	double r3;
+	double r4;
+	
+	double t1;
+	double t2;
+	
+	int it;
+	
+    double (*f)(double, double);
+	thread_data* thrd_data;
+	pthread_t* tid;
+	
+	pthread_cond_t cond;
+	pthread_mutex_t mutex;
 
 public:
-  Window (QWidget *parent, int argc, char *argv[]);
-  ~Window ();
+    Window(QWidget *parent);
+	~Window();
 
-  QSize minimumSizeHint () const;
-  QSize sizeHint () const;
-  int get_status ();
-  int parse_command_line (int argc, char *argv[]);
-  void set_func ();
-  void set_func_print ();
-  void set_view ();
-  void timerIsTimeout ();
-  QPointF l2g (double x_loc, double y_loc);
-  QColor l2g_colour (double z_loc, double z_min, double z_max);
-  
-  int enough_first_memory ();
-  int enough_memory_for_calc ();
-  void set_memory_from_calc_to_print ();
-  void delete_memory_for_print ();
-  int delete_last_memory ();
-  
-  int create_threads ();
-  int close_threads ();
-  
-  void recalculate ();
-  void requst_to_calculate ();
-  
+    QSize minimumSizeHint() const;
+    QSize sizeHint() const;
+
+    int parse_command_line(int argc, char *argv[]);
+    QPointF l2g(double x_loc, double y_loc, double y_min, double y_max);
+    
 public slots:
-  void change_func ();
-  void change_view ();
-  void change_zoom_up ();
-  void change_zoom_down ();
-  void change_nx_ny_down ();
-  void change_nx_ny_up ();
-  void change_mx_my_down ();
-  void change_mx_my_up ();
-  void change_disturbance_down ();
-  void change_disturbance_up ();
+	void update_image_bounds();
+	void select_func(int func_id);
+	int read_args(char* argv[]);
+	bool is_threads_ready();
+	void waiting_threads();
+	int memory_realloc();
+	void update_thread_data();
+	void save_prev_results();
 
+
+    void change_f(); // 0
+    void change_show_mode(); // 1
+    void increase_visible_area(); // 2
+    void decrease_visible_area(); // 3
+    void increase_triangulation(); // 4
+    void decrease_triangulation(); // 5
+    void increase_protrusion(); // 6
+    void decrease_protrusion(); // 7
+	void increase_m(); // 8
+	void decrease_m(); // 9
+	void close();
+    
 protected:
-  void paintEvent (QPaintEvent *event);
+	
+	QPointF l2g(double x_loc, double y_loc);
+	void draw_triangle(QPointF p_1, QPointF p_2, QPointF p_3, QPainter* painter, QColor color);
+	QColor get_graph_color(double value, double max_value, double min_value);
+	void draw_f(QPainter* painter);
+	double get_aprx_value(double x, double y);
+	void draw_aprx(QPainter* painter);
+	void draw_res(QPainter* painter);
+    void paintEvent(QPaintEvent *event);
+	void closeEvent(QCloseEvent *event);
 };
 
-#endif // WINDOW_H
+double f_0(double /* x */, double /* y */);
+double f_1(double x, double /* y */);
+double f_2(double /* x */, double y);
+double f_3(double x, double y);
+double f_4(double x, double y);
+double f_5(double x, double y);
+double f_6(double x, double y);
+double f_7(double x, double y);
+
+#endif

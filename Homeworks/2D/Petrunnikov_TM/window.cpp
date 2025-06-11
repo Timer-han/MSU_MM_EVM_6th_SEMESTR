@@ -6,8 +6,6 @@
 
 #define L2G(X, Y) (l2g((X), (Y), y_min, y_max))
 
-
-
 double f_0(double /* x */, double /* y */)
 {
 	return 1;
@@ -161,14 +159,6 @@ void Window::close() {
 	}
 }
 
-void Window::closeEvent(QCloseEvent *) {
-	if (is_threads_ready()) {
-		widget->close();
-	} else {
-        QMessageBox::warning(0, "Warning!", "The calculations are not finished yet!");
-	}
-}
-
 QSize Window::minimumSizeHint() const {
 	return QSize(100, 100);
 }
@@ -220,12 +210,6 @@ void Window::waiting_threads() {
     }
 }
 
-template<class InputIterator, class OutputIterator>
-static OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result) {
-    while(first != last) *result++ = *first++;
-    return result;
-}
-
 int Window::memory_realloc() {
     if (A) delete[] A;
 	if (I) delete[] I;
@@ -267,9 +251,7 @@ int Window::memory_realloc() {
 	// }
 	if (!x_print) {
 		x_print = new double[n];
-		copy (x, x + n, x_print);
-		// for (int i = 0; i < n; ++i)
-		// 	x_print[i] = x[i];
+		for (int i = 0; i < n; ++i) x_print[i] = x[i];
 	}
 	// if (!B_print) {
 	// 	B_print = new double[n];
@@ -344,8 +326,7 @@ void Window::save_prev_results() {
 	// for (int i = 0; i < size; ++i) A_print[i] = A[i];
 
 	x_print = new double[n];
-	copy (x, x + n, x_print);
-	// for (int i = 0; i < n; ++i) x_print[i] = x[i];
+	for (int i = 0; i < n; ++i) x_print[i] = x[i];
 
 	// B_print = new double[n];
 	// for (int i = 0; i < n; ++i) B_print[i] = B[i];
